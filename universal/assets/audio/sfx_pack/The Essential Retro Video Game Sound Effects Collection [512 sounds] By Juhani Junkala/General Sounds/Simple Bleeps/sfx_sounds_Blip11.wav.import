@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://c776ev4uc0ry2"
+path="res://.godot/imported/sfx_sounds_Blip11.wav-8b25a6e208feefb0958e253cdd273836.sample"
+
+[deps]
+
+source_file="res://assets/audio/sfx_pack/The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/General Sounds/Simple Bleeps/sfx_sounds_Blip11.wav"
+dest_files=["res://.godot/imported/sfx_sounds_Blip11.wav-8b25a6e208feefb0958e253cdd273836.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

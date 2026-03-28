@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://laa0sw0ve386"
+path="res://.godot/imported/sfx_sounds_interaction20.wav-a84cf0b455b5e6e46dda3f0e0a519e84.sample"
+
+[deps]
+
+source_file="res://assets/audio/sfx_pack/The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/General Sounds/Interactions/sfx_sounds_interaction20.wav"
+dest_files=["res://.godot/imported/sfx_sounds_interaction20.wav-a84cf0b455b5e6e46dda3f0e0a519e84.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

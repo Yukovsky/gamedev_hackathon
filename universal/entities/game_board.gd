@@ -143,6 +143,7 @@ func _try_place_module_at(module_type: String, build_cell: Vector2i) -> bool:
 	var module: ModuleBase = script_ref.new() as ModuleBase
 	
 	if not gridTileManager.canBuildAt(build_cell, module_type, module.grid_size):
+		AudioManager.play_ui_error()
 		module.queue_free()
 		return false
 
@@ -150,6 +151,7 @@ func _try_place_module_at(module_type: String, build_cell: Vector2i) -> bool:
 	var final_cost: int = _get_final_build_cost(module)
 	if final_cost > 0 and not ResourceManager.spend_metal(final_cost):
 		print("Not enough metal! Need: ", final_cost)
+		AudioManager.play_ui_error()
 		module.queue_free()
 		return false
 

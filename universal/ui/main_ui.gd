@@ -82,6 +82,7 @@ func _apply_button_texts() -> void:
 func _on_btn_shop_pressed() -> void:
 	if _is_game_finished:
 		return
+	AudioManager.play_ui_open()
 	bottom_panel.visible = !bottom_panel.visible
 
 func _on_module_built(_type: String, _pos: Vector2) -> void:
@@ -93,6 +94,7 @@ func _on_module_built(_type: String, _pos: Vector2) -> void:
 func _on_btn_hull_pressed() -> void:
 	if _is_game_finished:
 		return
+	AudioManager.play_ui_click()
 	GameEvents.build_requested.emit(Constants.MODULE_HULL, Vector2.ZERO)
 	# Можно закрыть сразу после выбора, чтобы не мешать кликать по сетке
 	bottom_panel.visible = false
@@ -100,12 +102,14 @@ func _on_btn_hull_pressed() -> void:
 func _on_btn_reactor_pressed() -> void:
 	if _is_game_finished:
 		return
+	AudioManager.play_ui_click()
 	GameEvents.build_requested.emit(Constants.MODULE_REACTOR, Vector2.ZERO)
 	bottom_panel.visible = false
 
 func _on_btn_collector_pressed() -> void:
 	if _is_game_finished:
 		return
+	AudioManager.play_ui_click()
 	GameEvents.build_requested.emit(Constants.MODULE_COLLECTOR, Vector2.ZERO)
 	bottom_panel.visible = false
 
@@ -113,6 +117,7 @@ func _on_btn_collector_pressed() -> void:
 func _on_btn_turret_pressed() -> void:
 	if _is_game_finished:
 		return
+	AudioManager.play_ui_click()
 	GameEvents.build_requested.emit(Constants.MODULE_TURRET, Vector2.ZERO)
 	bottom_panel.visible = false
 
@@ -138,6 +143,7 @@ func _on_game_finished(outcome: String, reason: String) -> void:
 
 
 func _on_btn_restart_pressed() -> void:
+	AudioManager.play_ui_open()
 	var tree := get_tree()
 	if tree != null:
 		tree.reload_current_scene()

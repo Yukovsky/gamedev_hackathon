@@ -45,3 +45,9 @@ signal raider_damaged(current_hp: int, max_hp: int, position: Vector2)
 
 ## Налетчик уничтожен
 signal raider_destroyed(position: Vector2, evolution_level: int, source: String)
+
+## Налетчик появился
+signal raider_spawned(position: Vector2)
+
+## Налетчик кусает модуль
+signal raider_bite(position: Vector2)

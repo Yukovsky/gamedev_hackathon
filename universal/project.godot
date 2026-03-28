@@ -19,6 +19,7 @@ config/features=PackedStringArray("4.6", "GL Compatibility")
 GameEvents="*res://core/game_events.gd"
 ResourceManager="*res://core/resource_manager.gd"
 Constants="*res://core/constants.gd"
+AudioManager="*res://core/audio_manager.gd"
 
 [display]
 

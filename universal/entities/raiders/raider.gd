@@ -61,6 +61,7 @@ func _ready() -> void:
 	if _vfx != null:
 		add_child(_vfx)
 		_vfx.play_spawn(global_position)
+	GameEvents.raider_spawned.emit(global_position)
 
 	_sfx = TempCombatSfxScript.new() as TempCombatSfx
 	if _sfx != null:
@@ -161,6 +162,7 @@ func _start_bite() -> void:
 		return
 
 	_is_biting = true
+	GameEvents.raider_bite.emit(global_position)
 	if _sfx != null:
 		_sfx.play_bite(global_position)
 	if _vfx != null:

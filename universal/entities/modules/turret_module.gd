@@ -134,6 +134,7 @@ func _fire_single_shot(target: Node2D) -> void:
 		return
 
 	_show_laser_to(target.global_position)
+	AudioManager.play_turret_shot()
 
 	var damage: int = turret_damage
 	if _consecutive_hits_on_target >= max(1, lock_on_after_shots):
