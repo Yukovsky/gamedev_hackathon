@@ -19,13 +19,14 @@ config/features=PackedStringArray("4.6", "GL Compatibility")
 GameEvents="*res://core/game_events.gd"
 ResourceManager="*res://core/resource_manager.gd"
 Constants="*res://core/constants.gd"
+GridTileManager="*uid://bo0d6phoc81sp"
+SaveManager="*uid://upeeynl7eik7"
 
 [display]
 
 window/size/viewport_width=1080
-window/size/viewport_height=2400
+window/size/viewport_height=1800
 window/stretch/mode="canvas_items"
-window/stretch/aspect="keep"
 window/handheld/orientation=1
 
 [physics]

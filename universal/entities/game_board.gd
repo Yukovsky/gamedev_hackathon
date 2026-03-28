@@ -1,8 +1,10 @@
 extends Node2D
 
+#ЗАХАРДКОЖЕНАЯ ЗАЛУПА НУЖНО ПОМЕНЯТЬ
+
 const CELL_SIZE = 90
 const START_X = 1080 / 2 - CELL_SIZE
-const START_Y = 2400 - (CELL_SIZE * 8) # Позиционируем корабль в нижней трети экрана
+const START_Y = 1800 - (CELL_SIZE * 8) # Позиционируем корабль в нижней трети экрана
 
 func _ready() -> void:
 	# Программист 2: Здесь спавн корабля, мусора и интерактивных сущностей
@@ -22,10 +24,11 @@ func _draw_base_ship() -> void:
 	for pos in layout:
 		var rect = ColorRect.new()
 		# Выбираем разные цвета для наглядности (Ядро - красное, остальное - синее)
+		rect.color = Color(0.2, 0.6, 0.8) # Синий цвет корпуса
+
 		if pos == Vector2(0, 2) or pos == Vector2(1, 2):
 			rect.color = Color(0.8, 0.3, 0.3) # Ядро внизу
-		else:
-			rect.color = Color(0.2, 0.6, 0.8) # Синий цвет корпуса
+		
 			
 		rect.size = Vector2(CELL_SIZE - 4, CELL_SIZE - 4) # Отступы для вида сетки
 		rect.position = Vector2(START_X + pos.x * CELL_SIZE, START_Y + pos.y * CELL_SIZE)
@@ -33,7 +36,7 @@ func _draw_base_ship() -> void:
 		
 		# Номер ячейки
 		var label = Label.new()
-		label.text = str(pos.x) + "," + str(pos.y)
+		label.text = str(int(pos.x)) + "," + str(int(pos.y))
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		label.set_anchors_preset(Control.PRESET_FULL_RECT)
