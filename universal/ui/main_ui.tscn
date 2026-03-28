@@ -33,21 +33,21 @@ text = "Металл: 0"
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="BtnShop" type="Button" parent="MarginContainer/VBoxContainer/TopPanel"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 64
-text = " 🛒 МАГАЗИН "
-
-[node name="Control2" type="Control" parent="MarginContainer/VBoxContainer/TopPanel"]
-layout_mode = 2
-size_flags_horizontal = 3
-
 [node name="EnergyLabel" type="Label" parent="MarginContainer/VBoxContainer/TopPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "⚡ 0 / 0"
+
+[node name="ShopRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="BtnShop" type="Button" parent="MarginContainer/VBoxContainer/ShopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = " 🛒 МАГАЗИН "
 
 [node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
