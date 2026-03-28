@@ -1,1 +1,63 @@
-.github
+# =========================
+# Godot Engine
+# =========================
+
+# Кеш и импортированные ресурсы Godot 4+ (самое важное)
+.godot/
+
+# Кеш Godot 3 (на всякий случай, если проект старый)
+.import/
+
+# Файл пресетов экспорта. 
+# ВНИМАНИЕ: Если ты вписываешь туда пароли от ключей Android/iOS, раскомментируй строку ниже, чтобы не слить их в Git.
+# export_presets.cfg
+
+# =========================
+# VS Code (Редактор)
+# =========================
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Локальная история (плагин Local History)
+.history/
+
+# =========================
+# C# / Mono (Если вдруг начнешь использовать C#)
+# =========================
+.mono/
+data_*/
+mono_crash.*.json
+*.csproj.user
+
+# =========================
+# Папки с билдами (Добавь свои, если называешь иначе)
+# =========================
+build/
+builds/
+export/
+exports/
+bin/
+
+# =========================
+# Системный мусор ОС
+# =========================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.AppleDouble
+.LSOverride
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+Desktop.ini
+$RECYCLE.BIN/
