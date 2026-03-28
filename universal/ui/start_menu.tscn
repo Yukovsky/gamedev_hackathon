@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://c5s6t7u8v9w0"]
+[gd_scene load_steps=6 format=3 uid="uid://c5s6t7u8v9w0"]
 
 [ext_resource type="Script" path="res://ui/start_menu.gd" id="1_sm"]
 [ext_resource type="Texture2D" path="res://assets/background.png" id="2_bg"]
@@ -56,7 +56,7 @@ texture = ExtResource("2_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="UI" type="CenterContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -65,12 +65,12 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+[node name="VBox" type="VBoxContainer" parent="UI"]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 150
 
-[node name="Title" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="Title" type="Label" parent="UI/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
@@ -79,14 +79,15 @@ theme_override_font_sizes/font_size = 120
 text = "UNIVERSAL"
 horizontal_alignment = 1
 
-[node name="ButtonsContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer"]
+[node name="ButtonsContainer" type="VBoxContainer" parent="UI/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 60
+mouse_filter = 2
+theme_override_constants/separation = 80
 
-[node name="BtnStart" type="Button" parent="CenterContainer/VBoxContainer/ButtonsContainer"]
+[node name="BtnStart" type="Button" parent="UI/VBox/ButtonsContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(500, 120)
+custom_minimum_size = Vector2(500, 150)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 theme_override_styles/normal = SubResource("StyleBoxFlat_Btn")
@@ -94,9 +95,9 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnHover")
 text = "ИГРАТЬ"
 
-[node name="BtnQuit" type="Button" parent="CenterContainer/VBoxContainer/ButtonsContainer"]
+[node name="BtnQuit" type="Button" parent="UI/VBox/ButtonsContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(500, 120)
+custom_minimum_size = Vector2(500, 150)
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 theme_override_styles/normal = SubResource("StyleBoxFlat_Btn")
