@@ -10,14 +10,16 @@ config_version=5
 
 [application]
 
-config/name="Univers"
-run/main_scene="res://scenes/Main.tscn"
+config/name="SpaceClicker"
+run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.6", "Mobile")
-config/icon="res://icon.svg"
+config/icon="res://app_icon.png"
 
 [autoload]
 
-GameManager="*res://scripts/GameManager.gd"
+GameEvents="*res://core/game_events.gd"
+ResourceManager="*res://core/resource_manager.gd"
+SoundManager="*res://core/sound_manager.gd"
 
 [display]
 

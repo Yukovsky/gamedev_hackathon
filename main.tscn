@@ -1,0 +1,82 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://main.gd" id="1_x"]
+[ext_resource type="PackedScene" path="res://entities/ship/ship_grid.tscn" id="2_y"]
+[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="3_z"]
+[ext_resource type="Texture2D" path="res://assets/space-shooter/starfield.png" id="4_a"]
+[ext_resource type="AudioStream" path="res://assets/sounds/Glass_Orbiting.mp3" id="5_b"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_x")
+
+[node name="Background" type="TextureRect" parent="."]
+offset_left = -5000.0
+offset_top = -5000.0
+offset_right = 6080.0
+offset_bottom = 7400.0
+texture = ExtResource("4_a")
+stretch_mode = 1
+
+[node name="ShipGrid" parent="." instance=ExtResource("2_y")]
+
+[node name="JunkContainer" type="Node2D" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(540, 1200)
+
+[node name="HUD" parent="." instance=ExtResource("3_z")]
+
+[node name="JunkTimer" type="Timer" parent="."]
+wait_time = 1.5
+autostart = true
+
+[node name="OverlayLayer" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="BuildOverlay" type="ColorRect" parent="OverlayLayer"]
+visible = false
+offset_top = 250.0
+offset_right = 1080.0
+offset_bottom = 2100.0
+mouse_filter = 2
+color = Color(0.1, 0.4, 1, 0.15)
+
+[node name="Label" type="Label" parent="OverlayLayer/BuildOverlay"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -400.0
+offset_top = 80.0
+offset_right = 400.0
+offset_bottom = 200.0
+grow_horizontal = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 48
+text = "РЕЖИМ ПОСТРОЙКИ"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CancelBtn" type="Button" parent="OverlayLayer/BuildOverlay"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -200.0
+offset_right = 200.0
+offset_bottom = -100.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 32
+text = "ОТМЕНА"
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_b")
+autoplay = true
+
+[connection signal="timeout" from="JunkTimer" to="." method="_on_junk_timer_timeout"]
+[connection signal="pressed" from="OverlayLayer/BuildOverlay/CancelBtn" to="." method="_on_cancel_build_pressed"]

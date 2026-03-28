@@ -1,0 +1,91 @@
+[gd_scene load_steps=3 format=3 uid="uid_0"]
+
+[ext_resource type="Script" path="res://ui/hud.gd" id="1_x"]
+[ext_resource type="Theme" uid="uid_1" path="res://ui/modern_theme.tres" id="2_y"]
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_x")
+
+[node name="TopPanel" type="PanelContainer" parent="."]
+offset_left = 40.0
+offset_top = 40.0
+offset_right = 1040.0
+offset_bottom = 240.0
+theme = ExtResource("2_y")
+
+[node name="Margin" type="MarginContainer" parent="TopPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="TopPanel/Margin"]
+layout_mode = 2
+
+[node name="MetalLabel" type="Label" parent="TopPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 54
+text = "МЕТАЛЛ: 0 / 10"
+vertical_alignment = 1
+
+[node name="SizeLabel" type="Label" parent="TopPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 32
+text = "РАЗМЕР: 2 x 3"
+vertical_alignment = 1
+
+[node name="BottomPanel" type="PanelContainer" parent="."]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -500.0
+offset_top = -300.0
+offset_right = 500.0
+offset_bottom = -60.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("2_y")
+
+[node name="Margin" type="MarginContainer" parent="BottomPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="HBox" type="HBoxContainer" parent="BottomPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="HullBtn" type="Button" parent="BottomPanel/Margin/HBox"]
+custom_minimum_size = Vector2(280, 160)
+layout_mode = 2
+theme = ExtResource("2_y")
+theme_override_font_sizes/font_size = 32
+text = "КОРПУС (3)"
+
+[node name="CargoBtn" type="Button" parent="BottomPanel/Margin/HBox"]
+custom_minimum_size = Vector2(280, 160)
+layout_mode = 2
+theme = ExtResource("2_y")
+theme_override_font_sizes/font_size = 32
+text = "СКЛАД (5)"
+
+[node name="CollectBtn" type="Button" parent="BottomPanel/Margin/HBox"]
+custom_minimum_size = Vector2(280, 160)
+layout_mode = 2
+theme = ExtResource("2_y")
+theme_override_font_sizes/font_size = 32
+text = "СБОРЩИК (10)"
+
+[connection signal="pressed" from="BottomPanel/Margin/HBox/HullBtn" to="." method="_on_hull_btn_pressed"]
+[connection signal="pressed" from="BottomPanel/Margin/HBox/CargoBtn" to="." method="_on_cargo_btn_pressed"]
+[connection signal="pressed" from="BottomPanel/Margin/HBox/CollectBtn" to="." method="_on_collect_btn_pressed"]
