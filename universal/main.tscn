@@ -1,9 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://lwgnb48yqndc"]
+[gd_scene load_steps=7 format=3 uid="uid://lwgnb48yqndc"]
 
 [ext_resource type="PackedScene" uid="uid://dq5p6y7x8w9v" path="res://entities/game_board.tscn" id="1_gb"]
 [ext_resource type="PackedScene" uid="uid://b1c2d3e4f5g6" path="res://ui/main_ui.tscn" id="2_ui"]
 [ext_resource type="Texture2D" path="res://assets/background.png" id="3_bg"]
 [ext_resource type="AudioStream" uid="uid://background_music_stream" path="res://assets/sounds/background_music.mp3" id="4_music"]
+[ext_resource type="Script" path="res://entities/raider/raider_spawner.gd" id="5_spawner"]
+[ext_resource type="PackedScene" path="res://entities/raider/raider.tscn" id="6_raider"]
 
 [node name="Main" type="Node2D"]
 
@@ -28,3 +30,7 @@ stretch_mode = 6
 [node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("4_music")
 autoplay = true
+
+[node name="RaiderSpawner" type="Node2D" parent="."]
+script = ExtResource("5_spawner")
+raider_scene = ExtResource("6_raider")

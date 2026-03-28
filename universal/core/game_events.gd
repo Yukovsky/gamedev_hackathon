@@ -31,3 +31,7 @@ signal defence_changed(new_total: int)
 
 ## Разрешение столкновения с врагом
 signal collision_resolved(hazard_class: int, success: bool, modules_lost: int, discounted_builds: int)
+
+## Налетчики
+signal raider_spawned(raider: Node2D)
+signal raider_defeated(raider: Node2D)

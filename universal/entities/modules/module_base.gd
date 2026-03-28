@@ -14,6 +14,7 @@ var cell_size_px: float = 90.0
 
 
 func configure(cell_pos: Vector2i, cell_size: float) -> void:
+	add_to_group("modules")
 	grid_position = cell_pos
 	cell_size_px = cell_size
 	position = Vector2(cell_pos.x * cell_size_px, cell_pos.y * cell_size_px)
