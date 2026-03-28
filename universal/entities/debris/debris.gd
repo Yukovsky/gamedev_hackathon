@@ -184,3 +184,63 @@ func _fit_sprite_to_unit_size() -> void:
 		return
 
 	_sprite.scale = Vector2(unit_size_px.x / texture_size.x, unit_size_px.y / texture_size.y)
+
+
+func _spawn_pixel_burst() -> void:
+	var parent_node: Node = get_parent()
+	if parent_node == null:
+		return
+
+	var burst_root := Node2D.new()
+	burst_root.global_position = global_position
+	parent_node.add_child(burst_root)
+
+	var color: Color = _get_burst_color()
+	for _i in range(max(1, burst_pixel_count)):
+		var pixel := Polygon2D.new()
+		var size: float = burst_pixel_size_px * randf_range(0.7, 1.25)
+		pixel.polygon = PackedVector2Array([
+			Vector2(-size, -size),
+			Vector2(size, -size),
+			Vector2(size, size),
+			Vector2(-size, size),
+		])
+		pixel.color = color.lerp(Color.WHITE, randf() * 0.25)
+		pixel.position = Vector2(randf_range(-5.0, 5.0), randf_range(-5.0, 5.0))
+		burst_root.add_child(pixel)
+
+		var angle: float = randf() * TAU
+		var distance: float = randf_range(burst_radius_px * 0.35, burst_radius_px)
+		var target: Vector2 = Vector2.RIGHT.rotated(angle) * distance
+
+		var tw: Tween = burst_root.create_tween()
+		tw.tween_property(pixel, "position", target, burst_duration_sec)
+		tw.parallel().tween_property(pixel, "rotation", randf_range(-2.4, 2.4), burst_duration_sec)
+		tw.parallel().tween_property(pixel, "modulate:a", 0.0, burst_duration_sec)
+		tw.tween_callback(pixel.queue_free)
+
+	var cleanup_tw: Tween = burst_root.create_tween()
+	cleanup_tw.tween_interval(burst_duration_sec + 0.08)
+	cleanup_tw.tween_callback(burst_root.queue_free)
+
+
+func _get_burst_color() -> Color:
+	match debris_type:
+		DebrisType.TRASH_1:
+			return Color(0.75, 0.85, 1.0, 1.0)
+		DebrisType.TRASH_2:
+			return Color(0.75, 1.0, 0.78, 1.0)
+		DebrisType.TRASH_3:
+			return Color(1.0, 0.84, 0.64, 1.0)
+		_:
+			return Color(0.85, 0.85, 0.95, 1.0)
+
+
+func _setup_random_rotation() -> void:
+	var min_speed: float = min(min_rotation_speed_deg_per_sec, max_rotation_speed_deg_per_sec)
+	var max_speed: float = max(min_rotation_speed_deg_per_sec, max_rotation_speed_deg_per_sec)
+	var speed_deg: float = randf_range(min_speed, max_speed)
+	if randf() < 0.5:
+		speed_deg *= -1.0
+
+	_rotation_speed_rad_per_sec = deg_to_rad(speed_deg)
