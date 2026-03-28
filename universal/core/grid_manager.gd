@@ -28,7 +28,8 @@ func canBuildAt(pos: Vector2i, module_type: String, size: Vector2i = Vector2i.ON
 		return false
 
 	# НОВОЕ ПРАВИЛО: Реактор нельзя ставить вплотную к ядру или другому реактору
-	if module_type == Constants.MODULE_REACTOR:
+	# Используем строковую константу напрямую для надежности
+	if module_type == "reactor":
 		if _is_adjacent_to_any(pos, size, _core_cells):
 			print("GridManager: Cannot place Reactor adjacent to Core!")
 			return false
@@ -42,8 +43,8 @@ func register_core(pos: Vector2i, size: Vector2i, entity: Node) -> void:
 	var core_cells: Array[Vector2i] = _collect_cells(pos, size)
 	for cell in core_cells:
 		_occupied_cells[cell] = entity
-		_core_cells.append(cell)
-	# Ядро дает питание в радиусе 1 клетки
+		if not _core_cells.has(cell):
+			_core_cells.append(cell)
 	_mark_power_around_cells(core_cells, 1)
 
 func register_module(pos: Vector2i, size: Vector2i, module_type: String, entity: Node) -> void:
@@ -51,10 +52,10 @@ func register_module(pos: Vector2i, size: Vector2i, module_type: String, entity:
 	for cell in module_cells:
 		_occupied_cells[cell] = entity
 
-	if module_type == Constants.MODULE_REACTOR:
+	if module_type == "reactor":
 		for cell in module_cells:
-			_reactor_cells.append(cell)
-		# Реактор дает питание в радиусе 1 клетки
+			if not _reactor_cells.has(cell):
+				_reactor_cells.append(cell)
 		_mark_power_around_cells(module_cells, 1)
 
 func unregister_module(entity: Node) -> void:
@@ -62,12 +63,11 @@ func unregister_module(entity: Node) -> void:
 	for key in _occupied_cells.keys():
 		if _occupied_cells[key] == entity:
 			keys_to_remove.append(key)
-			# Убираем из списков спец-клеток
-			_reactor_cells.erase(key)
-			_core_cells.erase(key)
-
+	
 	for key in keys_to_remove:
 		_occupied_cells.erase(key)
+		_reactor_cells.erase(key)
+		_core_cells.erase(key)
 
 func get_occupied_cells() -> Dictionary:
 	return _occupied_cells.duplicate(true)
@@ -88,11 +88,11 @@ func _is_any_cell_powered(pos: Vector2i, size: Vector2i) -> bool:
 	return false
 
 func _is_adjacent_to_any(pos: Vector2i, size: Vector2i, target_list: Array[Vector2i]) -> bool:
-	# Проверяем все клетки вокруг области постройки
+	if target_list.is_empty(): return false
+	# Проверяем все клетки вокруг области постройки (включая диагонали)
 	for x in range(pos.x - 1, pos.x + size.x + 1):
 		for y in range(pos.y - 1, pos.y + size.y + 1):
-			var check_pos = Vector2i(x, y)
-			if target_list.has(check_pos):
+			if target_list.has(Vector2i(x, y)):
 				return true
 	return false
 
