@@ -54,6 +54,9 @@ var _collision_shape: CollisionShape2D
 
 
 func _ready() -> void:
+	# Налетчик должен замирать на паузе вместе с остальным игровым миром.
+	process_mode = Node.PROCESS_MODE_PAUSABLE
+
 	add_to_group("raiders")
 	if _current_hp <= 0:
 		_current_hp = max(1, max_hp)
@@ -73,6 +76,8 @@ func _ready() -> void:
 
 	_vfx = TempCombatVfxScript.new() as TempCombatVfx
 	if _vfx != null:
+		if _vfx.has_method("set_palette"):
+			_vfx.call("set_palette", body_color, accent_color)
 		add_child(_vfx)
 		_vfx.play_spawn(global_position)
 	GameEvents.raider_spawned.emit(global_position)

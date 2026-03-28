@@ -8,6 +8,7 @@ var build_iterations_by_module: Dictionary = {
 	Constants.MODULE_REACTOR: 0,
 	Constants.MODULE_HULL: 0,
 	Constants.MODULE_COLLECTOR: 0,
+	Constants.MODULE_TURRET: 0,
 }
 
 func _ready() -> void:

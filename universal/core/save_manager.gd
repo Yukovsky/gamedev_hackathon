@@ -54,6 +54,7 @@ func load_game() -> void:
 				Constants.MODULE_REACTOR: legacy_iteration,
 				Constants.MODULE_HULL: legacy_iteration,
 				Constants.MODULE_COLLECTOR: legacy_iteration,
+				Constants.MODULE_TURRET: legacy_iteration,
 			}
 		ResourceManager.set_module_build_iterations(loaded_iterations)
 

@@ -15,6 +15,8 @@ var _target_b: Node2D
 
 
 func _ready() -> void:
+	# Это чисто визуальный эффект, поэтому он должен останавливаться на паузе.
+	process_mode = Node.PROCESS_MODE_PAUSABLE
 	_try_bind_targets()
 
 

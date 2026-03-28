@@ -6,6 +6,13 @@ class_name TempCombatVfx
 @export var destroy_color: Color = Color(1.0, 0.15, 0.1, 0.95)
 
 
+func set_palette(primary_color: Color, secondary_color: Color) -> void:
+	# Подбираем оттенки эффекта из цветов конкретного налетчика.
+	spawn_color = primary_color.lerp(Color.WHITE, 0.12)
+	bite_color = secondary_color.lerp(primary_color, 0.35)
+	destroy_color = primary_color.lerp(Color.BLACK, 0.18)
+
+
 func play_spawn(position_world: Vector2) -> void:
 	_spawn_ring(position_world, 18.0, 54.0, 0.22, spawn_color)
 
@@ -23,8 +30,9 @@ func _spawn_ring(position_world: Vector2, start_radius: float, end_radius: float
 	var ring: Polygon2D = Polygon2D.new()
 	ring.polygon = _build_circle_polygon(start_radius, 20)
 	ring.color = color
-	ring.global_position = position_world
+	ring.set_as_top_level(true)
 	add_child(ring)
+	ring.global_position = position_world
 
 	var tween: Tween = create_tween()
 	tween.tween_property(ring, "scale", Vector2.ONE * (end_radius / max(1.0, start_radius)), duration)
@@ -43,8 +51,9 @@ func _spawn_spark(position_world: Vector2, color: Color) -> void:
 			Vector2(-2, 0),
 		])
 		p.color = color
-		p.global_position = position_world
+		p.set_as_top_level(true)
 		add_child(p)
+		p.global_position = position_world
 
 		var angle: float = randf() * TAU
 		var distance: float = randf_range(26.0, 52.0)

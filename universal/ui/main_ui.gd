@@ -8,7 +8,7 @@ extends CanvasLayer
 @onready var btn_turret: Button = %BtnTurret
 @onready var btn_shop: Button = %BtnShop
 @onready var btn_shop_exit: Button = %BtnShopExit
-@onready var bottom_panel: HBoxContainer = %BottomPanel
+@onready var bottom_panel: Control = %BottomPanel
 @onready var end_overlay: ColorRect = %EndOverlay
 @onready var end_title_label: Label = %EndTitleLabel
 @onready var end_reason_label: Label = %EndReasonLabel
@@ -24,6 +24,7 @@ var _upgrade_button_by_id: Dictionary = {}
 func _ready() -> void:
 	# UI должна оставаться интерактивной, когда дерево на паузе.
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	_apply_static_font_overrides()
 
 	GameEvents.resource_changed.connect(_on_resource_changed)
 	# Закрываем меню, когда модуль успешно построен
@@ -50,6 +51,17 @@ func _ready() -> void:
 	_refresh_upgrade_buttons(ResourceManager.metal)
 	
 	print("MainUI Initialized")
+
+
+func _apply_static_font_overrides() -> void:
+	# В некоторых сборках безопаснее задавать размеры через API, а не через serialized theme_override_font_sizes.
+	btn_shop.add_theme_font_size_override("font_size", 64)
+	btn_shop_exit.add_theme_font_size_override("font_size", 42)
+	btn_hull.add_theme_font_size_override("font_size", 48)
+	btn_reactor.add_theme_font_size_override("font_size", 48)
+	btn_collector.add_theme_font_size_override("font_size", 48)
+	btn_turret.add_theme_font_size_override("font_size", 48)
+	btn_restart.add_theme_font_size_override("font_size", 46)
 
 func _on_resource_changed(type: String, new_total: int) -> void:
 	if _is_game_finished:
@@ -85,7 +97,7 @@ func _update_buttons(current_metal: int) -> void:
 	btn_hull.disabled = current_metal < ResourceManager.get_current_module_cost(Constants.MODULE_HULL)
 	btn_reactor.disabled = current_metal < ResourceManager.get_current_module_cost(Constants.MODULE_REACTOR)
 	btn_collector.disabled = current_metal < ResourceManager.get_current_module_cost(Constants.MODULE_COLLECTOR)
-	btn_turret.disabled = current_metal < Constants.get_module_cost(Constants.MODULE_TURRET)
+	btn_turret.disabled = current_metal < ResourceManager.get_current_module_cost(Constants.MODULE_TURRET)
 
 
 func _build_upgrade_buttons() -> void:
@@ -111,7 +123,7 @@ func _apply_button_texts() -> void:
 	btn_hull.text = " Корпус \n(%d Металла) " % ResourceManager.get_current_module_cost(Constants.MODULE_HULL)
 	btn_reactor.text = " Реактор \n(%d Металла) " % ResourceManager.get_current_module_cost(Constants.MODULE_REACTOR)
 	btn_collector.text = " Сборщик \n(%d Металла) " % ResourceManager.get_current_module_cost(Constants.MODULE_COLLECTOR)
-	btn_turret.text = " Турель \n(%d Металла) " % Constants.get_module_cost(Constants.MODULE_TURRET)
+	btn_turret.text = " Турель \n(%d Металла) " % ResourceManager.get_current_module_cost(Constants.MODULE_TURRET)
 
 func _on_btn_shop_pressed() -> void:
 	if _is_game_finished:
@@ -206,6 +218,8 @@ func _on_btn_collector_pressed() -> void:
 func _hide_shop_for_build_mode() -> void:
 	_shop_open = false
 	bottom_panel.visible = false
+	upgrades_panel.visible = false
+	btn_shop_exit.visible = false
 
 
 func _on_btn_turret_pressed() -> void:
@@ -213,7 +227,7 @@ func _on_btn_turret_pressed() -> void:
 		return
 	AudioManager.play_ui_click()
 	GameEvents.build_requested.emit(Constants.MODULE_TURRET, Vector2.ZERO)
-	bottom_panel.visible = false
+	_hide_shop_for_build_mode()
 
 
 func _on_game_finished(outcome: String, reason: String) -> void:

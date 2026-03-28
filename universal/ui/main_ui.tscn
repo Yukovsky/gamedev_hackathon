@@ -124,7 +124,6 @@ alignment = 1
 [node name="BtnShop" type="Button" parent="MarginContainer/VBoxContainer/ShopRow"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 64
 theme_override_styles/normal = SubResource("StyleBoxFlat_Btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnHover")
@@ -157,24 +156,24 @@ theme_override_constants/separation = 8
 [node name="BtnShopExit" type="Button" parent="MarginContainer/VBoxContainer/UpgradesPanel"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 42
 theme_override_styles/normal = SubResource("StyleBoxFlat_Btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnHover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_BtnDisabled")
 text = "Выйти из магазина"
 
-[node name="BottomPanel" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="BottomPanel" type="GridContainer" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
-alignment = 1
-theme_override_constants/separation = 40
+columns = 2
+theme_override_constants/h_separation = 24
+theme_override_constants/v_separation = 24
 
 [node name="BtnHull" type="Button" parent="MarginContainer/VBoxContainer/BottomPanel"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 48
+size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxFlat_Btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnHover")
@@ -185,7 +184,7 @@ text = " Корпус
 [node name="BtnReactor" type="Button" parent="MarginContainer/VBoxContainer/BottomPanel"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 48
+size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxFlat_Btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnHover")
@@ -196,7 +195,7 @@ text = " Реактор
 [node name="BtnCollector" type="Button" parent="MarginContainer/VBoxContainer/BottomPanel"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 48
+size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxFlat_Btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnHover")
@@ -207,7 +206,7 @@ text = " Сборщик
 [node name="BtnTurret" type="Button" parent="MarginContainer/VBoxContainer/BottomPanel"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 48
+size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxFlat_Btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnHover")
@@ -260,7 +259,6 @@ text = "Причина завершения"
 [node name="BtnRestart" type="Button" parent="EndOverlay/Center/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 46
 theme_override_styles/normal = SubResource("StyleBoxFlat_Btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnHover")

@@ -17,6 +17,9 @@ var _is_game_finished: bool = false
 
 
 func _ready() -> void:
+	# Спавнер и его таймеры должны останавливаться на глобальной паузе.
+	process_mode = Node.PROCESS_MODE_PAUSABLE
+
 	_rng.randomize()
 	if GameEvents.has_signal("raider_destroyed"):
 		GameEvents.raider_destroyed.connect(_on_raider_destroyed)

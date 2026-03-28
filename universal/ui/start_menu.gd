@@ -4,6 +4,7 @@ extends CanvasLayer
 
 func _ready() -> void:
 	print("--- МЕНЮ ЗАГРУЖЕНО ---")
+	btn_start.add_theme_font_size_override("font_size", 100)
 	
 	# Привязываем сигнал
 	btn_start.pressed.connect(_on_btn_start_pressed)
