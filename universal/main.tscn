@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://lwgnb48yqndc"]
+[gd_scene load_steps=7 format=3 uid="uid://lwgnb48yqndc"]
 
 [ext_resource type="PackedScene" uid="uid://dq5p6y7x8w9v" path="res://entities/game_board.tscn" id="1_gb"]
 [ext_resource type="PackedScene" uid="uid://b1c2d3e4f5g6" path="res://ui/main_ui.tscn" id="2_ui"]
@@ -6,30 +6,22 @@
 [ext_resource type="AudioStream" uid="uid://background_music_stream" path="res://assets/sounds/background_music.mp3" id="4_music"]
 [ext_resource type="Script" path="res://entities/raider/raider_spawner.gd" id="5_spawner"]
 [ext_resource type="PackedScene" path="res://entities/raider/raider.tscn" id="6_raider"]
-[ext_resource type="Script" path="res://core/background_controller.gd" id="7_bg_ctrl"]
 
 [node name="Main" type="Node2D"]
 
-[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+[node name="BackgroundLayer" type="CanvasLayer" parent="."]
+layer = -1
 
-[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
-motion_mirroring = Vector2(0, 2400)
-
-[node name="Background" type="TextureRect" parent="ParallaxBackground/ParallaxLayer"]
+[node name="Background" type="TextureRect" parent="BackgroundLayer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 1080.0
-offset_bottom = 2400.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("3_bg")
 expand_mode = 1
 stretch_mode = 6
-
-[node name="BackgroundController" type="Node" parent="ParallaxBackground"]
-script = ExtResource("7_bg_ctrl")
 
 [node name="GameBoard" parent="." instance=ExtResource("1_gb")]
 

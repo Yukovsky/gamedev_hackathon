@@ -2,16 +2,12 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://copwp4i20rxol"
-path="res://.godot/imported/trash-1.png-ba4ee44e6556b0732b3dc73c53c66ed3.ctex"
-metadata={
-"vram_texture": false
-}
+uid="uid://b8jkfbm8p3l3j"
+valid=false
 
 [deps]
 
-source_file="res://assets/sprites/trash-1.png"
-dest_files=["res://.godot/imported/trash-1.png-ba4ee44e6556b0732b3dc73c53c66ed3.ctex"]
+source_file="res://assets/sprites/collector.png"
 
 [params]
 
