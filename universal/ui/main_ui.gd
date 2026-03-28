@@ -4,6 +4,10 @@ extends CanvasLayer
 @onready var btn_storage: Button = %BtnStorage
 @onready var btn_collector: Button = %BtnCollector
 
+# Цены модулей (в будущем будут грузиться из .tres)
+const COST_STORAGE = 5
+const COST_COLLECTOR = 10
+
 func _ready() -> void:
 	# Программист 3: Логика UI (HUD, меню, экран победы/поражения)
 	GameEvents.resource_changed.connect(_on_resource_changed)
@@ -11,18 +15,26 @@ func _ready() -> void:
 	btn_storage.pressed.connect(_on_btn_storage_pressed)
 	btn_collector.pressed.connect(_on_btn_collector_pressed)
 	
+	# Начальная проверка кнопок
+	_update_buttons(0)
+	
 	print("MainUI Initialized")
 
 func _on_resource_changed(type: String, new_total: int, max_total: int) -> void:
 	if type == "metal":
 		metal_label.text = "Металл: %d / %d" % [new_total, max_total]
+		_update_buttons(new_total)
 		
-		# Visual feedback: flash label color
+		# Визуальный фидбек: вспышка цвета
 		var tween = create_tween()
-		metal_label.modulate = Color(0.5, 1.5, 0.5) # Bright green flash
+		metal_label.modulate = Color(0.5, 1.5, 0.5) # Ярко-зеленый
 		tween.tween_property(metal_label, "modulate", Color.WHITE, 0.3)
 
-# Temporary test: tap anywhere to simulate gathering metal
+func _update_buttons(current_metal: int) -> void:
+	btn_storage.disabled = current_metal < COST_STORAGE
+	btn_collector.disabled = current_metal < COST_COLLECTOR
+
+# Временный тест: клик в любом месте добавляет металл
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch and event.pressed:
 		GameEvents.garbage_clicked.emit(1)
