@@ -1,6 +1,14 @@
 extends Node2D
 class_name Raider
 
+enum RaiderRole {
+	NORMAL,
+	TANK,
+	SPRINTER,
+	SAPPER,
+	HACKER,
+}
+
 const TempCombatVfxScript: Script = preload("res://entities/effects/temp_combat_vfx.gd")
 const TempCombatSfxScript: Script = preload("res://entities/effects/temp_combat_sfx.gd")
 const ClickableComponentScript: Script = preload("res://shared/components/clickable_component.gd")
@@ -18,6 +26,11 @@ const ClickableComponentScript: Script = preload("res://shared/components/clicka
 @export var max_hp: int = 180
 @export var player_tap_damage: int = 42
 
+@export_group("Raider Roles")
+@export var role_name: String = "normal"
+@export var sapper_explosion_radius_cells: float = 1.35
+@export var hacker_disable_duration_sec: float = 3.2
+
 @export_group("Raider Visual")
 @export var body_size_px: float = 184.0
 @export var body_color: Color = Color(0.93, 0.2, 0.2, 1.0)
@@ -30,6 +43,7 @@ var _is_biting: bool = false
 var _current_hp: int = 0
 var _intelligence_level: int = 0
 var _adaptation_pressure: float = 0.0
+var _role: int = RaiderRole.NORMAL
 
 var _retarget_timer: Timer
 var _bite_timer: Timer
@@ -157,6 +171,14 @@ func configure_evolution(level: int, adaptation_pressure: float) -> void:
 	queue_redraw()
 
 
+func configure_role(role: int) -> void:
+	_role = clamp(role, RaiderRole.NORMAL, RaiderRole.HACKER)
+	_apply_role_modifiers()
+	_update_role_name()
+	_update_click_shape()
+	queue_redraw()
+
+
 func _start_bite() -> void:
 	if _is_biting:
 		return
@@ -174,9 +196,17 @@ func _on_bite_timeout() -> void:
 	var target_world: Vector2 = global_position
 	var bite_success: bool = false
 
-	if _is_target_valid() and _board != null and _board.has_method("try_bite_module"):
+	if _is_target_valid() and _board != null:
 		target_world = _target.get_world_center()
-		bite_success = bool(_board.call("try_bite_module", _target, bite_damage))
+
+		if _role == RaiderRole.HACKER and _target.module_id == Constants.MODULE_TURRET and _board.has_method("try_hack_turret"):
+			bite_success = bool(_board.call("try_hack_turret", _target, hacker_disable_duration_sec))
+		elif _role == RaiderRole.SAPPER and _board.has_method("try_sapper_explosion"):
+			bite_success = bool(_board.call("try_sapper_explosion", _target, bite_damage, sapper_explosion_radius_cells))
+			if bite_success:
+				_queue_despawn()
+		elif _board.has_method("try_bite_module"):
+			bite_success = bool(_board.call("try_bite_module", _target, bite_damage))
 
 	if bite_success:
 		if _vfx != null:
@@ -208,6 +238,7 @@ func _acquire_target() -> void:
 	if modules.is_empty():
 		return
 
+	var best_priority: int = -999999
 	var best_score: float = INF
 	for candidate_any in modules:
 		if not (candidate_any is ModuleBase):
@@ -215,6 +246,11 @@ func _acquire_target() -> void:
 		var candidate: ModuleBase = candidate_any as ModuleBase
 		if not is_instance_valid(candidate):
 			continue
+
+		var candidate_priority: int = 0
+		if _board.has_method("get_module_tactical_priority"):
+			candidate_priority = int(_board.call("get_module_tactical_priority", candidate.module_id))
+		candidate_priority += _get_role_priority_bonus(candidate.module_id)
 
 		var distance: float = global_position.distance_to(candidate.get_world_center())
 		var exposure_bonus: float = 0.0
@@ -228,11 +264,6 @@ func _acquire_target() -> void:
 			var hp_ratio: float = float(candidate.call("get_hp_ratio"))
 			hp_bias = hp_ratio * 120.0
 
-		var tactical_priority: float = 0.0
-		if _intelligence_level >= 2 and _board.has_method("get_module_tactical_priority"):
-			var priority_value: int = int(_board.call("get_module_tactical_priority", candidate.module_id))
-			tactical_priority = -float(priority_value) * 42.0
-
 		var target_pressure_penalty: float = 0.0
 		if _intelligence_level >= 3 and _board.has_method("get_target_pressure"):
 			target_pressure_penalty = float(_board.call("get_target_pressure", candidate)) * 64.0
@@ -241,8 +272,13 @@ func _acquire_target() -> void:
 		if candidate.module_id == Constants.MODULE_CORE and modules.size() > 1:
 			anti_core_bias = 180.0
 
-		var score: float = distance + exposure_bonus + hp_bias + tactical_priority + target_pressure_penalty + anti_core_bias
-		if score < best_score:
+		var role_bias: float = _get_role_target_bias(candidate)
+
+		var score: float = distance + exposure_bonus + hp_bias + target_pressure_penalty + anti_core_bias + role_bias
+		var is_better_priority: bool = candidate_priority > best_priority
+		var is_equal_priority_better_score: bool = candidate_priority == best_priority and score < best_score
+		if is_better_priority or is_equal_priority_better_score:
+			best_priority = candidate_priority
 			best_score = score
 			_target = candidate
 
@@ -334,6 +370,120 @@ func get_hp_ratio() -> float:
 	if max_hp <= 0:
 		return 0.0
 	return clamp(float(_current_hp) / float(max_hp), 0.0, 1.0)
+
+
+func get_role_name() -> String:
+	return role_name
+
+
+func _get_role_target_bias(candidate: ModuleBase) -> float:
+	match _role:
+		RaiderRole.SPRINTER:
+			if _board != null and _board.has_method("get_module_exposure_score"):
+				var exposure: float = float(_board.call("get_module_exposure_score", candidate))
+				return -exposure * 42.0
+			return 0.0
+		RaiderRole.SAPPER:
+			if candidate.module_id == Constants.MODULE_DEFENSE:
+				return -70.0
+			if candidate.module_id == Constants.MODULE_TURRET:
+				return -95.0
+			return 0.0
+		RaiderRole.HACKER:
+			if candidate.module_id == Constants.MODULE_TURRET:
+				return -220.0
+			return 0.0
+		_:
+			return 0.0
+
+
+func _get_role_priority_bonus(module_id: String) -> int:
+	match _role:
+		RaiderRole.SPRINTER:
+			if module_id == Constants.MODULE_HULL or module_id == Constants.MODULE_COLLECTOR or module_id == Constants.MODULE_STORAGE:
+				return 40
+			if module_id == Constants.MODULE_TURRET:
+				return -70
+			return 0
+		RaiderRole.SAPPER:
+			if module_id == Constants.MODULE_TURRET or module_id == Constants.MODULE_DEFENSE:
+				return 20
+			return 0
+		RaiderRole.HACKER:
+			if module_id == Constants.MODULE_TURRET:
+				return 80
+			return -20
+		RaiderRole.TANK:
+			if module_id == Constants.MODULE_REACTOR or module_id == Constants.MODULE_CORE:
+				return 15
+			return 0
+		_:
+			return 0
+
+
+func _apply_role_modifiers() -> void:
+	match _role:
+		RaiderRole.TANK:
+			movement_speed_px_per_sec *= 0.66
+			max_hp = int(ceil(float(max_hp) * 2.25))
+			bite_damage = int(ceil(float(bite_damage) * 1.18))
+			bite_delay_sec *= 1.14
+			body_size_px *= 1.28
+			body_color = Color(0.55, 0.16, 0.13, 1.0)
+			accent_color = Color(0.95, 0.62, 0.28, 1.0)
+		RaiderRole.SPRINTER:
+			movement_speed_px_per_sec *= 1.7
+			max_hp = int(ceil(float(max_hp) * 0.72))
+			bite_damage = int(ceil(float(bite_damage) * 0.85))
+			bite_delay_sec *= 0.82
+			body_size_px *= 0.86
+			body_color = Color(0.92, 0.25, 0.62, 1.0)
+			accent_color = Color(1.0, 0.72, 0.94, 1.0)
+		RaiderRole.SAPPER:
+			movement_speed_px_per_sec *= 0.92
+			max_hp = int(ceil(float(max_hp) * 0.92))
+			bite_damage = int(ceil(float(bite_damage) * 1.65))
+			bite_delay_sec *= 1.05
+			body_size_px *= 1.1
+			body_color = Color(0.95, 0.78, 0.25, 1.0)
+			accent_color = Color(1.0, 0.96, 0.55, 1.0)
+		RaiderRole.HACKER:
+			movement_speed_px_per_sec *= 1.1
+			max_hp = int(ceil(float(max_hp) * 0.88))
+			bite_damage = int(ceil(float(bite_damage) * 0.74))
+			bite_delay_sec *= 0.9
+			body_size_px *= 0.96
+			body_color = Color(0.22, 0.9, 0.86, 1.0)
+			accent_color = Color(0.68, 1.0, 0.98, 1.0)
+		_:
+			pass
+
+	max_hp = max(1, max_hp)
+	bite_damage = max(1, bite_damage)
+	bite_delay_sec = max(0.12, bite_delay_sec)
+	movement_speed_px_per_sec = max(12.0, movement_speed_px_per_sec)
+
+	if _current_hp <= 0:
+		_current_hp = max_hp
+	else:
+		_current_hp = max(_current_hp, max_hp)
+
+	if _bite_timer != null:
+		_bite_timer.wait_time = bite_delay_sec
+
+
+func _update_role_name() -> void:
+	match _role:
+		RaiderRole.TANK:
+			role_name = "tank"
+		RaiderRole.SPRINTER:
+			role_name = "sprinter"
+		RaiderRole.SAPPER:
+			role_name = "sapper"
+		RaiderRole.HACKER:
+			role_name = "hacker"
+		_:
+			role_name = "normal"
 
 
 func _release_reserved_target() -> void:

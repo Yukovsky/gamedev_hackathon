@@ -73,6 +73,8 @@ func _spawn_raider() -> void:
 		raider.call("configure_from_balance", balance)
 	if raider.has_method("configure_evolution"):
 		raider.call("configure_evolution", evolution_level, _compute_adaptation_pressure())
+	if raider.has_method("configure_role"):
+		raider.call("configure_role", _roll_raider_role(evolution_level))
 
 	var board: Node = get_parent()
 	if board != null and raider.has_method("set_game_board"):
@@ -141,6 +143,39 @@ func _compute_adaptation_pressure() -> float:
 		return 0.0
 	var value: float = float(_raiders_killed_by_tap) / 24.0
 	return clamp(value, 0.0, 1.0)
+
+
+func _roll_raider_role(evolution_level: int) -> int:
+	var elite_chance: float = 0.12 + float(evolution_level) * 0.035
+	elite_chance = clamp(elite_chance, 0.12, 0.75)
+
+	if _rng.randf() > elite_chance:
+		return Raider.RaiderRole.NORMAL
+
+	var roll: float = _rng.randf()
+
+	var tank_weight: float = 0.22 + float(evolution_level) * 0.01
+	var sprinter_weight: float = 0.26 + float(evolution_level) * 0.008
+	var sapper_weight: float = 0.28 + float(evolution_level) * 0.012
+	var hacker_weight: float = 0.24 + float(evolution_level) * 0.02
+
+	var total: float = tank_weight + sprinter_weight + sapper_weight + hacker_weight
+	if total <= 0.001:
+		return Raider.RaiderRole.NORMAL
+
+	var threshold: float = tank_weight / total
+	if roll < threshold:
+		return Raider.RaiderRole.TANK
+
+	threshold += sprinter_weight / total
+	if roll < threshold:
+		return Raider.RaiderRole.SPRINTER
+
+	threshold += sapper_weight / total
+	if roll < threshold:
+		return Raider.RaiderRole.SAPPER
+
+	return Raider.RaiderRole.HACKER
 
 
 func _cleanup_invalid_raiders() -> void:

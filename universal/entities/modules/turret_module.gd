@@ -20,6 +20,7 @@ enum TargetMode {
 @export var overheat_threshold: float = 1.0
 @export var cooldown_resume_threshold: float = 0.35
 @export var laser_color: Color = Color(1.0, 0.35, 0.15, 1.0)
+@export var hacked_tint: Color = Color(0.3, 0.95, 0.95, 1.0)
 
 var _fire_timer: Timer
 var _burst_timer: Timer
@@ -30,6 +31,8 @@ var _consecutive_hits_on_target: int = 0
 var _shots_left_in_burst: int = 0
 var _heat: float = 0.0
 var _is_overheated: bool = false
+var _hack_disabled_time_left_sec: float = 0.0
+var _base_sprite_color: Color = Color.WHITE
 
 
 func _init() -> void:
@@ -39,6 +42,7 @@ func _init() -> void:
 	max_hp = 200
 	tap_damage = 32
 	sprite_color = Color(0.95, 0.32, 0.18, 1.0)
+	_base_sprite_color = sprite_color
 
 
 func _ready() -> void:
@@ -69,6 +73,12 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if _hack_disabled_time_left_sec > 0.0:
+		_hack_disabled_time_left_sec = max(0.0, _hack_disabled_time_left_sec - delta)
+		if _hack_disabled_time_left_sec <= 0.0:
+			sprite_color = _base_sprite_color
+			queue_redraw()
+
 	if _heat > 0.0:
 		_heat = max(0.0, _heat - cool_per_sec * delta)
 
@@ -78,6 +88,8 @@ func _process(delta: float) -> void:
 
 func _on_fire_timer() -> void:
 	if _is_build_mode_active():
+		return
+	if _is_hacked_disabled():
 		return
 	if _is_overheated:
 		return
@@ -98,7 +110,7 @@ func _on_fire_timer() -> void:
 
 
 func _on_burst_timer() -> void:
-	if _is_build_mode_active() or _is_overheated:
+	if _is_build_mode_active() or _is_overheated or _is_hacked_disabled():
 		_burst_timer.stop()
 		return
 
@@ -218,3 +230,18 @@ func _is_build_mode_active() -> bool:
 			return bool(cursor.call("is_build_mode_active"))
 		cursor = cursor.get_parent()
 	return false
+
+
+func apply_hack_disable(duration_sec: float) -> void:
+	_hack_disabled_time_left_sec = max(_hack_disabled_time_left_sec, max(0.3, duration_sec))
+	sprite_color = hacked_tint
+	_consecutive_hits_on_target = 0
+	_current_target = null
+	if _burst_timer != null:
+		_burst_timer.stop()
+	_hide_laser()
+	queue_redraw()
+
+
+func _is_hacked_disabled() -> bool:
+	return _hack_disabled_time_left_sec > 0.0

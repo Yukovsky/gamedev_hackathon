@@ -357,22 +357,77 @@ func try_bite_module(module: ModuleBase, damage: int = 1) -> bool:
 	return _destroy_module(module, "raider")
 
 
+func try_sapper_explosion(target_module: ModuleBase, base_damage: int, radius_cells: float = 1.3) -> bool:
+	if target_module == null or not is_instance_valid(target_module):
+		return false
+
+	if not _placed_modules.has(target_module):
+		return false
+
+	var center: Vector2 = target_module.get_world_center()
+	var radius_px: float = max(0.35, radius_cells) * CELL_SIZE
+	var affected_any: bool = false
+	var targets: Array[ModuleBase] = []
+
+	for module in _placed_modules:
+		if not is_instance_valid(module):
+			continue
+		if module == _core_module:
+			continue
+		if center.distance_to(module.get_world_center()) > radius_px:
+			continue
+		targets.append(module)
+
+	for module in targets:
+		if not is_instance_valid(module):
+			continue
+		affected_any = true
+
+		var dist: float = center.distance_to(module.get_world_center())
+		var falloff: float = clamp(1.0 - dist / max(1.0, radius_px), 0.35, 1.0)
+		var damage: int = max(1, int(round(float(base_damage) * (1.1 + falloff))))
+
+		if module.has_method("take_damage"):
+			module.call("take_damage", damage, "raider")
+		else:
+			_destroy_module(module, "raider")
+
+	return affected_any
+
+
+func try_hack_turret(module: ModuleBase, duration_sec: float) -> bool:
+	if module == null or not is_instance_valid(module):
+		return false
+
+	if not _placed_modules.has(module):
+		return false
+
+	if module.module_id != Constants.MODULE_TURRET:
+		return false
+
+	if module.has_method("apply_hack_disable"):
+		module.call("apply_hack_disable", max(0.3, duration_sec))
+		return true
+
+	return false
+
+
 func get_module_tactical_priority(module_id: String) -> int:
 	match module_id:
-		Constants.MODULE_DEFENSE:
-			return 6
 		Constants.MODULE_TURRET:
-			return 6
+			return 100
+		Constants.MODULE_DEFENSE:
+			return 60
 		Constants.MODULE_REACTOR:
-			return 5
+			return 50
 		Constants.MODULE_COLLECTOR:
-			return 4
+			return 40
 		Constants.MODULE_STORAGE:
-			return 3
+			return 30
 		Constants.MODULE_HULL:
-			return 2
+			return 20
 		Constants.MODULE_CORE:
-			return 1
+			return 10
 		_:
 			return 0
 
