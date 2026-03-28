@@ -69,8 +69,12 @@ func _start_looting() -> void:
 
 func _finish_looting() -> void:
 	if is_instance_valid(target_module) and target_module.has_method("queue_free"):
-		print("Raider looted a module!")
-		target_module.queue_free()
+		# Проверяем, не является ли модуль Ядром
+		if target_module.get("module_id") == Constants.MODULE_CORE:
+			print("Raider: Core is too strong to loot!")
+		else:
+			print("Raider looted a module: ", target_module.get("module_id"))
+			target_module.queue_free()
 	queue_free()
 
 func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
