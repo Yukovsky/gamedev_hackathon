@@ -27,11 +27,15 @@ var float_frequency = 0.5
 func _ready():
 	hud.build_mode_selected.connect(_on_ui_build_mode_selected)
 	$JunkTimer.start()
-	target_zoom = camera.zoom
+	if camera:
+		target_zoom = camera.zoom
+	else:
+		target_zoom = Vector2(1, 1)
 
 func _process(delta):
 	# Smooth Zoom interpolation
-	camera.zoom = camera.zoom.lerp(target_zoom, 10 * delta)
+	if camera:
+		camera.zoom = camera.zoom.lerp(target_zoom, 10 * delta)
 	
 	# Floating effect (drift)
 	float_time += delta
@@ -59,13 +63,13 @@ func _on_ui_build_mode_selected(type):
 		2: build_label.text = "ВЫБЕРИТЕ КОРПУС ДЛЯ СКЛАДА"
 		3: build_label.text = "ВЫБЕРИТЕ КОРПУС ДЛЯ СБОРЩИКА"
 
-func _input(event):
+func _unhandled_input(event):
 	# Handle Zoom with Wheel
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			target_zoom += Vector2(zoom_speed, zoom_speed)
+			target_zoom *= (1.0 + zoom_speed)
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			target_zoom -= Vector2(zoom_speed, zoom_speed)
+			target_zoom *= (1.0 - zoom_speed)
 		
 		target_zoom = target_zoom.clamp(Vector2(min_zoom, min_zoom), Vector2(max_zoom, max_zoom))
 		

@@ -1,20 +1,35 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
-*.import
+
+# Godot 4: DO NOT ignore *.import files! 
+# (They store import settings)
+!*.import
+
 *.translation
-*.mono/
+*.pck
+
+# Export configuration and credentials
+export.cfg
+export_credentials.cfg
+
+# Build artifacts
+build/
+dist/
+
+# Mono/C# specific ignores
+.mono/
 *.csproj
 *.sln
 *.gen.cpp
 *.gen.h
-*.pck
 
 # OS-specific
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# Large Binary Files (already excluded from push but good to have here)
+# Large Binary Files
 *.a
 *.xcframework/
 *.zip
