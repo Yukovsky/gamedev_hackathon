@@ -1,8 +1,8 @@
 extends Node2D
 
 @export_group("Spawn Rules")
-@export var spawn_interval_sec: float = 2.0
-@export_range(0.0, 1.0, 0.01) var spawn_chance: float = 0.5
+@export var spawn_interval_sec: float = 1.0
+@export_range(0.0, 1.0, 0.01) var spawn_chance: float = 0.8
 @export var max_debris_on_screen: int = 20
 
 @export_group("Spawn Bounds")

@@ -13,7 +13,7 @@ signal collected(amount: int, debris_type: DebrisType, source: String)
 @export var metal_reward_trash_1: int = 17
 @export var metal_reward_trash_2: int = 13
 @export var metal_reward_trash_3: int = 20
-@export var movement_speed_px_per_sec: float = 90.0
+@export var movement_speed_px_per_sec: float = 500.0
 @export var unit_size_px: Vector2 = Vector2(90.0, 90.0)
 @export var movement_direction: Vector2 = Vector2.DOWN
 
