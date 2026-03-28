@@ -2,7 +2,7 @@ extends Node2D
 
 const CELL_SIZE = 90
 const START_X = 1080 / 2 - CELL_SIZE
-const START_Y = 2400 - (CELL_SIZE * 8) # Позиционируем корабль в нижней трети экрана
+const START_Y = 2400 - (CELL_SIZE * 4) # Позиционируем корабль в самом низу экрана
 
 func _ready() -> void:
 	# Программист 2: Здесь спавн корабля, мусора и интерактивных сущностей
