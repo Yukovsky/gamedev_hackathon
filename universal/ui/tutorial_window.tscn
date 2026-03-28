@@ -1,0 +1,68 @@
+[gd_scene format=3 uid="uid://c6qmbc0uftdvu"]
+
+[ext_resource type="Texture2D" uid="uid://c6aud1m5r0cpg" path="res://assets/icon.png" id="2_icon"]
+[ext_resource type="Script" uid="uid://bk340xvps1kf" path="res://ui/tutorial_window.gd" id="2_uupdj"]
+
+[node name="TutorialWindow" type="CanvasLayer" unique_id=2102290992]
+layer = 2
+script = ExtResource("2_uupdj")
+
+[node name="Overlay" type="ColorRect" parent="." unique_id=1828511262]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.784314)
+
+[node name="MarginContainer" type="MarginContainer" parent="Overlay" unique_id=853572299]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -300.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 60
+
+[node name="PanelContainer" type="PanelContainer" parent="Overlay/MarginContainer" unique_id=263092452]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Overlay/MarginContainer/PanelContainer" unique_id=956122415]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Overlay/MarginContainer/PanelContainer/MarginContainer" unique_id=8139590]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="Avatar" type="TextureRect" parent="Overlay/MarginContainer/PanelContainer/MarginContainer/HBoxContainer" unique_id=49138822]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("2_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Overlay/MarginContainer/PanelContainer/MarginContainer/HBoxContainer" unique_id=246427192]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="NameLabel" type="Label" parent="Overlay/MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer" unique_id=1367529767]
+layout_mode = 2
+theme_override_font_sizes/font_size = 42
+text = "НАДЯ"
+
+[node name="DialogText" type="RichTextLabel" parent="Overlay/MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer" unique_id=1694491440]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 32
+text = "Текст диалога будет здесь..."
+fit_content = true
+scroll_active = false
