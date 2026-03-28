@@ -178,7 +178,10 @@ func _get_final_build_cost(module: ModuleBase) -> int:
 	var discount: float = 1.0
 	if _core_module != null:
 		discount = _core_module.get_build_discount_multiplier()
-	return int(ceil(float(module.metal_cost) * discount))
+	var base_cost: int = ResourceManager.get_current_module_cost(module.module_id)
+	if base_cost <= 0:
+		base_cost = module.metal_cost
+	return int(ceil(float(base_cost) * discount))
 
 func _world_to_grid(world_position: Vector2) -> Vector2i:
 	var local_position: Vector2 = world_position - _modules_root.global_position

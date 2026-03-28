@@ -45,15 +45,15 @@ func _flash_label(label: Label) -> void:
 	tween.tween_property(label, "modulate", Color.WHITE, 0.3)
 
 func _update_buttons(current_metal: int) -> void:
-	btn_hull.disabled = current_metal < Constants.get_module_cost(Constants.MODULE_HULL)
-	btn_reactor.disabled = current_metal < Constants.get_module_cost(Constants.MODULE_REACTOR)
-	btn_collector.disabled = current_metal < Constants.get_module_cost(Constants.MODULE_COLLECTOR)
+	btn_hull.disabled = current_metal < ResourceManager.get_current_module_cost(Constants.MODULE_HULL)
+	btn_reactor.disabled = current_metal < ResourceManager.get_current_module_cost(Constants.MODULE_REACTOR)
+	btn_collector.disabled = current_metal < ResourceManager.get_current_module_cost(Constants.MODULE_COLLECTOR)
 
 
 func _apply_button_texts() -> void:
-	btn_hull.text = " Корпус \n(%d Металла) " % Constants.get_module_cost(Constants.MODULE_HULL)
-	btn_reactor.text = " Реактор \n(%d Металла) " % Constants.get_module_cost(Constants.MODULE_REACTOR)
-	btn_collector.text = " Сборщик \n(%d Металла) " % Constants.get_module_cost(Constants.MODULE_COLLECTOR)
+	btn_hull.text = " Корпус \n(%d Металла) " % ResourceManager.get_current_module_cost(Constants.MODULE_HULL)
+	btn_reactor.text = " Реактор \n(%d Металла) " % ResourceManager.get_current_module_cost(Constants.MODULE_REACTOR)
+	btn_collector.text = " Сборщик \n(%d Металла) " % ResourceManager.get_current_module_cost(Constants.MODULE_COLLECTOR)
 
 func _on_btn_shop_pressed() -> void:
 	bottom_panel.visible = !bottom_panel.visible
@@ -61,6 +61,8 @@ func _on_btn_shop_pressed() -> void:
 func _on_module_built(_type: String, _pos: Vector2) -> void:
 	# Закрываем панель после постройки
 	bottom_panel.visible = false
+	_apply_button_texts()
+	_update_buttons(ResourceManager.metal)
 
 func _on_btn_hull_pressed() -> void:
 	GameEvents.build_requested.emit(Constants.MODULE_HULL, Vector2.ZERO)

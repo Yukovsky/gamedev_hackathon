@@ -37,6 +37,13 @@ var _resource_max_metal: int = 0
 var _resource_hull_bonus: int = 0
 var _is_balance_loaded: bool = false
 
+# Стоимости из БАЛАНС.csv по номеру итерации (0..9), дальше используется последний индекс.
+const ITERATION_MODULE_COSTS: Dictionary = {
+	MODULE_REACTOR: [350.0, 525.0, 787.5, 1181.25, 1771.875, 2657.8125, 3986.71875, 5980.078125, 8970.117188, 13455.17578],
+	MODULE_HULL: [75.0, 97.5, 126.75, 164.775, 214.2075, 278.46975, 362.010675, 470.6138775, 611.7980408, 795.337453],
+	MODULE_COLLECTOR: [100.0, 130.0, 169.0, 219.7, 285.61, 371.293, 482.6809, 627.48517, 815.730721, 1060.449937],
+}
+
 # ========== Параметры ядра ==========
 const BASE_METAL_PER_CLICK: int = 10
 const BASE_ENERGY_PER_CLICK: int = 5
@@ -62,6 +69,21 @@ func _ensure_balance_loaded() -> void:
 func get_module_cost(module_id: String) -> int:
 	_ensure_balance_loaded()
 	return int(MODULE_COST_METAL.get(module_id, 0))
+
+
+func get_module_cost_for_iteration(module_id: String, iteration: int) -> int:
+	_ensure_balance_loaded()
+	if ITERATION_MODULE_COSTS.has(module_id):
+		var iteration_costs: Array = ITERATION_MODULE_COSTS[module_id]
+		if iteration_costs.is_empty():
+			return get_module_cost(module_id)
+		var index: int = clamp(iteration, 0, iteration_costs.size() - 1)
+		return int(ceil(float(iteration_costs[index])))
+	return get_module_cost(module_id)
+
+
+func is_incremental_price_module(module_id: String) -> bool:
+	return ITERATION_MODULE_COSTS.has(module_id)
 
 
 func get_resource_initial_metal() -> int:

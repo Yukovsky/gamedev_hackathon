@@ -21,7 +21,8 @@ func save_game() -> void:
 	var save_dict = {
 		"resources": {
 			"metal": ResourceManager.metal,
-			"max_metal": ResourceManager.max_metal
+			"max_metal": ResourceManager.max_metal,
+			"build_iterations_by_module": ResourceManager.build_iterations_by_module
 		},
 		"grid": grid_data
 	}
@@ -44,6 +45,16 @@ func load_game() -> void:
 		var res_data = save_dict.get("resources", {})
 		ResourceManager.metal = res_data.get("metal", 0)
 		ResourceManager.max_metal = res_data.get("max_metal", 50)
+
+		var loaded_iterations: Dictionary = res_data.get("build_iterations_by_module", {})
+		if loaded_iterations.is_empty() and res_data.has("build_iteration"):
+			var legacy_iteration: int = int(res_data.get("build_iteration", 0))
+			loaded_iterations = {
+				Constants.MODULE_REACTOR: legacy_iteration,
+				Constants.MODULE_HULL: legacy_iteration,
+				Constants.MODULE_COLLECTOR: legacy_iteration,
+			}
+		ResourceManager.set_module_build_iterations(loaded_iterations)
 		
 		GameEvents.resource_changed.emit("metal", ResourceManager.metal)
 		print("Игра загружена (ресурсы восстановлены)!")
