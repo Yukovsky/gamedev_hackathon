@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://c6qmbc0uftdvu"]
 
 [ext_resource type="Texture2D" uid="uid://c6aud1m5r0cpg" path="res://assets/icon.png" id="2_icon"]
-[ext_resource type="Script" uid="uid://bk340xvps1kf" path="res://ui/tutorial_window.gd" id="2_uupdj"]
+[ext_resource type="Script" path="res://ui/tutorial_window.gd" id="2_uupdj"]
+[ext_resource type="FontFile" uid="uid://vh0a6rfjthl1" path="res://assets/fonts/Exo2-VariableFont_wght.ttf" id="3_8w6qn"]
 
 [node name="TutorialWindow" type="CanvasLayer" unique_id=2102290992]
 layer = 2
@@ -62,6 +63,7 @@ text = "НАДЯ"
 [node name="DialogText" type="RichTextLabel" parent="Overlay/MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer" unique_id=1694491440]
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_fonts/normal_font = ExtResource("3_8w6qn")
 theme_override_font_sizes/normal_font_size = 32
 text = "Текст диалога будет здесь..."
 fit_content = true

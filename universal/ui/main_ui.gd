@@ -7,6 +7,7 @@ extends CanvasLayer
 @onready var btn_hull: Button = %BtnHull
 @onready var btn_turret: Button = %BtnTurret
 @onready var btn_shop: Button = %BtnShop
+@onready var btn_bgm_toggle: Button = %BtnBgmToggle
 @onready var btn_shop_exit: Button = %BtnShopExit
 @onready var bottom_panel: Control = %BottomPanel
 @onready var end_overlay: ColorRect = %EndOverlay
@@ -39,6 +40,7 @@ func _ready() -> void:
 	btn_hull.pressed.connect(_on_btn_hull_pressed)
 	btn_turret.pressed.connect(_on_btn_turret_pressed)
 	btn_shop.pressed.connect(_on_btn_shop_pressed)
+	btn_bgm_toggle.pressed.connect(_on_btn_bgm_toggle_pressed)
 	btn_restart.pressed.connect(_on_btn_restart_pressed)
 	btn_shop_exit.pressed.connect(_on_btn_shop_exit_pressed)
 	_build_upgrade_buttons()
@@ -49,6 +51,7 @@ func _ready() -> void:
 	end_overlay.visible = false
 	_update_buttons(ResourceManager.metal)
 	_refresh_upgrade_buttons(ResourceManager.metal)
+	_update_bgm_button()
 	
 	print("MainUI Initialized")
 
@@ -145,6 +148,21 @@ func _on_upgrade_purchased(_upgrade_id: String, _new_level: int) -> void:
 	_set_shop_open(false, true)
 	_refresh_upgrade_buttons(ResourceManager.metal)
 
+
+func _update_bgm_button() -> void:
+	if AudioManager.is_bgm_enabled():
+		btn_bgm_toggle.text = "BGM: ON"
+		btn_bgm_toggle.add_theme_color_override("font_color", Color(0.8, 1, 0.3))
+	else:
+		btn_bgm_toggle.text = "BGM: OFF"
+		btn_bgm_toggle.add_theme_color_override("font_color", Color(1, 0.5, 0.5))
+
+func _on_btn_bgm_toggle_pressed() -> void:
+	AudioManager.play_ui_click()
+	var enabled := AudioManager.toggle_bgm()
+	_update_bgm_button()
+	if enabled:
+		AudioManager.play_ui_open()
 
 func _on_build_mode_cancelled(_module_type: String) -> void:
 	# Режим постройки отменен: снимаем паузу, магазин уже скрыт.
@@ -252,10 +270,17 @@ func _on_game_finished(outcome: String, reason: String) -> void:
 
 func _on_btn_restart_pressed() -> void:
 	AudioManager.play_ui_open()
-	var tree := get_tree()
-	if tree != null:
-		tree.reload_current_scene()
 	upgrades_panel.visible = false
 	btn_shop_exit.visible = false
-	# Пауза остается активной, пока не будет постройки/отмены.
-	get_tree().paused = true
+	get_tree().paused = false
+	AudioManager.set_bgm_enabled(true)
+	_update_bgm_button()
+
+	var tree := get_tree()
+	if tree != null:
+		# перезагрузка сцены сохранит global singleton-ы, но внутренняя логика ResourceManager/UpgradeManager остаётся
+		if ResourceManager.has_method("reset"):
+			ResourceManager.reset()
+		if UpgradeManager.has_method("reset"):
+			UpgradeManager.reset()
+		tree.reload_current_scene()

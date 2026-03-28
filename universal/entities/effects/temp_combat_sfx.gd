@@ -6,7 +6,7 @@ class_name TempCombatSfx
 
 
 func play_spawn(position_world: Vector2) -> void:
-	_play_tone(position_world, 520.0, 0.08, -14.0)
+	_play_tone(position_world, 10.0, 0.08, -50.0)
 
 
 func play_bite(position_world: Vector2) -> void:

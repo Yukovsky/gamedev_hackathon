@@ -1,20 +1,19 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://dlbl7fd2ulpqp"]
 
-[ext_resource type="Script" path="res://entities/debris/debris.gd" id="1_debris"]
-[ext_resource type="Script" path="res://shared/components/clickable_component.gd" id="2_clickable"]
+[ext_resource type="Script" uid="uid://p36mq1fnaxv3" path="res://entities/debris/debris.gd" id="1_debris"]
+[ext_resource type="Script" uid="uid://c6g77jgvs0wju" path="res://shared/components/clickable_component.gd" id="2_clickable"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(140, 140)
 
-[node name="Debris" type="Node2D"]
+[node name="Debris" type="Node2D" unique_id=402095655]
 script = ExtResource("1_debris")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1587877352]
 unique_name_in_owner = true
-centered = true
 
-[node name="ClickableComponent" type="Area2D" parent="."]
+[node name="ClickableComponent" type="Area2D" parent="." unique_id=1629255794]
 script = ExtResource("2_clickable")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ClickableComponent"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ClickableComponent" unique_id=2008053031]
 shape = SubResource("RectangleShape2D_1")
