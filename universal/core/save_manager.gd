@@ -45,7 +45,7 @@ func load_game() -> void:
 		ResourceManager.metal = res_data.get("metal", 0)
 		ResourceManager.max_metal = res_data.get("max_metal", 50)
 		
-		GameEvents.resource_changed.emit("metal", ResourceManager.metal, ResourceManager.max_metal)
+		GameEvents.resource_changed.emit("metal", ResourceManager.metal)
 		print("Игра загружена (ресурсы восстановлены)!")
 
 func _serialize_grid(grid: Dictionary) -> Dictionary:

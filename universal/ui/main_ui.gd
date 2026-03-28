@@ -17,18 +17,26 @@ func _ready() -> void:
 	btn_collector.pressed.connect(_on_btn_collector_pressed)
 	btn_hull.pressed.connect(_on_btn_hull_pressed)
 	btn_shop.pressed.connect(_on_btn_shop_pressed)
+	_apply_button_texts()
+	_sync_resource_ui(ResourceManager.metal, ResourceManager.max_metal, false)
 	
 	bottom_panel.visible = false
-	_update_buttons(0)
+	_update_buttons(ResourceManager.metal)
 	
 	print("MainUI Initialized")
 
-func _on_resource_changed(type: String, new_total: int, max_total: int) -> void:
+func _on_resource_changed(type: String, new_total: int) -> void:
 	if type == "metal":
-		metal_label.text = "Металл: %d / %d" % [new_total, max_total]
-		metal_bar.max_value = max_total
-		metal_bar.value = new_total
+		_sync_resource_ui(new_total, ResourceManager.max_metal, true)
 		_update_buttons(new_total)
+
+
+func _sync_resource_ui(current_total: int, max_total: int, animate: bool) -> void:
+	metal_label.text = "Металл: %d / %d" % [current_total, max_total]
+	metal_bar.min_value = 0
+	metal_bar.max_value = max_total
+	metal_bar.value = current_total
+	if animate:
 		_flash_label(metal_label)
 
 func _flash_label(label: Label) -> void:
@@ -37,9 +45,15 @@ func _flash_label(label: Label) -> void:
 	tween.tween_property(label, "modulate", Color.WHITE, 0.3)
 
 func _update_buttons(current_metal: int) -> void:
-	btn_hull.disabled = current_metal < Constants.MODULE_COST_METAL[Constants.MODULE_HULL]
-	btn_reactor.disabled = current_metal < Constants.MODULE_COST_METAL[Constants.MODULE_REACTOR]
-	btn_collector.disabled = current_metal < Constants.MODULE_COST_METAL[Constants.MODULE_COLLECTOR]
+	btn_hull.disabled = current_metal < Constants.get_module_cost(Constants.MODULE_HULL)
+	btn_reactor.disabled = current_metal < Constants.get_module_cost(Constants.MODULE_REACTOR)
+	btn_collector.disabled = current_metal < Constants.get_module_cost(Constants.MODULE_COLLECTOR)
+
+
+func _apply_button_texts() -> void:
+	btn_hull.text = " Корпус \n(%d Металла) " % Constants.get_module_cost(Constants.MODULE_HULL)
+	btn_reactor.text = " Реактор \n(%d Металла) " % Constants.get_module_cost(Constants.MODULE_REACTOR)
+	btn_collector.text = " Сборщик \n(%d Металла) " % Constants.get_module_cost(Constants.MODULE_COLLECTOR)
 
 func _on_btn_shop_pressed() -> void:
 	bottom_panel.visible = !bottom_panel.visible

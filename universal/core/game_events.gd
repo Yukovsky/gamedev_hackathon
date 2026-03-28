@@ -9,7 +9,7 @@ extends Node
 signal garbage_clicked(amount: int)
 
 ## Ресурсы изменились (металл, энергия)
-signal resource_changed(type: String, new_total: int, max_total: int)
+signal resource_changed(type: String, new_total: int)
 
 ## Запрос на постройку модуля
 signal build_requested(module_type: String, position: Vector2)

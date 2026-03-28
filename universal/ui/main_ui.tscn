@@ -105,7 +105,7 @@ layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 48
-text = "Металл: 0 / 100"
+text = "Металл: 0 / 0"
 
 [node name="MetalBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/TopPanel/ResourceVBox"]
 unique_name_in_owner = true
@@ -113,7 +113,7 @@ custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_BarBG")
 theme_override_styles/fill = SubResource("StyleBoxFlat_BarMetal")
-value = 50.0
+value = 0.0
 show_percentage = false
 
 [node name="ShopRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
@@ -163,7 +163,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnHover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_BtnDisabled")
 text = " Реактор 
-(15 Металла) "
+(350 Металла) "
 
 [node name="BtnCollector" type="Button" parent="MarginContainer/VBoxContainer/BottomPanel"]
 unique_name_in_owner = true
@@ -174,4 +174,4 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnHover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_BtnDisabled")
 text = " Сборщик 
-(25 Металла) "
+(100 Металла) "

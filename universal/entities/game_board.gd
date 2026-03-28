@@ -51,24 +51,37 @@ func _ready() -> void:
 
 	print("GameBoard Initialized at origin: ", _modules_root.position)
 
-func _input(event: InputEvent) -> void:
+func _unhandled_input(event: InputEvent) -> void:
 	if _active_build_type == "": return
-	
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		# Проверка, не кликнули ли мы по кнопкам UI (которые на слое выше)
-		# Но так как у нас CanvasLayer, _input поймает всё.
-		# Поэтому мы полагаемся на то, что если кликнули по сетке, мы строим.
-		var grid_pos = _world_to_grid(get_global_mouse_position())
-		
-		# Пытаемся построить. Если успешно — режим сбросится сам внутри _try_place_module_at
-		if _try_place_module_at(_active_build_type, grid_pos):
-			print("Build Successful at ", grid_pos)
-		else:
-			# Если кликнули ВНУТРИ сетки, но мимо подсветки — отменяем режим
-			if grid_pos.x >= 0 and grid_pos.x < GridManager.GRID_WIDTH and \
-			   grid_pos.y >= 0 and grid_pos.y < GridManager.GRID_HEIGHT:
-				_clear_highlights()
-				print("Build cancelled by clicking empty grid")
+
+	var pointer_pos: Vector2
+	var has_pointer_press: bool = false
+
+	if event is InputEventMouseButton:
+		var mouse_event: InputEventMouseButton = event as InputEventMouseButton
+		if mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.pressed:
+			has_pointer_press = true
+			pointer_pos = mouse_event.position
+	elif event is InputEventScreenTouch:
+		var touch_event: InputEventScreenTouch = event as InputEventScreenTouch
+		if touch_event.pressed:
+			has_pointer_press = true
+			pointer_pos = touch_event.position
+
+	if not has_pointer_press:
+		return
+
+	var grid_pos: Vector2i = _world_to_grid(pointer_pos)
+
+	# Пытаемся построить. Если успешно — режим сбросится сам внутри _try_place_module_at
+	if _try_place_module_at(_active_build_type, grid_pos):
+		print("Build Successful at ", grid_pos)
+	else:
+		# Если кликнули ВНУТРИ сетки, но мимо подсветки — отменяем режим
+		if grid_pos.x >= 0 and grid_pos.x < GridManager.GRID_WIDTH and \
+		   grid_pos.y >= 0 and grid_pos.y < GridManager.GRID_HEIGHT:
+			_clear_highlights()
+			print("Build cancelled by clicking empty grid")
 
 func _on_build_requested(module_type: String, requested_position: Vector2) -> void:
 	if not _module_script_by_id.has(module_type): return
@@ -107,6 +120,7 @@ func _create_highlight(pos: Vector2i, size: Vector2i) -> void:
 	rect.color = Color(0.5, 0.5, 0.5, 0.4)
 	rect.size = Vector2(size.x * CELL_SIZE - 4, size.y * CELL_SIZE - 4)
 	rect.position = Vector2(pos.x * CELL_SIZE + 2, pos.y * CELL_SIZE + 2)
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_highlights_root.add_child(rect)
 
 func _try_place_module_at(module_type: String, build_cell: Vector2i) -> bool:
@@ -119,6 +133,7 @@ func _try_place_module_at(module_type: String, build_cell: Vector2i) -> bool:
 		module.queue_free()
 		return false
 
+	var discount_used: bool = _core_module != null and _core_module.get_build_discount_multiplier() < 1.0
 	var final_cost: int = _get_final_build_cost(module)
 	if final_cost > 0 and not ResourceManager.spend_metal(final_cost):
 		print("Not enough metal! Need: ", final_cost)
@@ -126,6 +141,8 @@ func _try_place_module_at(module_type: String, build_cell: Vector2i) -> bool:
 		return false
 
 	_place_module(module, build_cell)
+	if discount_used and _core_module != null:
+		_core_module.consume_build_discount()
 	GameEvents.module_built.emit(module_type, Vector2(build_cell))
 	_clear_highlights()
 	return true

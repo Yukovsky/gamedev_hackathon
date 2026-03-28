@@ -9,18 +9,20 @@ var _collect_timer: Timer
 var _laser_hide_timer: Timer
 var _laser: Line2D
 var _ship_bounds_provider: Callable
+var _is_on_cooldown: bool = false
 
 
 func _init() -> void:
 	module_id = Constants.MODULE_COLLECTOR
 	grid_size = Vector2i.ONE
-	metal_cost = Constants.MODULE_COST_METAL[module_id]
+	metal_cost = Constants.get_module_cost(module_id)
 	sprite_color = Color(1.0, 0.9, 0.2, 1.0) # Желтый
 
 
 func _ready() -> void:
 	_collect_timer = Timer.new()
 	_collect_timer.one_shot = true
+	_collect_timer.wait_time = collect_cooldown_sec
 	_collect_timer.timeout.connect(_on_cooldown_finished)
 	add_child(_collect_timer)
 
@@ -36,7 +38,12 @@ func _ready() -> void:
 	_laser.visible = false
 	add_child(_laser)
 
-	_process_collection_cycle()
+
+func _process(_delta: float) -> void:
+	if _is_on_cooldown:
+		return
+
+	_try_collect()
 
 
 func set_ship_bounds_provider(provider: Callable) -> void:
@@ -55,14 +62,16 @@ func _try_collect() -> void:
 	elif target.has_method("collect"):
 		target.collect("collector")
 
+	_start_cooldown()
 
-func _process_collection_cycle() -> void:
-	_try_collect()
+
+func _start_cooldown() -> void:
+	_is_on_cooldown = true
 	_collect_timer.start(collect_cooldown_sec)
 
 
 func _on_cooldown_finished() -> void:
-	_process_collection_cycle()
+	_is_on_cooldown = false
 
 
 func _find_best_debris_target() -> Node2D:
