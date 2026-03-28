@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://b1c2d3e4f5g6"]
+[gd_scene load_steps=8 format=3 uid="uid://b1c2d3e4f5g6"]
 
 [ext_resource type="Script" path="res://ui/main_ui.gd" id="1_a2b3c"]
 
@@ -69,13 +69,6 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BarEnergy"]
-bg_color = Color(1, 0.8, 0, 0.8)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
 [node name="MainUI" type="CanvasLayer"]
 script = ExtResource("1_a2b3c")
 
@@ -85,6 +78,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 40
 theme_override_constants/margin_top = 60
 theme_override_constants/margin_right = 40
@@ -92,15 +86,18 @@ theme_override_constants/margin_bottom = 60
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 20
 
 [node name="TopPanel" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 20
 
 [node name="ResourceVBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TopPanel"]
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
 
 [node name="MetalLabel" type="Label" parent="MarginContainer/VBoxContainer/TopPanel/ResourceVBox"]
 unique_name_in_owner = true
@@ -119,31 +116,9 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_BarMetal")
 value = 50.0
 show_percentage = false
 
-[node name="EnergyVBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TopPanel"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="EnergyLabel" type="Label" parent="MarginContainer/VBoxContainer/TopPanel/EnergyVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 48
-text = "⚡ 0 / 500"
-horizontal_alignment = 2
-
-[node name="EnergyBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/TopPanel/EnergyVBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 20)
-layout_mode = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_BarBG")
-theme_override_styles/fill = SubResource("StyleBoxFlat_BarEnergy")
-value = 50.0
-fill_mode = 1
-show_percentage = false
-
 [node name="ShopRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+mouse_filter = 2
 alignment = 1
 
 [node name="BtnShop" type="Button" parent="MarginContainer/VBoxContainer/ShopRow"]
@@ -159,14 +134,16 @@ text = " 🛒 МАГАЗИН "
 [node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+mouse_filter = 2
 
 [node name="BottomPanel" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+mouse_filter = 2
 alignment = 1
 theme_override_constants/separation = 40
 
-[node name="BtnStorage" type="Button" parent="MarginContainer/VBoxContainer/BottomPanel"]
+[node name="BtnHull" type="Button" parent="MarginContainer/VBoxContainer/BottomPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
@@ -174,8 +151,19 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_Btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnHover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_BtnDisabled")
-text = " Склад 
+text = " Корпус 
 (5 Металла) "
+
+[node name="BtnGenerator" type="Button" parent="MarginContainer/VBoxContainer/BottomPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxFlat_Btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnHover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_BtnDisabled")
+text = " Генератор 
+(15 Металла) "
 
 [node name="BtnCollector" type="Button" parent="MarginContainer/VBoxContainer/BottomPanel"]
 unique_name_in_owner = true
@@ -186,4 +174,4 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_BtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnHover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_BtnDisabled")
 text = " Сборщик 
-(10 Металла) "
+(25 Металла) "
