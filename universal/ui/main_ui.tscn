@@ -37,16 +37,16 @@ layout_mode = 2
 alignment = 1
 theme_override_constants/separation = 40
 
-[node name="BtnStorage" type="Button" parent="MarginContainer/VBoxContainer/BottomPanel"]
+[node name="BtnReactor" type="Button" parent="MarginContainer/VBoxContainer/BottomPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
-text = " Build Storage 
-(5 Metal) "
+text = " Build Reactor 
+(400 Metal) "
 
 [node name="BtnCollector" type="Button" parent="MarginContainer/VBoxContainer/BottomPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = " Build Collector 
-(10 Metal) "
+(100 Metal) "

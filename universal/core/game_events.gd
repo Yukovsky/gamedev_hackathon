@@ -25,3 +25,9 @@ signal game_started
 
 ## Игра закончена
 signal game_ended
+
+## Защита корабля изменилась
+signal defence_changed(new_total: int)
+
+## Разрешение столкновения с врагом
+signal collision_resolved(hazard_class: int, success: bool, modules_lost: int, discounted_builds: int)

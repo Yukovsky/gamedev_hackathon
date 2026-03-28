@@ -35,6 +35,7 @@ var _is_collected: bool = false
 
 
 func _ready() -> void:
+	add_to_group("debris")
 	_apply_visual()
 	_apply_unit_size()
 	if _clickable.has_signal("clicked"):
@@ -89,7 +90,7 @@ func _get_metal_reward() -> int:
 
 func _get_movement_vector() -> Vector2:
 	if movement_direction == Vector2.ZERO:
-		return Vector2.LEFT
+		return Vector2.DOWN
 	return movement_direction.normalized()
 
 
