@@ -15,7 +15,7 @@ func _ready() -> void:
 
 func _on_resource_changed(type: String, new_total: int, max_total: int) -> void:
 	if type == "metal":
-		metal_label.text = "Metal: %d / %d" % [new_total, max_total]
+		metal_label.text = "Металл: %d / %d" % [new_total, max_total]
 		
 		# Visual feedback: flash label color
 		var tween = create_tween()
