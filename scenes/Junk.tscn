@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid_0"]
+
+[ext_resource type="Script" path="res://scripts/Junk.gd" id="1_x"]
+
+[sub_resource type="RectangleShape2D" id="1"]
+size = Vector2(60, 60)
+
+[node name="Junk" type="Area2D"]
+input_pickable = true
+script = ExtResource("1_x")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("1")
