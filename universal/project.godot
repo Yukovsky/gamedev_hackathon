@@ -15,7 +15,7 @@ config_version=5
 config/name="Universal"
 run/main_scene="res://ui/start_menu.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
-config/icon="res://assets/Gemini_Generated_Image_z2m6wvz2m6wvz2m6.png"
+config/icon="res://assets/main_screen_picture.png"
 
 [autoload]
 

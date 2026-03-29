@@ -57,7 +57,7 @@ var shop_guide_steps: Array[String] = [
 	"[color=%s]РЕАКТОР[/color] — без них у нас не будет энергии для работы модулей." % COLOR_REACTOR_TEXT,
 	"Реактор запитывает соседние ячейки и позволяет строить модули в них",
 	"Обратите внимание, что [color=%s]РЕАКТОРЫ[/color] не должны питать [color=%s]ЯДРО[/color] и наоборот" % [COLOR_REACTOR_TEXT, COLOR_CORE_TEXT],
-	"[color=%s]СБОРЩИК[/color] — автоматически добывает ближайший к к вашему кораблю мусор" % COLOR_COLLECTOR_TEXT,
+	"[color=%s]СБОРЩИК[/color] — автоматически добывает ближайший к вашему кораблю мусор" % COLOR_COLLECTOR_TEXT,
 	"[color=%s]ТУРЕЛЬ[/color] — оборонительный модуль, атакует врагов автоматически." % COLOR_TURRET_TEXT,
 	"[color=%s]ЯДРО[/color] — увеличивает количество металла, получаемого с каждого обломка." % COLOR_CORE_TEXT,
 	"Сейчас у нас хватает [color=orange]МЕТАЛЛА[/color] на [color=%s]КОРПУС[/color]. Самое время его приобрести" % COLOR_HULL_TEXT,
