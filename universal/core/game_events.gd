@@ -57,3 +57,9 @@ signal raider_spawned(position: Vector2)
 
 ## Налетчик кусает модуль
 signal raider_bite(position: Vector2)
+
+## Магазин открыт
+signal shop_opened
+
+## Магазин закрыт
+signal shop_closed
