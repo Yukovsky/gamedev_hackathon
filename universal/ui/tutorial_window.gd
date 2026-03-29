@@ -120,6 +120,8 @@ var _training_shop_invite_done: bool = false
 var _training_shop_guide_done: bool = false
 var _training_reactor_guide_done: bool = false
 var _training_max_resources_done: bool = false
+var _tutorial_pending_first_raider_request: bool = false
+var _tutorial_built_modules_count: int = 0
 
 const START_MENU_SCENE: String = "res://ui/start_menu.tscn"
 const FIRST_RAIDER_REQUEST_DELAY_SEC: float = 0.25
@@ -159,6 +161,7 @@ func _ready() -> void:
 		GameEvents.raider_destroyed.connect(_on_raider_destroyed)
 		GameEvents.resource_changed.connect(_on_resource_changed)
 		GameEvents.shop_opened.connect(_on_shop_opened)
+		GameEvents.module_built.connect(_on_module_built)
 	
 	# Автостарт оставляем на случай, если сцена запущена без main.gd-контроллера.
 	get_tree().create_timer(0.5, true, false, true).timeout.connect(start_tutorial)
@@ -376,8 +379,8 @@ func _request_first_raider_for_tutorial() -> void:
 		return
 	if _tutorial_first_raider_requested:
 		return
-	_tutorial_first_raider_requested = true
-	call_deferred("_emit_raider_spawn_request_after_delay")
+	_tutorial_pending_first_raider_request = true
+	_try_emit_first_raider_request()
 
 func _emit_raider_spawn_request_after_delay() -> void:
 	await get_tree().create_timer(FIRST_RAIDER_REQUEST_DELAY_SEC, true, false, true).timeout
@@ -386,6 +389,30 @@ func _emit_raider_spawn_request_after_delay() -> void:
 	if _raider_warning_shown:
 		return
 	GameEvents.tutorial_raider_spawn_requested.emit()
+
+
+func _on_module_built(module_type: String, _position: Vector2) -> void:
+	if tutorial_mode != TutorialMode.FULL and tutorial_mode != TutorialMode.FULL_CYCLE_TRAINING:
+		return
+	if module_type == Constants.MODULE_CORE:
+		return
+	_tutorial_built_modules_count += 1
+	_try_emit_first_raider_request()
+
+
+func _try_emit_first_raider_request() -> void:
+	if not _tutorial_pending_first_raider_request:
+		return
+	if _tutorial_first_raider_requested:
+		return
+	if _raider_warning_shown:
+		return
+	if _tutorial_built_modules_count < 2:
+		return
+
+	_tutorial_pending_first_raider_request = false
+	_tutorial_first_raider_requested = true
+	call_deferred("_emit_raider_spawn_request_after_delay")
 
 
 func _mark_training_step_done(finished_steps: Array[String]) -> void:
