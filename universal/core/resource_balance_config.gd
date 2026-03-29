@@ -1,7 +1,7 @@
 extends Resource
 class_name ResourceBalanceConfig
 
-@export var initial_metal: int = 75
+@export var initial_metal: int = 25
 @export var max_metal: int = 200
 @export var hull_metal_bonus: int = 50
 

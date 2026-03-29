@@ -1,0 +1,140 @@
+[
+  {
+    "buildings_min": 0,
+    "buildings_max": 1,
+    "enemy_set": [],
+    "normal_hp": 0,
+    "sprinter_hp": 0,
+    "tank_hp": 0,
+    "max_active": 0,
+    "recommended_turrets": 0,
+    "required_dps": 0
+  },
+  {
+    "buildings_min": 2,
+    "buildings_max": 2,
+    "enemy_set": [
+      { "type": "normal", "count": 1 }
+    ],
+    "normal_hp": 153,
+    "sprinter_hp": 0,
+    "tank_hp": 0,
+    "max_active": 1,
+    "recommended_turrets": 1,
+    "required_dps": 40
+  },
+  {
+    "buildings_min": 3,
+    "buildings_max": 3,
+    "enemy_set": [
+      { "type": "normal", "count": 1 }
+    ],
+    "normal_hp": 162,
+    "sprinter_hp": 0,
+    "tank_hp": 0,
+    "max_active": 1,
+    "recommended_turrets": 1,
+    "required_dps": 45
+  },
+  {
+    "buildings_min": 4,
+    "buildings_max": 4,
+    "enemy_set": [
+      { "type": "normal", "count": 2 }
+    ],
+    "normal_hp": 171,
+    "sprinter_hp": 0,
+    "tank_hp": 0,
+    "max_active": 1,
+    "recommended_turrets": 1,
+    "required_dps": 80
+  },
+  {
+    "buildings_min": 5,
+    "buildings_max": 5,
+    "enemy_set": [
+      { "type": "normal", "count": 1 },
+      { "type": "sprinter", "count": 1 }
+    ],
+    "normal_hp": 180,
+    "sprinter_hp": 130,
+    "tank_hp": 0,
+    "max_active": 2,
+    "recommended_turrets": 1,
+    "required_dps": 75
+  },
+  {
+    "buildings_min": 6,
+    "buildings_max": 6,
+    "enemy_set": [
+      { "type": "normal", "count": 2 },
+      { "type": "sprinter", "count": 1 }
+    ],
+    "normal_hp": 189,
+    "sprinter_hp": 137,
+    "tank_hp": 0,
+    "max_active": 2,
+    "recommended_turrets": 2,
+    "required_dps": 120
+  },
+  {
+    "buildings_min": 7,
+    "buildings_max": 7,
+    "enemy_set": [
+      { "type": "normal", "count": 1 },
+      { "type": "sprinter", "count": 1 },
+      { "type": "tank", "count": 1 }
+    ],
+    "normal_hp": 198,
+    "sprinter_hp": 143,
+    "tank_hp": 446,
+    "max_active": 2,
+    "recommended_turrets": 2,
+    "required_dps": 180
+  },
+  {
+    "buildings_min": 8,
+    "buildings_max": 8,
+    "enemy_set": [
+      { "type": "normal", "count": 2 },
+      { "type": "sprinter", "count": 1 },
+      { "type": "tank", "count": 1 }
+    ],
+    "normal_hp": 207,
+    "sprinter_hp": 150,
+    "tank_hp": 466,
+    "max_active": 3,
+    "recommended_turrets": 2,
+    "required_dps": 190
+  },
+  {
+    "buildings_min": 9,
+    "buildings_max": 9,
+    "enemy_set": [
+      { "type": "normal", "count": 2 },
+      { "type": "sprinter", "count": 2 },
+      { "type": "tank", "count": 1 }
+    ],
+    "normal_hp": 216,
+    "sprinter_hp": 156,
+    "tank_hp": 486,
+    "max_active": 3,
+    "recommended_turrets": 3,
+    "required_dps": 240
+  },
+  {
+    "buildings_min": 10,
+    "buildings_max": 999,
+    "enemy_set": [
+      { "type": "normal", "count": 2 },
+      { "type": "sprinter", "count": 2 },
+      { "type": "tank", "count": 2 }
+    ],
+    "normal_hp": 225,
+    "sprinter_hp": 163,
+    "tank_hp": 506,
+    "max_active": 3,
+    "recommended_turrets": 4,
+    "required_dps": 320
+  }
+]

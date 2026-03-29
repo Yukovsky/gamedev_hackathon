@@ -5,30 +5,6 @@
 [ext_resource type="FontFile" uid="uid://c62uvuv7pptp5" path="res://assets/fonts/PressStart2P-Regular.ttf" id="3_font"]
 [ext_resource type="Texture2D" uid="uid://bau3koey21dai" path="res://assets/Gemini_Generated_Image_z2m6wvz2m6wvz2m6.png" id="4_appicon"]
 
-[sub_resource type="StyleBoxFlat" id="PixelBorder_Outer"]
-bg_color = Color(0.0, 0.0, 0.0, 0.0)
-border_width_left = 24
-border_width_top = 24
-border_width_right = 24
-border_width_bottom = 24
-border_color = Color(0.816, 0.627, 0.941, 1)
-corner_radius_top_left = 0
-corner_radius_top_right = 0
-corner_radius_bottom_right = 0
-corner_radius_bottom_left = 0
-
-[sub_resource type="StyleBoxFlat" id="PixelBorder_Inner"]
-bg_color = Color(0.0, 0.0, 0.0, 0.0)
-border_width_left = 12
-border_width_top = 12
-border_width_right = 12
-border_width_bottom = 12
-border_color = Color(0.756, 0.565, 0.875, 1)
-corner_radius_top_left = 0
-corner_radius_top_right = 0
-corner_radius_bottom_right = 0
-corner_radius_bottom_left = 0
-
 [sub_resource type="StyleBoxFlat" id="StyleBox_StartBtn"]
 bg_color = Color(0.227, 0.118, 0.431, 1)
 border_width_left = 4
@@ -267,23 +243,3 @@ theme_override_font_sizes/font_size = 24
 theme_override_colors/font_color = Color(0.439, 0.251, 0.690, 1)
 text = "BUILD 0.4.2"
 horizontal_alignment = 0
-
-[node name="ScreenBorder" type="PanelContainer" parent="." unique_id=2119551550]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-layer = -1
-theme_override_styles/panel = SubResource("PixelBorder_Outer")
-
-[node name="ScreenBorderInner" type="PanelContainer" parent="." unique_id=2119551551]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-layer = -1
-theme_override_styles/panel = SubResource("PixelBorder_Inner")

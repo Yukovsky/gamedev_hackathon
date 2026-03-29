@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_resource_balance")
-initial_metal = 50
+initial_metal = 25
 max_metal = 200
 hull_metal_bonus = 100
 collector_cost_metal = 100

@@ -34,7 +34,8 @@ var _tutorial_focus_tween: Tween
 var _tutorial_focus_color: Color = Color.WHITE
 
 const LEVEL_BAR_FILLED_COLOR: Color = Color(0.941, 0.816, 0.125, 1.0)
-const TUTORIAL_FOCUS_PULSE: Color = Color(1.2, 1.2, 1.2, 1.0)
+const TUTORIAL_FOCUS_PULSE: Color = Color(6.5, 6.5, 6.5, 1.0)  # Экстра-яркий пик поверх затемнения
+const TUTORIAL_FOCUS_BASE_BOOST: float = 2.2  # Минимум пульса тоже яркий
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -274,13 +275,20 @@ func _on_tutorial_focus_changed(target_id: String, accent_color: Color, _allow_i
 	if not _tutorial_focused_control.visible:
 		return
 
-	_tutorial_focused_control.modulate = _tutorial_focus_color
+	var boosted_focus_color := Color(
+		_tutorial_focus_color.r * TUTORIAL_FOCUS_BASE_BOOST,
+		_tutorial_focus_color.g * TUTORIAL_FOCUS_BASE_BOOST,
+		_tutorial_focus_color.b * TUTORIAL_FOCUS_BASE_BOOST,
+		1.0
+	)
+
+	_tutorial_focused_control.modulate = boosted_focus_color
 	_tutorial_focus_tween = create_tween()
 	_tutorial_focus_tween.set_loops()
 	_tutorial_focus_tween.set_trans(Tween.TRANS_SINE)
 	_tutorial_focus_tween.set_ease(Tween.EASE_IN_OUT)
-	_tutorial_focus_tween.tween_property(_tutorial_focused_control, "modulate", TUTORIAL_FOCUS_PULSE, 0.45)
-	_tutorial_focus_tween.tween_property(_tutorial_focused_control, "modulate", _tutorial_focus_color, 0.45)
+	_tutorial_focus_tween.tween_property(_tutorial_focused_control, "modulate", TUTORIAL_FOCUS_PULSE, 0.3)
+	_tutorial_focus_tween.tween_property(_tutorial_focused_control, "modulate", boosted_focus_color, 0.3)
 
 	GameEvents.tutorial_target_rect_changed.emit(target_id, _tutorial_focused_control.get_global_rect())
 

@@ -28,7 +28,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.102, 0.051, 0.208, 0.8)
+color = Color(0.102, 0.051, 0.208, 0.45)
 
 [node name="MarginContainer" type="MarginContainer" parent="Overlay" unique_id=853572299]
 layout_mode = 1
@@ -43,46 +43,62 @@ theme_override_constants/margin_left = 40
 theme_override_constants/margin_right = 40
 theme_override_constants/margin_bottom = 60
 
-[node name="PanelContainer" type="PanelContainer" parent="Overlay/MarginContainer" unique_id=263092452]
+[node name="HBoxContainer" type="HBoxContainer" parent="Overlay/MarginContainer" unique_id=8139590]
 layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="AvatarPanel" type="PanelContainer" parent="Overlay/MarginContainer/HBoxContainer" unique_id=263092452]
+custom_minimum_size = Vector2(224, 224)
+layout_mode = 2
+size_flags_vertical = 8
 theme_override_styles/panel = SubResource("TutorialPanel")
 
-[node name="MarginContainer" type="MarginContainer" parent="Overlay/MarginContainer/PanelContainer" unique_id=956122415]
+[node name="MarginContainer" type="MarginContainer" parent="Overlay/MarginContainer/HBoxContainer/AvatarPanel" unique_id=956122415]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Avatar" type="TextureRect" parent="Overlay/MarginContainer/HBoxContainer/AvatarPanel/MarginContainer" unique_id=49138822]
+custom_minimum_size = Vector2(204, 204)
+layout_mode = 2
+texture = ExtResource("2_nadya")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DialogPanel" type="PanelContainer" parent="Overlay/MarginContainer/HBoxContainer" unique_id=210018877]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+theme_override_styles/panel = SubResource("TutorialPanel")
+
+[node name="MarginContainer" type="MarginContainer" parent="Overlay/MarginContainer/HBoxContainer/DialogPanel" unique_id=417553102]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Overlay/MarginContainer/PanelContainer/MarginContainer" unique_id=8139590]
-layout_mode = 2
-theme_override_constants/separation = 30
-
-[node name="Avatar" type="TextureRect" parent="Overlay/MarginContainer/PanelContainer/MarginContainer/HBoxContainer" unique_id=49138822]
-custom_minimum_size = Vector2(224, 224)
-layout_mode = 2
-texture = ExtResource("2_nadya")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Overlay/MarginContainer/PanelContainer/MarginContainer/HBoxContainer" unique_id=246427192]
+[node name="VBoxContainer" type="VBoxContainer" parent="Overlay/MarginContainer/HBoxContainer/DialogPanel/MarginContainer" unique_id=246427192]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="NameLabel" type="Label" parent="Overlay/MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer" unique_id=1367529767]
+[node name="NameLabel" type="Label" parent="Overlay/MarginContainer/HBoxContainer/DialogPanel/MarginContainer/VBoxContainer" unique_id=1367529767]
 layout_mode = 2
-theme_override_font_sizes/font_size = 34
+theme_override_font_sizes/font_size = 43
 theme_override_fonts/font = ExtResource("3_8w6qn")
 theme_override_colors/font_color = Color(0.756, 0.565, 0.875, 1)
-text = "НАДЯ"
+text = "Н.А.Д.Я."
 
-[node name="DialogText" type="RichTextLabel" parent="Overlay/MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer" unique_id=1694491440]
+[node name="DialogText" type="RichTextLabel" parent="Overlay/MarginContainer/HBoxContainer/DialogPanel/MarginContainer/VBoxContainer" unique_id=1694491440]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_fonts/normal_font = ExtResource("3_8w6qn")
-theme_override_font_sizes/normal_font_size = 26
+theme_override_font_sizes/normal_font_size = 33
 theme_override_colors/default_color = Color(0.816, 0.627, 0.941, 1)
 text = "Текст диалога будет здесь..."
-fit_content = true
+fit_content = false
+visible_characters_behavior = 0
 scroll_active = false
