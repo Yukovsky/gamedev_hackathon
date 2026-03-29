@@ -99,5 +99,6 @@ theme_override_fonts/normal_font = ExtResource("3_8w6qn")
 theme_override_font_sizes/normal_font_size = 33
 theme_override_colors/default_color = Color(0.816, 0.627, 0.941, 1)
 text = "Текст диалога будет здесь..."
-fit_content = true
+fit_content = false
+visible_characters_behavior = 0
 scroll_active = false

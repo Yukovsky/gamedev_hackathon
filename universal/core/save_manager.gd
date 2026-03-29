@@ -78,7 +78,10 @@ func is_tutorial_shown(tutorial_id: String) -> bool:
 
 
 func mark_tutorial_shown(tutorial_id: String) -> void:
+	if bool(tutorial_flags.get(tutorial_id, false)):
+		return
 	tutorial_flags[tutorial_id] = true
+	save_game()
 
 func _serialize_grid(grid: Dictionary) -> Dictionary:
 	var string_grid = {}

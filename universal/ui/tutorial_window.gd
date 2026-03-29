@@ -8,6 +8,9 @@ extends CanvasLayer
 const BASE_DIALOG_PANEL_HEIGHT: float = 224.0
 const DIALOG_CONTENT_PADDING: float = 110.0
 const MAX_DIALOG_HEIGHT_RATIO: float = 0.55
+const TYPEWRITER_CHAR_DELAY: float = 0.03
+const TEXT_DESCENDER_PADDING: float = 10.0
+const TUTORIAL_ID_NADYA_ONE_TIME: String = "nadya_first_launch_done"
 
 const COLOR_HULL_TEXT: String = "#4DCC4D"
 const COLOR_REACTOR_TEXT: String = "#F2BD33"
@@ -68,8 +71,8 @@ var dialog_queue: Array[Array] = [] # Очередь диалогов
 var tutorial_steps: Array[String] = []
 var current_step: int = 0
 var is_typing: bool = false
-var typing_tween: Tween
 var highlight_tween: Tween
+var _typing_session_id: int = 0
 
 # Флаги состояний и паузы
 var _pause_state_before_tutorial: bool = false
@@ -80,6 +83,7 @@ var _shop_invite_shown: bool = false
 var _shop_guide_shown: bool = false
 var _reactor_guide_shown: bool = false
 var _max_resources_shown_times: int = 0
+var _tutorial_disabled_for_profile: bool = false
 
 # Флаг для защиты от закликивания (анти-скип)
 var _is_input_blocked: bool = false
@@ -94,6 +98,10 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS # Работаем даже при паузе
 	hide()
 	dialog_text.bbcode_enabled = true
+	dialog_text.visible_characters_behavior = TextServer.VC_CHARS_BEFORE_SHAPING
+	_tutorial_disabled_for_profile = SaveManager.is_tutorial_shown(TUTORIAL_ID_NADYA_ONE_TIME)
+	if _tutorial_disabled_for_profile:
+		return
 	
 	# Восстанавливаем обычное затемнение - полный экран
 	overlay.anchor_left = 0.0
@@ -115,6 +123,8 @@ func _ready() -> void:
 
 # ========== ЛОГИКА ОЧЕРЕДИ ==========
 func _queue_dialog(steps: Array[String]) -> void:
+	if _tutorial_disabled_for_profile:
+		return
 	if steps.is_empty(): 
 		return
 	dialog_queue.append(steps)
@@ -145,6 +155,8 @@ func _hide_and_unpause() -> void:
 
 func _show_current_step() -> void:
 	if current_step >= tutorial_steps.size():
+		if tutorial_steps == shop_guide_steps:
+			_mark_tutorial_completed_once()
 		_play_next_dialog()
 		return
 
@@ -162,25 +174,14 @@ func _show_current_step() -> void:
 	dialog_panel.custom_minimum_size.y = BASE_DIALOG_PANEL_HEIGHT
 	is_typing = true
 	dialog_text.text = tutorial_steps[current_step]
-	dialog_text.visible_ratio = 0.0 
-	call_deferred("_update_dialog_panel_height", 0.0)
-	
-	if typing_tween: 
-		typing_tween.kill()
-		
-	typing_tween = create_tween()
-	var duration = tutorial_steps[current_step].length() * 0.03
-	typing_tween.tween_method(_on_typing_progress, 0.0, 1.0, duration)
-	typing_tween.finished.connect(func(): 
-		_update_dialog_panel_height(1.0)
-		is_typing = false
-		_start_highlight_animation()
-	)
+	dialog_text.visible_characters = 0
+	call_deferred("_start_typewriter")
 
 func _start_highlight_animation() -> void:
 	if highlight_tween:
 		highlight_tween.kill()
 	highlight_tween = create_tween()
+	highlight_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	highlight_tween.set_loops()
 	highlight_tween.set_ease(Tween.EASE_IN_OUT)
 	highlight_tween.set_trans(Tween.TRANS_SINE)
@@ -189,8 +190,19 @@ func _start_highlight_animation() -> void:
 
 # ========== РЕАКЦИИ НА ИГРОВЫЕ СОБЫТИЯ ==========
 func _on_game_started() -> void:
+	if _tutorial_disabled_for_profile:
+		return
 	_queue_dialog(intro_steps)
 	_queue_dialog(gathering_steps)
+
+func _mark_tutorial_completed_once() -> void:
+	if _tutorial_disabled_for_profile:
+		return
+	if SaveManager.is_tutorial_shown(TUTORIAL_ID_NADYA_ONE_TIME):
+		_tutorial_disabled_for_profile = true
+		return
+	SaveManager.mark_tutorial_shown(TUTORIAL_ID_NADYA_ONE_TIME)
+	_tutorial_disabled_for_profile = true
 
 func _on_raider_spawned(_position: Vector2) -> void:
 	if _raider_warning_shown: 
@@ -250,10 +262,9 @@ func _input(event: InputEvent) -> void:
 			return
 		
 		if is_typing:
-			if typing_tween: 
-				typing_tween.kill()
-			dialog_text.visible_ratio = 1.0
-			_update_dialog_panel_height(1.0)
+			_typing_session_id += 1
+			dialog_text.visible_characters = dialog_text.get_total_character_count()
+			_fit_dialog_panel_to_visible_text()
 			is_typing = false
 			_start_highlight_animation()
 		else:
@@ -327,22 +338,77 @@ func _extract_event_position(event: InputEvent) -> Vector2:
 		return (event as InputEventScreenTouch).position
 	return Vector2(-10000.0, -10000.0)
 
-func _on_typing_progress(ratio: float) -> void:
-	dialog_text.visible_ratio = ratio
-	_update_dialog_panel_height(ratio)
+func _start_typewriter() -> void:
+	_typing_session_id += 1
+	var session_id: int = _typing_session_id
+	_run_typewriter(session_id)
 
-func _update_dialog_panel_height(progress: float = 1.0) -> void:
+func _run_typewriter(session_id: int) -> void:
+	var total_chars: int = dialog_text.get_total_character_count()
+	if total_chars <= 0:
+		is_typing = false
+		_start_highlight_animation()
+		return
+
+	while dialog_text.visible_characters < total_chars:
+		if session_id != _typing_session_id or not is_typing:
+			return
+
+		var next_visible_characters: int = dialog_text.visible_characters + 1
+		if _needs_expand_for_next_character(next_visible_characters):
+			_expand_dialog_for_next_character(next_visible_characters)
+			await get_tree().process_frame
+			if session_id != _typing_session_id or not is_typing:
+				return
+
+		dialog_text.visible_characters = next_visible_characters
+		await get_tree().create_timer(TYPEWRITER_CHAR_DELAY, true, false, true).timeout
+
+	if session_id != _typing_session_id or not is_typing:
+		return
+
+	is_typing = false
+	_start_highlight_animation()
+
+func _needs_expand_for_next_character(next_visible_characters: int) -> bool:
+	var current_panel_height: float = dialog_panel.custom_minimum_size.y
+	var current_capacity: float = max(0.0, current_panel_height - DIALOG_CONTENT_PADDING)
+	var next_content_height: float = _predict_content_height(next_visible_characters)
+	return next_content_height > current_capacity + 0.5
+
+func _expand_dialog_for_next_character(next_visible_characters: int) -> void:
 	var viewport_height: float = get_viewport().get_visible_rect().size.y
 	if viewport_height <= 0.0:
 		return
 
-	# Рост только правой панели диалога: окно Н.А.Д.Я. слева остаётся фиксированным.
-	var text_height: float = dialog_text.get_content_height()
+	var current_panel_height: float = dialog_panel.custom_minimum_size.y
+	var current_capacity: float = max(0.0, current_panel_height - DIALOG_CONTENT_PADDING)
+	var next_content_height: float = _predict_content_height(next_visible_characters)
+	var required_expand: float = max(0.0, next_content_height - current_capacity)
+	if required_expand <= 0.0:
+		return
+
+	var max_dialog_height: float = viewport_height * MAX_DIALOG_HEIGHT_RATIO
+	var target_height: float = min(max_dialog_height, current_panel_height + required_expand)
+	dialog_panel.custom_minimum_size.y = max(BASE_DIALOG_PANEL_HEIGHT, target_height)
+
+func _predict_content_height(visible_characters: int) -> float:
+	var previous_visible_characters: int = dialog_text.visible_characters
+	dialog_text.visible_characters = visible_characters
+	# RichTextLabel can slightly underestimate lower glyph descenders in some fonts.
+	var predicted_height: float = dialog_text.get_content_height() + TEXT_DESCENDER_PADDING
+	dialog_text.visible_characters = previous_visible_characters
+	return predicted_height
+
+func _fit_dialog_panel_to_visible_text() -> void:
+	var viewport_height: float = get_viewport().get_visible_rect().size.y
+	if viewport_height <= 0.0:
+		return
+
+	var text_height: float = dialog_text.get_content_height() + TEXT_DESCENDER_PADDING
 	var requested_height: float = max(BASE_DIALOG_PANEL_HEIGHT, text_height + DIALOG_CONTENT_PADDING)
 	var max_dialog_height: float = viewport_height * MAX_DIALOG_HEIGHT_RATIO
-	var full_target_height: float = clamp(requested_height, BASE_DIALOG_PANEL_HEIGHT, max_dialog_height)
-	var clamped_progress: float = clamp(progress, 0.0, 1.0)
-	var target_height: float = lerp(BASE_DIALOG_PANEL_HEIGHT, full_target_height, clamped_progress)
+	var target_height: float = clamp(requested_height, BASE_DIALOG_PANEL_HEIGHT, max_dialog_height)
 	dialog_panel.custom_minimum_size.y = target_height
 
 func _create_cutout_layer() -> void:
