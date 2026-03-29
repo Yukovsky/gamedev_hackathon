@@ -406,7 +406,9 @@ func _input(event: InputEvent) -> void:
 			if _step_allows_target_interaction:
 				if not _can_trigger_step_action(_extract_event_position(event)):
 					return
-				if not _step_action_id.is_empty():
+				# Для покупки корпуса: первый клик завершает реплику, а не строит модуль.
+				# Реальная постройка произойдет только следующим кликом игрока по кнопке после закрытия окна.
+				if not _step_action_id.is_empty() and _step_action_id != "buy_hull":
 					GameEvents.tutorial_action_requested.emit(_step_action_id)
 
 			current_step += 1
