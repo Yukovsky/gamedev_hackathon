@@ -4,129 +4,131 @@ extends CanvasLayer
 @onready var dialog_text: RichTextLabel = $Overlay/MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/DialogText
 @onready var name_label: Label = $Overlay/MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/NameLabel
 
-# ========== ЧАСТЬ 1: Приветствие ==========
-# Показывается: При начале игры
+# ========== ТЕКСТЫ ДИАЛОГОВ ==========
 var intro_steps: Array[String] = [
-	"Капитан, вы меня слышите? Это [color=yellow][b]Н.А.Д.Я.[/b][/color], ваша Наблюдательная Автономная Диспетческая Ячейка.",
+	"Капитан, вы меня слышите? Это [color=yellow][b][upper]Н.А.Д.Я.[/upper][/b][/color], ваша Наблюдательная Автономная Диспетчерская Ячейка.",
 	"Наш корабль серьезно пострадал. Мы застряли в секторе космического мусора.",
 ]
 
-# ========== ЧАСТЬ 2: Сбор мусора ==========
-# Показывается: После приветствия (шаг 0-1)
 var gathering_steps: Array[String] = [
-	"Чтобы выжить, нам нужно собирать обломки. Нажимайте по пролетающему мусору, чтобы добыть [color=orange][b]МЕТАЛЛ[/b][/color]!",
+	"Чтобы выжить, нам нужно собирать обломки. Нажимайте по пролетающему мусору, чтобы добыть [color=orange][b][upper]МЕТАЛЛ[/upper][/b][/color]!",
 ]
 
-# ========== ЧАСТЬ 5: Предупреждение о врагах ==========
-# Показывается: При появлении первого налётчика
 var raider_warning_steps: Array[String] = [
-	"Капитан, тревога! Это [color=red][b]враг[/b][/color]. Он хочет забрать наши ресурсы.",
-	"Чтобы отбиться, кликайте прямо по [color=red][b]врагу[/b][/color], как по мусору.",
+	"Капитан, тревога! Это [color=red][b][upper]ВРАГ[/upper][/b][/color]. Он хочет забрать наши ресурсы."
 ]
 
-# ========== ЧАСТЬ 6: Защита от врагов ==========
-# Показывается: После уничтожения первого врага
 var raider_defense_steps: Array[String] = [
-	"Капитан, для автоматизации защиты от [color=red][b]врагов[/b][/color] постройте турели: их можно купить в магазине."
+	"Капитан, для автоматизации защиты от [color=red][b][upper]ВРАГОВ[/upper][/b][/color] постройте турели: их можно купить в магазине."
 ]
 
-# ========== ЧАСТЬ Х: Обучение магазина (1 раз при 75+ металла) ==========
+var shop_invite_steps: Array[String] = [
+	"Капитан, у вас достаточно [color=orange][b][upper]МЕТАЛЛА[/upper][/b][/color]! Зайдите в [color=green][b][upper]МАГАЗИН[/upper][/b][/color], чтобы купить модули для корабля."
+]
+
 var shop_guide_steps: Array[String] = [
 	"Хорошо, капитан. Магазин открыт! Я расскажу об основных модулях, за каждый отвечает свой эффект:",
-	"[color=cyan]Корпус[/color] — базовая защита, которая смягчает урон.",
-	"[color=cyan]Реактор[/color] — источник энергии, расширяет возможности строительства.",
-	"[color=cyan]Сборщик[/color] — увеличивает скорость добычи металла.",
-	"[color=cyan]Турель[/color] — оборонительный модуль, атакует врагов автоматически.",
-	"[color=cyan]Специальный модуль[/color] — уникальный эффект: усиление урона/щит/экон. Используй по ситуации."
+	"[color=cyan][upper]КОРПУС[/upper][/color] — базовая защита, которая смягчает урон.",
+	"[color=cyan][upper]РЕАКТОР[/upper][/color] — источник энергии, расширяет возможности строительства.",
+	"[color=cyan][upper]СБОРЩИК[/upper][/color] — увеличивает скорость добычи металла.",
+	"[color=cyan][upper]ТУРЕЛЬ[/upper][/color] — оборонительный модуль, атакует врагов автоматически.",
+	"[color=cyan][upper]СПЕЦИАЛЬНЫЙ МОДУЛЬ[/upper][/color] — уникальный эффект: усиление урона/щит/экон. Используй по ситуации."
+]
+var reactor_guide_steps: Array[String] = [
+	"Капитан, вы накопили [color=orange][b][upper]375 МЕТАЛЛА[/upper][/b][/color]! Этого хватит для постройки [color=cyan][upper]РЕАКТОРА[/upper][/color].",
+	"Каждому новому отсеку нужна энергия. Постройте [color=cyan][upper]РЕАКТОР[/upper][/color], чтобы увеличить энергоемкость корабля и продолжить расширение базы!"
 ]
 
-var tutorial_steps: Array[String] = []
+# ... другие переменные ...
 
+# ========== СИСТЕМНЫЕ ПЕРЕМЕННЫЕ ==========
+var dialog_queue: Array[Array] = [] # Очередь диалогов
+var tutorial_steps: Array[String] = []
 var current_step: int = 0
-var current_tutorial_phase: int = 0  # 0=intro, 1=gathering, 2=raider_warning, 3=raider_defense
 var is_typing: bool = false
 var typing_tween: Tween
+var highlight_tween: Tween
+var _reactor_guide_shown: bool = false
+
+# Флаги состояний и паузы
 var _pause_state_before_tutorial: bool = false
 var _pause_applied: bool = false
-var _pending_raider_warning: bool = false
-var shop_opened: bool = false
-var _shop_guide_shown: bool = false
-var _pending_shop_guide: bool = false
 var _raider_warning_shown: bool = false
+var _raider_defense_shown: bool = false
+var _shop_invite_shown: bool = false
+var _shop_guide_shown: bool = false
 
 func _ready() -> void:
-	# Диалог должен оставаться интерактивным даже когда игра на паузе.
-	process_mode = Node.PROCESS_MODE_ALWAYS
+	process_mode = Node.PROCESS_MODE_ALWAYS # Работаем даже при паузе
 	hide()
-	
-	# Включаем BBCode для форматирования текста
 	dialog_text.bbcode_enabled = true
 	
-	GameEvents.game_started.connect(start_tutorial)
+	# === ИЗМЕНЕНИЯ ЗДЕСЬ ===
+	# Убираем старую подписку на GameEvents.game_started
+	
+	# Оставляем остальные подписки:
 	GameEvents.raider_spawned.connect(_on_raider_spawned)
 	GameEvents.raider_destroyed.connect(_on_raider_destroyed)
 	GameEvents.resource_changed.connect(_on_resource_changed)
 	GameEvents.shop_opened.connect(_on_shop_opened)
-	GameEvents.shop_closed.connect(_on_shop_closed)
 	GameEvents.game_finished.connect(_on_game_finished)
-	# Мы удалили старую подписку на gui_input, теперь все работает через _input()
+	
+	# ЗАПУСКАЕМ НАДЮ САМОСТОЯТЕЛЬНО:
+	# Ждем ровно 0.5 секунды после загрузки сцены и вызываем стартовый диалог.
+	# Это гарантирует, что вся игра прогрузилась и мы ничего не пропустим.
+	get_tree().create_timer(0.5, true, false, true).timeout.connect(_on_game_started)
 
-func start_tutorial() -> void:
-	current_tutorial_phase = 0
-	_start_dialog(intro_steps)
-	# После завершения intro_steps, нужно показать gathering_steps
-	# Это обработается через клики пользователя
-
-
-func _start_dialog(steps: Array[String]) -> void:
-	if steps.is_empty():
+# ========== ЛОГИКА ОЧЕРЕДИ ==========
+func _queue_dialog(steps: Array[String]) -> void:
+	if steps.is_empty(): 
 		return
+	# Добавляем диалог в конец очереди
+	dialog_queue.append(steps)
+	# Если Надя сейчас ничего не говорит, запускаем диалог
+	if not visible:
+		_play_next_dialog()
 
+func _play_next_dialog() -> void:
+	# Если очередь пуста - прячем окно и снимаем паузу
+	if dialog_queue.is_empty():
+		_hide_and_unpause()
+		return
+		
+	# Если это первый диалог в серии, замораживаем игру
 	if not _pause_applied:
 		_pause_state_before_tutorial = get_tree().paused
 		get_tree().paused = true
 		_pause_applied = true
-
-	tutorial_steps = steps
-	show()
+		
+	tutorial_steps = dialog_queue.pop_front()
 	current_step = 0
+	show()
 	_show_current_step()
 
-
-func _on_raider_spawned(_position: Vector2) -> void:
-	# Показываем предупреждение только при появлении первого налётчика
-	if _raider_warning_shown:
-		return
-	if visible:
-		_pending_raider_warning = true
-		return
-	# Небольшая задержка, чтобы игрок успел увидеть появление врага
-	await get_tree().create_timer(1.5).timeout
-	# Если за это время открылся другой диалог — поставим предупреждение в очередь
-	if visible:
-		_pending_raider_warning = true
-		return
-
-	_raider_warning_shown = true
-	_start_dialog(raider_warning_steps)
-
-func _on_resource_changed(type: String, new_amount: int) -> void:
-	# Старый курс: просто обновление UI, логика тут отсутствует
-	# оставляем подписку, чтобы ничего не ломалось в связках.
-	return
+func _hide_and_unpause() -> void:
+	hide()
+	# Возвращаем паузу в то состояние, в котором она была ДО начала диалога.
+	# (Если игрок открыл магазин, игра останется на паузе магазина)
+	if _pause_applied:
+		get_tree().paused = _pause_state_before_tutorial
+		_pause_applied = false
 
 func _show_current_step() -> void:
+	# Если текущий диалог закончился, запускаем следующий из очереди
 	if current_step >= tutorial_steps.size():
-		_move_to_next_phase()
+		_play_next_dialog()
 		return
 
+	# Сбрасываем цвет перед новой репликой
+	dialog_text.modulate = Color.WHITE
+	if highlight_tween:
+		highlight_tween.kill()
+
 	is_typing = true
-	var text = tutorial_steps[current_step]
-	# Текст уже содержит BBCode форматирование, просто используем его как есть
-	dialog_text.text = text
-	dialog_text.visible_ratio = 0.0 # Сбрасываем видимость текста в ноль
+	dialog_text.text = tutorial_steps[current_step]
+	dialog_text.visible_ratio = 0.0 
 	
-	if typing_tween:
+	if typing_tween: 
 		typing_tween.kill()
 		
 	typing_tween = create_tween()
@@ -137,132 +139,80 @@ func _show_current_step() -> void:
 		_start_highlight_animation()
 	)
 
-func _move_to_next_phase() -> void:
-	"""Переход к следующей фазе обучения"""
-	current_tutorial_phase += 1
-	current_step = 0
-	print("Переход на фазу: ", current_tutorial_phase)
-	
+func _start_highlight_animation() -> void:
+	if highlight_tween:
+		highlight_tween.kill()
+	highlight_tween = create_tween()
+	highlight_tween.set_loops()
+	highlight_tween.set_ease(Tween.EASE_IN_OUT)
+	highlight_tween.set_trans(Tween.TRANS_SINE)
+	highlight_tween.tween_property(dialog_text, "modulate", Color(1.2, 1.2, 1.2), 1.0)
+	highlight_tween.tween_property(dialog_text, "modulate", Color(1.0, 1.0, 1.0), 1.0)
 
-	
-	match current_tutorial_phase:
-		0:
-			# ЧАСТЬ 1: Приветствие
-			_start_dialog(intro_steps)
-		1:
-			# ЧАСТЬ 2: Сбор мусора
-			_start_dialog(gathering_steps)
-		2:
-			# Ожидание враги
-			_hide_and_unpause()
-		3:
-			# Защита
-			_hide_and_unpause()
-		_:
-			_hide_and_unpause()
+# ========== РЕАКЦИИ НА ИГРОВЫЕ СОБЫТИЯ ==========
+func _on_game_started() -> void:
+	_queue_dialog(intro_steps)
+	_queue_dialog(gathering_steps)
 
-func _hide_and_unpause() -> void:
-	"""Скрывает диалог и восстанавливает паузу"""
-	hide()
+func _on_raider_spawned(_position: Vector2) -> void:
+	if _raider_warning_shown: 
+		return
+	_raider_warning_shown = true
 	
-	if _pause_applied:
-		get_tree().paused = _pause_state_before_tutorial
-		_pause_applied = false
-	print("Диалог скрыт, пауза восстановлена")
+	# Ждем 1.5 сек перед предупреждением. Параметры таймера гарантируют, 
+	# что он сработает независимо от текущей паузы
+	await get_tree().create_timer(1.5, true, false, true).timeout
+	_queue_dialog(raider_warning_steps)
 
-	if _pending_shop_guide:
-		_pending_shop_guide = false
-		_start_dialog(shop_guide_steps)
+func _on_resource_changed(type: String, new_amount: int) -> void:
+	if type == "metal":
+		# Первое событие: приглашение в магазин на 75 металла
+		if new_amount >= 75 and not _shop_invite_shown:
+			_shop_invite_shown = true
+			_queue_dialog(shop_invite_steps)
+			
+		# Второе событие: обучение реактору на 375 металла
+		if new_amount >= 375 and not _reactor_guide_shown:
+			_reactor_guide_shown = true
+			_queue_dialog(reactor_guide_steps)
 
 func _on_shop_opened() -> void:
-	shop_opened = true
-	print("Магазин открыт. Текущая фаза: ", current_tutorial_phase)
-
-	# Один раз, при 75+ металла, триггерим гайд Надя по модулям
 	if not _shop_guide_shown and ResourceManager.metal >= 75:
 		_shop_guide_shown = true
-		if visible:
-			_pending_shop_guide = true
-			return
-		_start_dialog(shop_guide_steps)
-
-func _on_shop_closed() -> void:
-	shop_opened = false
-	print("Магазин закрыт")
+		_queue_dialog(shop_guide_steps)
 
 func _on_raider_destroyed(_position: Vector2, _evolution_level: int, _source: String) -> void:
-	# Показываем советы об защите после первого уничтоженного врага
-	if current_tutorial_phase == 3 and not visible:
-		# Восстанавливаем паузу для диалога
-		if not _pause_applied:
-			_pause_state_before_tutorial = get_tree().paused
-			get_tree().paused = true
-			_pause_applied = true
-		_start_dialog(raider_defense_steps)
+	# Показываем совет только если враг уже появлялся и обучение защите еще не было
+	if _raider_warning_shown and not _raider_defense_shown:
+		_raider_defense_shown = true
+		_queue_dialog(raider_defense_steps)
+
 func _on_game_finished(outcome: String, _reason: String) -> void:
 	if outcome == "lose":
 		var defeat_steps: Array[String] = [
-			"Капитан, мы потерпели поражение. Корабль разрушен.",
-			"Не расстраивайтесь, попробуйте снова!"
+			"[upper]КАПИТАН, МЫ ПОТЕРПЕЛИ ПОРАЖЕНИЕ. КОРАБЛЬ РАЗРУШЕН.[/upper]",
+			"[upper]НЕ РАССТРАИВАЙТЕСЬ, ПОПРОБУЙТЕ СНОВА![/upper]"
 		]
-		if not _pause_applied:
-			_pause_state_before_tutorial = get_tree().paused
-			get_tree().paused = true
-			_pause_applied = true
-		tutorial_steps = defeat_steps
-		show()
-		current_step = 0
-		_show_current_step()
-func _start_highlight_animation() -> void:
-	# Простая пульсация для выделенных слов (анимация цвета)
-	var tween = create_tween()
-	tween.set_loops()
-	tween.set_ease(Tween.EASE_IN_OUT)
-	tween.set_trans(Tween.TRANS_SINE)
-	
-	# Анимируем modulate для всего текста (простая пульсация)
-	tween.tween_property(dialog_text, "modulate", Color(1.2, 1.2, 1.2), 1.0)
-	tween.tween_property(dialog_text, "modulate", Color(1.0, 1.0, 1.0), 1.0)
+		dialog_queue.clear() # Сбрасываем все другие советы, поражение важнее всего
+		_queue_dialog(defeat_steps)
 
-
-
-func _end_tutorial() -> void:
-	_hide_and_unpause()
-	print("Фаза ", current_tutorial_phase, " обучения завершена!")
-	
-	# Проверяем, есть ли следующая фаза
-	if current_tutorial_phase < 5:
-		_move_to_next_phase()
-	else:
-		print("Обучение полностью завершено!")
-	
-	if _pending_raider_warning:
-		_pending_raider_warning = false
-		_start_dialog(raider_warning_steps)
-
-# ==========================================
-# ГЛОБАЛЬНЫЙ ПЕРЕХВАТ КЛИКОВ
-# ==========================================
+# ========== ГЛОБАЛЬНЫЙ ПЕРЕХВАТ КЛИКОВ ==========
 func _input(event: InputEvent) -> void:
-	# Если Надя спрятана, мы вообще не вмешиваемся в клики
-	if not visible:
+	if not visible: 
 		return
 
-	# Проверяем, что это левый клик мыши или тап по экрану смартфона
 	var is_click = event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed
 	var is_touch = event is InputEventScreenTouch and event.pressed
 	
 	if is_click or is_touch:
-		# МАГИЯ: Забираем клик себе! Теперь он не пройдет сквозь интерфейс в игру.
 		get_viewport().set_input_as_handled() 
 		
 		if is_typing:
-			# Если текст еще печатается - моментально показываем его весь
-			if typing_tween:
+			if typing_tween: 
 				typing_tween.kill()
 			dialog_text.visible_ratio = 1.0
 			is_typing = false
+			_start_highlight_animation() # Включаем пульсацию, даже если игрок пропустил печать
 		else:
-			# Если текст уже напечатан - идем к следующей реплике
 			current_step += 1
 			_show_current_step()
