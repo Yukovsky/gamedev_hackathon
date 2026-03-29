@@ -110,14 +110,12 @@ var _reactor_guide_shown: bool = false
 var _max_resources_shown_times: int = 0
 var _tutorial_disabled_for_profile: bool = false
 var _tutorial_started: bool = false
-var _training_shop_guide_done: bool = false
-var _training_max_reached_done: bool = false
-var _training_finish_scheduled: bool = false
 var _training_redirect_scheduled: bool = false
 var _training_failed: bool = false
+var _tutorial_first_raider_requested: bool = false
 
-const TRAINING_FINISH_DELAY_SEC: float = 5.0
 const START_MENU_SCENE: String = "res://ui/start_menu.tscn"
+const FIRST_RAIDER_REQUEST_DELAY_SEC: float = 0.25
 
 # Флаг для защиты от закликивания (анти-скип)
 var _is_input_blocked: bool = false
@@ -253,6 +251,9 @@ func _mark_tutorial_completed_once() -> void:
 	_tutorial_disabled_for_profile = true
 
 func _on_dialog_finished(finished_steps: Array[String]) -> void:
+	if finished_steps == gathering_steps and (tutorial_mode == TutorialMode.FULL or tutorial_mode == TutorialMode.FULL_CYCLE_TRAINING):
+		_request_first_raider_for_tutorial()
+
 	if tutorial_mode == TutorialMode.FULL:
 		if finished_steps == shop_guide_steps:
 			_mark_tutorial_completed_once()
@@ -263,13 +264,11 @@ func _on_dialog_finished(finished_steps: Array[String]) -> void:
 			_schedule_return_to_main_menu()
 			return
 		if finished_steps == shop_guide_steps:
-			_training_shop_guide_done = true
-		if finished_steps == max_resources_steps:
-			_training_max_reached_done = true
+			_queue_dialog(full_cycle_training_complete_steps)
+			return
 		if finished_steps == full_cycle_training_complete_steps:
 			_schedule_return_to_main_menu()
 			return
-		_try_schedule_full_cycle_finish()
 		return
 
 	if tutorial_mode == TutorialMode.MAX_METAL_TRAINING:
@@ -317,11 +316,6 @@ func _on_max_resources_reached(resource_type: String, _max_amount: int) -> void:
 	if tutorial_mode == TutorialMode.FULL_CYCLE_TRAINING:
 		if resource_type != "metal":
 			return
-		if _max_resources_shown_times >= 1:
-			return
-		_max_resources_shown_times = 1
-		_queue_dialog(max_resources_steps)
-		return
 
 	if _max_resources_shown_times < 2:
 		_max_resources_shown_times += 1
@@ -349,25 +343,23 @@ func _on_game_finished(outcome: String, _reason: String) -> void:
 		dialog_queue.clear()
 		_queue_dialog(defeat_steps)
 
-func _try_schedule_full_cycle_finish() -> void:
-	if tutorial_mode != TutorialMode.FULL_CYCLE_TRAINING:
-		return
+func _request_first_raider_for_tutorial() -> void:
 	if _training_failed:
 		return
-	if _training_finish_scheduled:
+	if _raider_warning_shown:
 		return
-	if not _training_shop_guide_done:
+	if _tutorial_first_raider_requested:
 		return
-	if not _training_max_reached_done:
-		return
-	_training_finish_scheduled = true
-	call_deferred("_finish_full_cycle_training_after_delay")
+	_tutorial_first_raider_requested = true
+	call_deferred("_emit_raider_spawn_request_after_delay")
 
-func _finish_full_cycle_training_after_delay() -> void:
-	await get_tree().create_timer(TRAINING_FINISH_DELAY_SEC, true, false, true).timeout
-	if not is_inside_tree():
+func _emit_raider_spawn_request_after_delay() -> void:
+	await get_tree().create_timer(FIRST_RAIDER_REQUEST_DELAY_SEC, true, false, true).timeout
+	if _training_failed:
 		return
-	_queue_dialog(full_cycle_training_complete_steps)
+	if _raider_warning_shown:
+		return
+	GameEvents.tutorial_raider_spawn_requested.emit()
 
 func _schedule_return_to_main_menu() -> void:
 	if _training_redirect_scheduled:

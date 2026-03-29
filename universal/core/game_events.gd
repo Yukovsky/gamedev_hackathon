@@ -58,6 +58,9 @@ signal raider_spawned(position: Vector2)
 ## Налетчик кусает модуль
 signal raider_bite(position: Vector2)
 
+## Туториал просит гарантированно заспавнить первого налетчика
+signal tutorial_raider_spawn_requested
+
 ## Магазин открыт
 signal shop_opened
 

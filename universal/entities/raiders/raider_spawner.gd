@@ -122,6 +122,8 @@ func _ready() -> void:
 		GameEvents.module_built.connect(_on_buildings_changed)
 	if GameEvents.has_signal("module_destroyed"):
 		GameEvents.module_destroyed.connect(_on_buildings_changed)
+	if GameEvents.has_signal("tutorial_raider_spawn_requested"):
+		GameEvents.tutorial_raider_spawn_requested.connect(_on_tutorial_raider_spawn_requested)
 
 	_spawn_timer = Timer.new()
 	_spawn_timer.one_shot = false
@@ -324,3 +326,22 @@ func _on_game_ended() -> void:
 		if is_instance_valid(raider):
 			raider.queue_free()
 	_active_raiders.clear()
+
+
+func _on_tutorial_raider_spawn_requested() -> void:
+	if _is_game_finished:
+		return
+	_cleanup_invalid_raiders()
+	if not _active_raiders.is_empty():
+		return
+
+	var row: Dictionary = _get_balance_row(_get_current_buildings_count())
+	var tutorial_row: Dictionary = row.duplicate(true)
+	if int(tutorial_row.get("max_active", 0)) <= 0:
+		tutorial_row["max_active"] = 1
+	if not tutorial_row.has("enemy_set") or (tutorial_row.get("enemy_set") as Array).is_empty():
+		tutorial_row["enemy_set"] = [{"type": "normal", "count": 1}]
+	if int(tutorial_row.get("normal_hp", 0)) <= 0:
+		tutorial_row["normal_hp"] = max(1, balance.raider_max_hp)
+
+	_spawn_raider(tutorial_row)
