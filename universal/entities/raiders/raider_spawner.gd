@@ -4,6 +4,7 @@ extends Node2D
 @export var raider_scene: PackedScene = preload("res://entities/raiders/raider.tscn")
 @export var balance: RaiderBalance = RaiderBalance.new()
 @export var spawn_interval_sec: float = 1.2
+@export var min_buildings_for_spawn: int = 2
 
 @export_group("Spawn Bounds")
 @export var spawn_offset_y_px: float = 110.0
@@ -16,6 +17,7 @@ var _is_game_finished: bool = false
 var _spawn_cycle: Array[int] = []
 var _spawn_cycle_index: int = 0
 var _spawn_cycle_key: String = ""
+var _spawn_enabled_by_buildings: bool = false
 
 const BALANCE_ROWS: Array[Dictionary] = [
 	{
@@ -132,6 +134,7 @@ func _ready() -> void:
 	add_child(_spawn_timer)
 	_spawn_timer.wait_time = max(0.15, spawn_interval_sec)
 	_spawn_timer.start()
+	_sync_spawn_timer_state()
 
 
 func _process(_delta: float) -> void:
@@ -143,9 +146,12 @@ func _process(_delta: float) -> void:
 func _on_spawn_timer_timeout() -> void:
 	if _is_game_finished:
 		return
+	var buildings_count: int = _sync_spawn_timer_state()
+	if not _spawn_enabled_by_buildings:
+		return
 	_cleanup_invalid_raiders()
 
-	var row: Dictionary = _get_balance_row(_get_current_buildings_count())
+	var row: Dictionary = _get_balance_row(buildings_count)
 	if int(row.get("max_active", 0)) <= 0:
 		return
 	if _active_raiders.size() >= int(row.get("max_active", 0)):
@@ -156,6 +162,22 @@ func _on_spawn_timer_timeout() -> void:
 
 func _on_buildings_changed(_module_type: String, _position: Vector2) -> void:
 	_reset_spawn_cycle()
+	_sync_spawn_timer_state()
+
+
+func _sync_spawn_timer_state() -> int:
+	var buildings_count: int = _get_current_buildings_count()
+	_spawn_enabled_by_buildings = buildings_count >= max(1, min_buildings_for_spawn)
+
+	if _spawn_timer != null:
+		if _spawn_enabled_by_buildings:
+			if _spawn_timer.is_stopped():
+				_spawn_timer.start()
+		else:
+			if not _spawn_timer.is_stopped():
+				_spawn_timer.stop()
+
+	return buildings_count
 
 
 func _spawn_raider(row: Dictionary) -> void:
