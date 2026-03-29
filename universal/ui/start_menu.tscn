@@ -18,20 +18,6 @@ corner_radius_bottom_left = 30
 shadow_color = Color(0, 0, 0, 0.5)
 shadow_size = 10
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_StartBtnHover"]
-bg_color = Color(0.2, 0.5, 0.8, 0.9)
-border_width_left = 8
-border_width_top = 8
-border_width_right = 8
-border_width_bottom = 8
-border_color = Color(0.6, 1, 1, 1)
-corner_radius_top_left = 30
-corner_radius_top_right = 30
-corner_radius_bottom_right = 30
-corner_radius_bottom_left = 30
-shadow_color = Color(0, 0, 0, 0.7)
-shadow_size = 15
-
 [sub_resource type="StyleBoxFlat" id="StyleBox_StartBtnPressed"]
 bg_color = Color(0.05, 0.2, 0.4, 0.9)
 border_width_left = 4
@@ -45,6 +31,20 @@ corner_radius_bottom_right = 30
 corner_radius_bottom_left = 30
 shadow_color = Color(0, 0, 0, 0.3)
 shadow_size = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_StartBtnHover"]
+bg_color = Color(0.2, 0.5, 0.8, 0.9)
+border_width_left = 8
+border_width_top = 8
+border_width_right = 8
+border_width_bottom = 8
+border_color = Color(0.6, 1, 1, 1)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+shadow_color = Color(0, 0, 0, 0.7)
+shadow_size = 15
 
 [node name="StartMenu" type="CanvasLayer" unique_id=209197812]
 script = ExtResource("1_sm")
@@ -86,8 +86,8 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_fonts/font = ExtResource("3_loyqk")
 theme_override_styles/normal = SubResource("StyleBox_StartBtn")
-theme_override_styles/hover = SubResource("StyleBox_StartBtnHover")
 theme_override_styles/pressed = SubResource("StyleBox_StartBtnPressed")
+theme_override_styles/hover = SubResource("StyleBox_StartBtnHover")
 text = "ИГРАТЬ"
 
 [node name="BtnExit" type="Button" parent="Control" unique_id=1919690250]
@@ -107,6 +107,6 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_fonts/font = ExtResource("3_loyqk")
 theme_override_styles/normal = SubResource("StyleBox_StartBtn")
-theme_override_styles/hover = SubResource("StyleBox_StartBtnHover")
 theme_override_styles/pressed = SubResource("StyleBox_StartBtnPressed")
+theme_override_styles/hover = SubResource("StyleBox_StartBtnHover")
 text = "ВЫХОД"
