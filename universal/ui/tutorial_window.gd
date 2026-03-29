@@ -12,6 +12,15 @@ const TYPEWRITER_CHAR_DELAY: float = 0.03
 const TEXT_DESCENDER_PADDING: float = 10.0
 const TUTORIAL_ID_NADYA_ONE_TIME: String = "nadya_first_launch_done"
 
+enum TutorialMode {
+	FULL,
+	MAX_METAL_TRAINING,
+	FULL_CYCLE_TRAINING,
+}
+
+@export var tutorial_mode: TutorialMode = TutorialMode.FULL
+@export var ignore_save_flags: bool = false
+
 const COLOR_HULL_TEXT: String = "#4DCC4D"
 const COLOR_REACTOR_TEXT: String = "#F2BD33"
 const COLOR_COLLECTOR_TEXT: String = "#FFE633"
@@ -66,6 +75,22 @@ var max_resources_steps: Array[String] = [
 	"Нам нужно потратить ресурсы на постройку модулей или апгрейдов. Направляйтесь в [color=cyan]ЦЕХ[/color] и используйте металл!",
 ]
 
+var max_metal_training_complete_steps: Array[String] = [
+	"Капитан, вы молодец, справились! Теперь можно спокойно играть!",
+]
+
+var full_cycle_training_complete_steps: Array[String] = [
+	"Обучение закончено. Капитан, вы молодец, справились! Возвращаю вас на главный экран.",
+]
+
+var training_defeat_steps: Array[String] = [
+	"Капитан, обучение прервано: корабль не пережил атаку. Возвращаю вас на главный экран, попробуем снова.",
+]
+
+var max_metal_training_intro_steps: Array[String] = [
+	"Капитан, это тренировочный режим. Наберите максимум [color=orange]МЕТАЛЛА[/color], и я проверю ваш первый рубеж!",
+]
+
 # ========== СИСТЕМНЫЕ ПЕРЕМЕННЫЕ ==========
 var dialog_queue: Array[Array] = [] # Очередь диалогов
 var tutorial_steps: Array[String] = []
@@ -84,6 +109,15 @@ var _shop_guide_shown: bool = false
 var _reactor_guide_shown: bool = false
 var _max_resources_shown_times: int = 0
 var _tutorial_disabled_for_profile: bool = false
+var _tutorial_started: bool = false
+var _training_shop_guide_done: bool = false
+var _training_max_reached_done: bool = false
+var _training_finish_scheduled: bool = false
+var _training_redirect_scheduled: bool = false
+var _training_failed: bool = false
+
+const TRAINING_FINISH_DELAY_SEC: float = 5.0
+const START_MENU_SCENE: String = "res://ui/start_menu.tscn"
 
 # Флаг для защиты от закликивания (анти-скип)
 var _is_input_blocked: bool = false
@@ -99,9 +133,10 @@ func _ready() -> void:
 	hide()
 	dialog_text.bbcode_enabled = true
 	dialog_text.visible_characters_behavior = TextServer.VC_CHARS_BEFORE_SHAPING
-	_tutorial_disabled_for_profile = SaveManager.is_tutorial_shown(TUTORIAL_ID_NADYA_ONE_TIME)
-	if _tutorial_disabled_for_profile:
-		return
+	if tutorial_mode == TutorialMode.FULL and not ignore_save_flags:
+		_tutorial_disabled_for_profile = SaveManager.is_tutorial_shown(TUTORIAL_ID_NADYA_ONE_TIME)
+		if _tutorial_disabled_for_profile:
+			return
 	
 	# Восстанавливаем обычное затемнение - полный экран
 	overlay.anchor_left = 0.0
@@ -110,16 +145,32 @@ func _ready() -> void:
 	overlay.anchor_bottom = 1.0
 	overlay.visible = true
 	
-	GameEvents.raider_spawned.connect(_on_raider_spawned)
-	GameEvents.raider_destroyed.connect(_on_raider_destroyed)
-	GameEvents.resource_changed.connect(_on_resource_changed)
 	GameEvents.max_resources_reached.connect(_on_max_resources_reached)
-	GameEvents.shop_opened.connect(_on_shop_opened)
 	GameEvents.game_finished.connect(_on_game_finished)
 	GameEvents.tutorial_target_rect_changed.connect(_on_tutorial_target_rect_changed)
+
+	if tutorial_mode == TutorialMode.FULL or tutorial_mode == TutorialMode.FULL_CYCLE_TRAINING:
+		GameEvents.raider_spawned.connect(_on_raider_spawned)
+		GameEvents.raider_destroyed.connect(_on_raider_destroyed)
+		GameEvents.resource_changed.connect(_on_resource_changed)
+		GameEvents.shop_opened.connect(_on_shop_opened)
 	
-	# Ждем ровно 0.5 секунды после загрузки сцены и вызываем стартовый диалог.
-	get_tree().create_timer(0.5, true, false, true).timeout.connect(_on_game_started)
+	# Автостарт оставляем на случай, если сцена запущена без main.gd-контроллера.
+	get_tree().create_timer(0.5, true, false, true).timeout.connect(start_tutorial)
+
+func start_tutorial() -> void:
+	if _tutorial_started:
+		return
+	if _tutorial_disabled_for_profile:
+		return
+	_tutorial_started = true
+
+	if tutorial_mode == TutorialMode.MAX_METAL_TRAINING:
+		_queue_dialog(max_metal_training_intro_steps)
+		return
+
+	_queue_dialog(intro_steps)
+	_queue_dialog(gathering_steps)
 
 # ========== ЛОГИКА ОЧЕРЕДИ ==========
 func _queue_dialog(steps: Array[String]) -> void:
@@ -137,8 +188,9 @@ func _play_next_dialog() -> void:
 		return
 		
 	if not _pause_applied:
-		_pause_state_before_tutorial = get_tree().paused
-		get_tree().paused = true
+		var tree := get_tree()
+		_pause_state_before_tutorial = tree.paused if tree != null else false
+		_set_tree_paused_safe(true)
 		_pause_applied = true
 		
 	tutorial_steps = dialog_queue.pop_front()
@@ -150,13 +202,12 @@ func _hide_and_unpause() -> void:
 	hide()
 	_clear_focus_target()
 	if _pause_applied:
-		get_tree().paused = _pause_state_before_tutorial
+		_set_tree_paused_safe(_pause_state_before_tutorial)
 		_pause_applied = false
 
 func _show_current_step() -> void:
 	if current_step >= tutorial_steps.size():
-		if tutorial_steps == shop_guide_steps:
-			_mark_tutorial_completed_once()
+		_on_dialog_finished(tutorial_steps)
 		_play_next_dialog()
 		return
 
@@ -190,10 +241,7 @@ func _start_highlight_animation() -> void:
 
 # ========== РЕАКЦИИ НА ИГРОВЫЕ СОБЫТИЯ ==========
 func _on_game_started() -> void:
-	if _tutorial_disabled_for_profile:
-		return
-	_queue_dialog(intro_steps)
-	_queue_dialog(gathering_steps)
+	start_tutorial()
 
 func _mark_tutorial_completed_once() -> void:
 	if _tutorial_disabled_for_profile:
@@ -204,7 +252,33 @@ func _mark_tutorial_completed_once() -> void:
 	SaveManager.mark_tutorial_shown(TUTORIAL_ID_NADYA_ONE_TIME)
 	_tutorial_disabled_for_profile = true
 
+func _on_dialog_finished(finished_steps: Array[String]) -> void:
+	if tutorial_mode == TutorialMode.FULL:
+		if finished_steps == shop_guide_steps:
+			_mark_tutorial_completed_once()
+		return
+
+	if tutorial_mode == TutorialMode.FULL_CYCLE_TRAINING:
+		if finished_steps == training_defeat_steps:
+			_schedule_return_to_main_menu()
+			return
+		if finished_steps == shop_guide_steps:
+			_training_shop_guide_done = true
+		if finished_steps == max_resources_steps:
+			_training_max_reached_done = true
+		if finished_steps == full_cycle_training_complete_steps:
+			_schedule_return_to_main_menu()
+			return
+		_try_schedule_full_cycle_finish()
+		return
+
+	if tutorial_mode == TutorialMode.MAX_METAL_TRAINING:
+		if finished_steps == training_defeat_steps:
+			_schedule_return_to_main_menu()
+
 func _on_raider_spawned(_position: Vector2) -> void:
+	if tutorial_mode != TutorialMode.FULL and tutorial_mode != TutorialMode.FULL_CYCLE_TRAINING:
+		return
 	if _raider_warning_shown: 
 		return
 	_raider_warning_shown = true
@@ -212,6 +286,8 @@ func _on_raider_spawned(_position: Vector2) -> void:
 	_queue_dialog(raider_warning_steps)
 
 func _on_resource_changed(type: String, new_amount: int) -> void:
+	if tutorial_mode != TutorialMode.FULL and tutorial_mode != TutorialMode.FULL_CYCLE_TRAINING:
+		return
 	if type == "metal":
 		if new_amount >= 75 and not _shop_invite_shown:
 			_shop_invite_shown = true
@@ -222,28 +298,95 @@ func _on_resource_changed(type: String, new_amount: int) -> void:
 			_queue_dialog(reactor_guide_steps)
 
 func _on_shop_opened() -> void:
+	if tutorial_mode != TutorialMode.FULL and tutorial_mode != TutorialMode.FULL_CYCLE_TRAINING:
+		return
 	if not _shop_guide_shown and ResourceManager.metal >= 75:
 		_shop_guide_shown = true
 		_queue_dialog(shop_guide_steps)
 
 func _on_max_resources_reached(resource_type: String, _max_amount: int) -> void:
+	if tutorial_mode == TutorialMode.MAX_METAL_TRAINING:
+		if _max_resources_shown_times >= 1:
+			return
+		_max_resources_shown_times = 1
+		if resource_type == "metal":
+			_queue_dialog([max_resources_steps[0]])
+			_queue_dialog(max_metal_training_complete_steps)
+		return
+
+	if tutorial_mode == TutorialMode.FULL_CYCLE_TRAINING:
+		if resource_type != "metal":
+			return
+		if _max_resources_shown_times >= 1:
+			return
+		_max_resources_shown_times = 1
+		_queue_dialog(max_resources_steps)
+		return
+
 	if _max_resources_shown_times < 2:
 		_max_resources_shown_times += 1
 		print("DEBUG: Max resources reached times: ", _max_resources_shown_times)
 		_queue_dialog(max_resources_steps)
 
 func _on_raider_destroyed(_position: Vector2, _evolution_level: int, _source: String) -> void:
+	if tutorial_mode != TutorialMode.FULL and tutorial_mode != TutorialMode.FULL_CYCLE_TRAINING:
+		return
 	if _raider_warning_shown and not _raider_defense_shown:
 		_raider_defense_shown = true
 		_queue_dialog(raider_defense_steps)
 
 func _on_game_finished(outcome: String, _reason: String) -> void:
 	if outcome == "lose":
+		if tutorial_mode == TutorialMode.FULL_CYCLE_TRAINING or tutorial_mode == TutorialMode.MAX_METAL_TRAINING:
+			_training_failed = true
+			dialog_queue.clear()
+			_queue_dialog(training_defeat_steps)
+			return
+
 		var defeat_steps: Array[String] = [
 			"КАПИТАН, МЫ ПОТЕРПЕЛИ ПОРАЖЕНИЕ! АКТИВИРУЮ РЕЖИМ ПОСЛЕДНЕЙ НАДЕЖДЫ...",
 		]
 		dialog_queue.clear()
 		_queue_dialog(defeat_steps)
+
+func _try_schedule_full_cycle_finish() -> void:
+	if tutorial_mode != TutorialMode.FULL_CYCLE_TRAINING:
+		return
+	if _training_failed:
+		return
+	if _training_finish_scheduled:
+		return
+	if not _training_shop_guide_done:
+		return
+	if not _training_max_reached_done:
+		return
+	_training_finish_scheduled = true
+	call_deferred("_finish_full_cycle_training_after_delay")
+
+func _finish_full_cycle_training_after_delay() -> void:
+	await get_tree().create_timer(TRAINING_FINISH_DELAY_SEC, true, false, true).timeout
+	if not is_inside_tree():
+		return
+	_queue_dialog(full_cycle_training_complete_steps)
+
+func _schedule_return_to_main_menu() -> void:
+	if _training_redirect_scheduled:
+		return
+	_training_redirect_scheduled = true
+	_return_to_main_menu()
+
+func _return_to_main_menu() -> void:
+	_set_tree_paused_safe(false)
+	if ResourceLoader.exists(START_MENU_SCENE):
+		var tree := get_tree()
+		if tree != null:
+			tree.change_scene_to_file(START_MENU_SCENE)
+
+func _set_tree_paused_safe(value: bool) -> void:
+	var tree := get_tree()
+	if tree == null:
+		return
+	tree.paused = value
 
 # ========== ГЛОБАЛЬНЫЙ ПЕРЕХВАТ КЛИКОВ ==========
 func _input(event: InputEvent) -> void:

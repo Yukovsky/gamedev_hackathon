@@ -3,22 +3,112 @@ extends Node2D
 @export_group("Raider Scene")
 @export var raider_scene: PackedScene = preload("res://entities/raiders/raider.tscn")
 @export var balance: RaiderBalance = RaiderBalance.new()
+@export var spawn_interval_sec: float = 1.2
 
 @export_group("Spawn Bounds")
 @export var spawn_offset_y_px: float = 110.0
 @export var spawn_margin_x_px: float = 64.0
 
-@export_group("Spawn Gate")
-@export var modules_required_to_start: int = 2
-
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var _spawn_timer: Timer
 var _active_raiders: Array[Node2D] = []
-var _elapsed_sec: float = 0.0
-var _raiders_killed_by_tap: int = 0
 var _is_game_finished: bool = false
-var _built_modules_count: int = 0
-var _is_spawn_unlocked: bool = false
+var _spawn_cycle: Array[int] = []
+var _spawn_cycle_index: int = 0
+var _spawn_cycle_key: String = ""
+
+const BALANCE_ROWS: Array[Dictionary] = [
+	{
+		"buildings_min": 0,
+		"buildings_max": 1,
+		"enemy_set": [],
+		"normal_hp": 0,
+		"sprinter_hp": 0,
+		"tank_hp": 0,
+		"max_active": 0,
+	},
+	{
+		"buildings_min": 2,
+		"buildings_max": 2,
+		"enemy_set": [{"type": "normal", "count": 1}],
+		"normal_hp": 153,
+		"sprinter_hp": 0,
+		"tank_hp": 0,
+		"max_active": 1,
+	},
+	{
+		"buildings_min": 3,
+		"buildings_max": 3,
+		"enemy_set": [{"type": "normal", "count": 1}],
+		"normal_hp": 162,
+		"sprinter_hp": 0,
+		"tank_hp": 0,
+		"max_active": 1,
+	},
+	{
+		"buildings_min": 4,
+		"buildings_max": 4,
+		"enemy_set": [{"type": "normal", "count": 2}],
+		"normal_hp": 171,
+		"sprinter_hp": 0,
+		"tank_hp": 0,
+		"max_active": 1,
+	},
+	{
+		"buildings_min": 5,
+		"buildings_max": 5,
+		"enemy_set": [{"type": "normal", "count": 1}, {"type": "sprinter", "count": 1}],
+		"normal_hp": 180,
+		"sprinter_hp": 130,
+		"tank_hp": 0,
+		"max_active": 2,
+	},
+	{
+		"buildings_min": 6,
+		"buildings_max": 6,
+		"enemy_set": [{"type": "normal", "count": 2}, {"type": "sprinter", "count": 1}],
+		"normal_hp": 189,
+		"sprinter_hp": 137,
+		"tank_hp": 0,
+		"max_active": 2,
+	},
+	{
+		"buildings_min": 7,
+		"buildings_max": 7,
+		"enemy_set": [{"type": "normal", "count": 1}, {"type": "sprinter", "count": 1}, {"type": "tank", "count": 1}],
+		"normal_hp": 198,
+		"sprinter_hp": 143,
+		"tank_hp": 446,
+		"max_active": 2,
+	},
+	{
+		"buildings_min": 8,
+		"buildings_max": 8,
+		"enemy_set": [{"type": "normal", "count": 2}, {"type": "sprinter", "count": 1}, {"type": "tank", "count": 1}],
+		"normal_hp": 207,
+		"sprinter_hp": 150,
+		"tank_hp": 466,
+		"max_active": 3,
+	},
+	{
+		"buildings_min": 9,
+		"buildings_max": 9,
+		"enemy_set": [{"type": "normal", "count": 2}, {"type": "sprinter", "count": 2}, {"type": "tank", "count": 1}],
+		"normal_hp": 216,
+		"sprinter_hp": 156,
+		"tank_hp": 486,
+		"max_active": 3,
+	},
+	{
+		"buildings_min": 10,
+		"buildings_max": 999,
+		"enemy_set": [{"type": "normal", "count": 2}, {"type": "sprinter", "count": 2}, {"type": "tank", "count": 2}],
+		"normal_hp": 225,
+		"sprinter_hp": 163,
+		"tank_hp": 506,
+		"max_active": 3,
+	},
+]
 
 
 func _ready() -> void:
@@ -26,68 +116,47 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_PAUSABLE
 
 	_rng.randomize()
-	if GameEvents.has_signal("raider_destroyed"):
-		GameEvents.raider_destroyed.connect(_on_raider_destroyed)
 	if GameEvents.has_signal("game_ended"):
 		GameEvents.game_ended.connect(_on_game_ended)
 	if GameEvents.has_signal("module_built"):
-		GameEvents.module_built.connect(_on_module_built)
+		GameEvents.module_built.connect(_on_buildings_changed)
+	if GameEvents.has_signal("module_destroyed"):
+		GameEvents.module_destroyed.connect(_on_buildings_changed)
 
 	_spawn_timer = Timer.new()
 	_spawn_timer.one_shot = false
-	_spawn_timer.autostart = false
+	_spawn_timer.autostart = true
 	_spawn_timer.timeout.connect(_on_spawn_timer_timeout)
 	add_child(_spawn_timer)
-
-	_spawn_timer.wait_time = _compute_spawn_interval()
-
-	if modules_required_to_start <= 0:
-		_unlock_spawning()
+	_spawn_timer.wait_time = max(0.15, spawn_interval_sec)
+	_spawn_timer.start()
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if _is_game_finished:
 		return
-
-	_elapsed_sec += delta
 	_cleanup_invalid_raiders()
-
-	if _spawn_timer != null:
-		_spawn_timer.wait_time = _compute_spawn_interval()
 
 
 func _on_spawn_timer_timeout() -> void:
 	if _is_game_finished:
 		return
+	_cleanup_invalid_raiders()
 
-	if not _is_spawn_unlocked:
+	var row: Dictionary = _get_balance_row(_get_current_buildings_count())
+	if int(row.get("max_active", 0)) <= 0:
+		return
+	if _active_raiders.size() >= int(row.get("max_active", 0)):
 		return
 
-	if _active_raiders.size() >= _compute_max_raiders():
-		return
-
-	if _rng.randf() > _compute_spawn_chance():
-		return
-
-	_spawn_raider()
+	_spawn_raider(row)
 
 
-func _on_module_built(_module_type: String, _position: Vector2) -> void:
-	if _is_spawn_unlocked:
-		return
-
-	_built_modules_count += 1
-	if _built_modules_count >= max(0, modules_required_to_start):
-		_unlock_spawning()
+func _on_buildings_changed(_module_type: String, _position: Vector2) -> void:
+	_reset_spawn_cycle()
 
 
-func _unlock_spawning() -> void:
-	_is_spawn_unlocked = true
-	if _spawn_timer != null and _spawn_timer.is_stopped():
-		_spawn_timer.start()
-
-
-func _spawn_raider() -> void:
+func _spawn_raider(row: Dictionary) -> void:
 	if raider_scene == null:
 		return
 
@@ -95,17 +164,18 @@ func _spawn_raider() -> void:
 	if raider == null:
 		return
 
-	var evolution_level: int = _compute_evolution_level()
-	var spawn_pos: Vector2 = _compute_spawn_position(evolution_level)
+	var role: int = _next_role_for_row(row)
+	var hp: int = _hp_for_role(row, role)
+	var spawn_pos: Vector2 = _compute_spawn_position(role)
 
 	raider.global_position = spawn_pos
 
 	if raider.has_method("configure_from_balance"):
 		raider.call("configure_from_balance", balance)
-	if raider.has_method("configure_evolution"):
-		raider.call("configure_evolution", evolution_level, _compute_adaptation_pressure())
 	if raider.has_method("configure_role"):
-		raider.call("configure_role", _roll_raider_role(evolution_level))
+		raider.call("configure_role", role)
+	if raider.has_method("configure_role_hp"):
+		raider.call("configure_role_hp", hp)
 
 	var board: Node = get_parent()
 	if board != null and raider.has_method("set_game_board"):
@@ -116,38 +186,106 @@ func _spawn_raider() -> void:
 	raider.tree_exited.connect(_on_raider_tree_exited.bind(raider))
 
 
-func _compute_spawn_interval() -> float:
-	if balance == null:
-		return 3.0
-	return max(balance.spawn_interval_min_sec, balance.spawn_interval_start_sec - balance.spawn_acceleration_per_sec * _elapsed_sec)
+func _get_current_buildings_count() -> int:
+	var board: Node = get_parent()
+	if board == null:
+		return 0
+
+	if board.has_method("get_raider_balance_buildings_count"):
+		return max(0, int(board.call("get_raider_balance_buildings_count")))
+
+	if board.has_method("get_attackable_modules"):
+		var modules_any: Variant = board.call("get_attackable_modules")
+		if modules_any is Array:
+			var result: int = 0
+			for module_any in modules_any:
+				if module_any is ModuleBase:
+					var module: ModuleBase = module_any as ModuleBase
+					if module.module_id != Constants.MODULE_CORE:
+						result += 1
+			return result
+
+	return 0
 
 
-func _compute_spawn_chance() -> float:
-	if balance == null:
-		return 0.5
-	return clamp(balance.spawn_chance_start + balance.spawn_chance_growth_per_sec * _elapsed_sec, 0.0, balance.spawn_chance_max)
+func _get_balance_row(buildings_count: int) -> Dictionary:
+	for row in BALANCE_ROWS:
+		var min_b: int = int(row.get("buildings_min", 0))
+		var max_b: int = int(row.get("buildings_max", 0))
+		if buildings_count >= min_b and buildings_count <= max_b:
+			return row
+	return BALANCE_ROWS[BALANCE_ROWS.size() - 1]
 
 
-func _compute_max_raiders() -> int:
-	if balance == null:
-		return 2
-	var growth_steps: int = int(floor(_elapsed_sec / 90.0))
-	var max_raiders: int = balance.max_raiders_start + growth_steps * max(0, balance.max_raiders_growth_per_90_sec)
-	return clamp(max_raiders, balance.max_raiders_start, balance.max_raiders_cap)
+func _next_role_for_row(row: Dictionary) -> int:
+	var enemy_set: Array = row.get("enemy_set", []) as Array
+	var cycle_key: String = str(row.get("buildings_min", 0)) + ":" + str(row.get("buildings_max", 0)) + ":" + str(enemy_set)
+	if _spawn_cycle.is_empty() or _spawn_cycle_key != cycle_key or _spawn_cycle_index >= _spawn_cycle.size():
+		_spawn_cycle_key = cycle_key
+		_spawn_cycle = _build_spawn_cycle(enemy_set)
+		_spawn_cycle_index = 0
+
+	if _spawn_cycle.is_empty():
+		return Raider.RaiderRole.NORMAL
+
+	var role: int = _spawn_cycle[_spawn_cycle_index]
+	_spawn_cycle_index += 1
+	return role
 
 
-func _compute_spawn_position(evolution_level: int) -> Vector2:
+func _build_spawn_cycle(enemy_set: Array) -> Array[int]:
+	var roles: Array[int] = []
+	for entry_any in enemy_set:
+		if not (entry_any is Dictionary):
+			continue
+		var entry: Dictionary = entry_any as Dictionary
+		var role: int = _role_from_type_name(String(entry.get("type", "normal")))
+		var count: int = max(0, int(entry.get("count", 0)))
+		for _i in range(count):
+			roles.append(role)
+
+	if roles.is_empty():
+		roles.append(Raider.RaiderRole.NORMAL)
+
+	for i in range(roles.size() - 1, 0, -1):
+		var j: int = _rng.randi_range(0, i)
+		var tmp: int = roles[i]
+		roles[i] = roles[j]
+		roles[j] = tmp
+
+	return roles
+
+
+func _role_from_type_name(type_name: String) -> int:
+	match type_name.to_lower():
+		"sprinter":
+			return Raider.RaiderRole.SPRINTER
+		"tank":
+			return Raider.RaiderRole.TANK
+		_:
+			return Raider.RaiderRole.NORMAL
+
+
+func _hp_for_role(row: Dictionary, role: int) -> int:
+	match role:
+		Raider.RaiderRole.SPRINTER:
+			return max(1, int(row.get("sprinter_hp", 1)))
+		Raider.RaiderRole.TANK:
+			return max(1, int(row.get("tank_hp", 1)))
+		_:
+			return max(1, int(row.get("normal_hp", 1)))
+
+
+func _compute_spawn_position(role: int) -> Vector2:
 	var viewport_size: Vector2 = get_viewport_rect().size
 	var min_x: float = spawn_margin_x_px
 	var max_x: float = max(spawn_margin_x_px, viewport_size.x - spawn_margin_x_px)
+	var spawn_from_side_chance: float = 0.18
 
-	var spawn_from_side_chance: float = 0.0
-	if evolution_level >= 2:
-		spawn_from_side_chance = 0.25
-	if evolution_level >= 4:
-		spawn_from_side_chance = 0.42
-	if evolution_level >= 6:
-		spawn_from_side_chance = 0.58
+	if role == Raider.RaiderRole.SPRINTER:
+		spawn_from_side_chance = 0.48
+	elif role == Raider.RaiderRole.TANK:
+		spawn_from_side_chance = 0.1
 
 	if _rng.randf() < spawn_from_side_chance:
 		var side_left: bool = _rng.randf() < 0.5
@@ -159,54 +297,10 @@ func _compute_spawn_position(evolution_level: int) -> Vector2:
 	return Vector2(spawn_x, -spawn_offset_y_px)
 
 
-func _compute_evolution_level() -> int:
-	if balance == null:
-		return 0
-
-	var time_level: int = int(floor(_elapsed_sec / max(1.0, balance.evolution_step_sec)))
-	var kill_blocks: int = int(floor(float(_raiders_killed_by_tap) / 6.0))
-	var kill_level: int = kill_blocks * max(0, balance.evolution_level_per_6_kills)
-	return clamp(time_level + kill_level, 0, balance.evolution_max_level)
-
-
-func _compute_adaptation_pressure() -> float:
-	if balance == null:
-		return 0.0
-	var value: float = float(_raiders_killed_by_tap) / 24.0
-	return clamp(value, 0.0, 1.0)
-
-
-func _roll_raider_role(evolution_level: int) -> int:
-	var elite_chance: float = 0.12 + float(evolution_level) * 0.035
-	elite_chance = clamp(elite_chance, 0.12, 0.75)
-
-	if _rng.randf() > elite_chance:
-		return Raider.RaiderRole.NORMAL
-
-	var roll: float = _rng.randf()
-
-	var tank_weight: float = 0.22 + float(evolution_level) * 0.01
-	var sprinter_weight: float = 0.26 + float(evolution_level) * 0.008
-	var sapper_weight: float = 0.28 + float(evolution_level) * 0.012
-	var hacker_weight: float = 0.24 + float(evolution_level) * 0.02
-
-	var total: float = tank_weight + sprinter_weight + sapper_weight + hacker_weight
-	if total <= 0.001:
-		return Raider.RaiderRole.NORMAL
-
-	var threshold: float = tank_weight / total
-	if roll < threshold:
-		return Raider.RaiderRole.TANK
-
-	threshold += sprinter_weight / total
-	if roll < threshold:
-		return Raider.RaiderRole.SPRINTER
-
-	threshold += sapper_weight / total
-	if roll < threshold:
-		return Raider.RaiderRole.SAPPER
-
-	return Raider.RaiderRole.HACKER
+func _reset_spawn_cycle() -> void:
+	_spawn_cycle.clear()
+	_spawn_cycle_index = 0
+	_spawn_cycle_key = ""
 
 
 func _cleanup_invalid_raiders() -> void:
@@ -219,11 +313,6 @@ func _cleanup_invalid_raiders() -> void:
 
 func _on_raider_tree_exited(raider: Node2D) -> void:
 	_active_raiders.erase(raider)
-
-
-func _on_raider_destroyed(_position: Vector2, _evolution_level: int, source: String) -> void:
-	if source == "tap":
-		_raiders_killed_by_tap += 1
 
 
 func _on_game_ended() -> void:

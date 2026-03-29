@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://g7wwueahjr52"
-path="res://.godot/imported/shark.png-c2d7354d81ac3ac9d060aa3564c8c81f.ctex"
+uid="uid://b5ga1vpubrvr6"
+path="res://.godot/imported/tank.png-15cc957887862deb349c27c8977816db.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/shark.png"
-dest_files=["res://.godot/imported/shark.png-c2d7354d81ac3ac9d060aa3564c8c81f.ctex"]
+source_file="res://assets/sprites/tank.png"
+dest_files=["res://.godot/imported/tank.png-15cc957887862deb349c27c8977816db.ctex"]
 
 [params]
 

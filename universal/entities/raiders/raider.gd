@@ -5,13 +5,14 @@ enum RaiderRole {
 	NORMAL,
 	TANK,
 	SPRINTER,
-	SAPPER,
-	HACKER,
 }
 
 const TempCombatVfxScript: Script = preload("res://entities/effects/temp_combat_vfx.gd")
 const TempCombatSfxScript: Script = preload("res://entities/effects/temp_combat_sfx.gd")
 const ClickableComponentScript: Script = preload("res://shared/components/clickable_component.gd")
+const TextureNormal: Texture2D = preload("res://assets/sprites/normal.png")
+const TextureSprinter: Texture2D = preload("res://assets/sprites/sprinter.png")
+const TextureTank: Texture2D = preload("res://assets/sprites/tank.png")
 
 @export_group("Raider Movement")
 @export var movement_speed_px_per_sec: float = 285.0
@@ -33,8 +34,6 @@ const ClickableComponentScript: Script = preload("res://shared/components/clicka
 
 @export_group("Raider Roles")
 @export var role_name: String = "normal"
-@export var sapper_explosion_radius_cells: float = 1.35
-@export var hacker_disable_duration_sec: float = 3.2
 
 @export_group("Raider Visual")
 @export var body_size_px: float = 184.0
@@ -46,14 +45,13 @@ var _target: ModuleBase
 var _reserved_target: ModuleBase
 var _is_biting: bool = false
 var _current_hp: int = 0
-var _intelligence_level: int = 0
-var _adaptation_pressure: float = 0.0
 var _role: int = RaiderRole.NORMAL
 
 var _retarget_timer: Timer
 var _bite_timer: Timer
 var _vfx: TempCombatVfx
 var _sfx: TempCombatSfx
+var _body_sprite: Sprite2D
 var _clickable: Area2D
 var _collision_shape: CollisionShape2D
 var _movement_time_sec: float = 0.0
@@ -68,6 +66,8 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_PAUSABLE
 
 	add_to_group("raiders")
+	_body_sprite = get_node_or_null("BodySprite") as Sprite2D
+	_apply_role_sprite()
 	if _current_hp <= 0:
 		_current_hp = max(1, max_hp)
 	_wobble_phase = randf() * TAU
@@ -134,12 +134,7 @@ func _process(delta: float) -> void:
 		return
 
 	if distance > 0.001:
-		var hp_ratio: float = get_hp_ratio()
-		var rage_bonus: float = 1.0
-		if hp_ratio < 0.35:
-			rage_bonus = 1.22 + 0.12 * min(1.0, _adaptation_pressure)
-
-		var speed: float = movement_speed_px_per_sec * rage_bonus * _runtime_speed_multiplier
+		var speed: float = movement_speed_px_per_sec * _runtime_speed_multiplier
 		var move_dir: Vector2 = to_target.normalized()
 		var perp_dir: Vector2 = Vector2(-move_dir.y, move_dir.x)
 		var wobble: float = sin(_movement_time_sec * TAU * _runtime_wobble_frequency_hz + _wobble_phase)
@@ -172,36 +167,17 @@ func configure_from_balance(balance: RaiderBalance) -> void:
 		_bite_timer.wait_time = bite_delay_sec
 
 
-func configure_evolution(level: int, adaptation_pressure: float) -> void:
-	_intelligence_level = max(0, level)
-	_adaptation_pressure = clamp(adaptation_pressure, 0.0, 1.0)
-
-	var speed_scale: float = 1.0 + float(_intelligence_level) * (0.11 + 0.04 * _adaptation_pressure)
-	var hp_scale: float = 1.0 + float(_intelligence_level) * (0.14 + 0.05 * _adaptation_pressure)
-	var bite_scale: float = 1.0 + float(_intelligence_level) * (0.11 + 0.05 * _adaptation_pressure)
-
-	movement_speed_px_per_sec *= speed_scale
-	max_hp = int(ceil(float(max_hp) * hp_scale))
-	bite_damage = int(ceil(float(bite_damage) * bite_scale))
-	bite_delay_sec = max(0.24, bite_delay_sec * pow(0.93, _intelligence_level))
-
-	if _current_hp <= 0:
-		_current_hp = max_hp
-	else:
-		_current_hp = max(_current_hp, max_hp)
-
-	if _retarget_timer != null:
-		_retarget_timer.wait_time = max(0.12, retarget_interval_sec * pow(0.9, _intelligence_level))
-	if _bite_timer != null:
-		_bite_timer.wait_time = bite_delay_sec
-
+func configure_role_hp(role_hp: int) -> void:
+	max_hp = max(1, role_hp)
+	_current_hp = max_hp
 	queue_redraw()
 
 
 func configure_role(role: int) -> void:
-	_role = clamp(role, RaiderRole.NORMAL, RaiderRole.HACKER)
+	_role = clamp(role, RaiderRole.NORMAL, RaiderRole.SPRINTER)
 	_apply_role_modifiers()
 	_update_role_name()
+	_apply_role_sprite()
 	_update_click_shape()
 	queue_redraw()
 
@@ -225,14 +201,7 @@ func _on_bite_timeout() -> void:
 
 	if _is_target_valid() and _board != null:
 		target_world = _target.get_world_center()
-
-		if _role == RaiderRole.HACKER and _target.module_id == Constants.MODULE_TURRET and _board.has_method("try_hack_turret"):
-			bite_success = bool(_board.call("try_hack_turret", _target, hacker_disable_duration_sec))
-		elif _role == RaiderRole.SAPPER and _board.has_method("try_sapper_explosion"):
-			bite_success = bool(_board.call("try_sapper_explosion", _target, bite_damage, sapper_explosion_radius_cells))
-			if bite_success:
-				_queue_despawn()
-		elif _board.has_method("try_bite_module"):
+		if _board.has_method("try_bite_module"):
 			bite_success = bool(_board.call("try_bite_module", _target, bite_damage))
 
 	if bite_success:
@@ -284,16 +253,16 @@ func _acquire_target() -> void:
 		if _board.has_method("get_module_exposure_score"):
 			var exposure_any: Variant = _board.call("get_module_exposure_score", candidate)
 			var exposure: float = float(exposure_any)
-			exposure_bonus = -exposure * lerp(30.0, 72.0, min(1.0, float(_intelligence_level) / 6.0))
+			exposure_bonus = -exposure * 48.0
 
 		var hp_bias: float = 0.0
-		if _intelligence_level >= 1 and candidate.has_method("get_hp_ratio"):
+		if candidate.has_method("get_hp_ratio"):
 			var hp_ratio: float = float(candidate.call("get_hp_ratio"))
-			hp_bias = hp_ratio * 120.0
+			hp_bias = hp_ratio * 64.0
 
 		var target_pressure_penalty: float = 0.0
-		if _intelligence_level >= 3 and _board.has_method("get_target_pressure"):
-			target_pressure_penalty = float(_board.call("get_target_pressure", candidate)) * 64.0
+		if _board.has_method("get_target_pressure"):
+			target_pressure_penalty = float(_board.call("get_target_pressure", candidate)) * 32.0
 
 		var anti_core_bias: float = 0.0
 		if candidate.module_id == Constants.MODULE_CORE and modules.size() > 1:
@@ -382,7 +351,7 @@ func take_damage(amount: int, source: String = "unknown") -> bool:
 			_vfx.play_destroy(global_position)
 		if _sfx != null:
 			_sfx.play_destroy(global_position)
-		GameEvents.raider_destroyed.emit(global_position, _intelligence_level, source)
+		GameEvents.raider_destroyed.emit(global_position, 0, source)
 		queue_free()
 		return true
 
@@ -410,13 +379,9 @@ func _get_role_target_bias(candidate: ModuleBase) -> float:
 				var exposure: float = float(_board.call("get_module_exposure_score", candidate))
 				return -exposure * 42.0
 			return 0.0
-		RaiderRole.SAPPER:
-			if candidate.module_id == Constants.MODULE_TURRET:
-				return -95.0
-			return 0.0
-		RaiderRole.HACKER:
-			if candidate.module_id == Constants.MODULE_TURRET:
-				return -220.0
+		RaiderRole.TANK:
+			if candidate.module_id == Constants.MODULE_REACTOR or candidate.module_id == Constants.MODULE_CORE:
+				return -54.0
 			return 0.0
 		_:
 			return 0.0
@@ -430,14 +395,6 @@ func _get_role_priority_bonus(module_id: String) -> int:
 			if module_id == Constants.MODULE_TURRET:
 				return -70
 			return 0
-		RaiderRole.SAPPER:
-			if module_id == Constants.MODULE_TURRET:
-				return 20
-			return 0
-		RaiderRole.HACKER:
-			if module_id == Constants.MODULE_TURRET:
-				return 80
-			return -20
 		RaiderRole.TANK:
 			if module_id == Constants.MODULE_REACTOR or module_id == Constants.MODULE_CORE:
 				return 15
@@ -447,54 +404,9 @@ func _get_role_priority_bonus(module_id: String) -> int:
 
 
 func _apply_role_modifiers() -> void:
-	match _role:
-		RaiderRole.TANK:
-			movement_speed_px_per_sec *= 0.66
-			max_hp = int(ceil(float(max_hp) * 2.25))
-			bite_damage = int(ceil(float(bite_damage) * 1.18))
-			bite_delay_sec *= 1.14
-			body_size_px *= 1.28
-			body_color = Color(0.55, 0.16, 0.13, 1.0)
-			accent_color = Color(0.95, 0.62, 0.28, 1.0)
-		RaiderRole.SPRINTER:
-			movement_speed_px_per_sec *= 1.7
-			max_hp = int(ceil(float(max_hp) * 0.72))
-			bite_damage = int(ceil(float(bite_damage) * 0.85))
-			bite_delay_sec *= 0.82
-			body_size_px *= 0.86
-			body_color = Color(0.92, 0.25, 0.62, 1.0)
-			accent_color = Color(1.0, 0.72, 0.94, 1.0)
-		RaiderRole.SAPPER:
-			movement_speed_px_per_sec *= 0.92
-			max_hp = int(ceil(float(max_hp) * 0.92))
-			bite_damage = int(ceil(float(bite_damage) * 1.65))
-			bite_delay_sec *= 1.05
-			body_size_px *= 1.1
-			body_color = Color(0.95, 0.78, 0.25, 1.0)
-			accent_color = Color(1.0, 0.96, 0.55, 1.0)
-		RaiderRole.HACKER:
-			movement_speed_px_per_sec *= 1.1
-			max_hp = int(ceil(float(max_hp) * 0.88))
-			bite_damage = int(ceil(float(bite_damage) * 0.74))
-			bite_delay_sec *= 0.9
-			body_size_px *= 0.96
-			body_color = Color(0.22, 0.9, 0.86, 1.0)
-			accent_color = Color(0.68, 1.0, 0.98, 1.0)
-		_:
-			pass
-
-	max_hp = max(1, max_hp)
-	bite_damage = max(1, bite_damage)
-	bite_delay_sec = max(0.12, bite_delay_sec)
-	movement_speed_px_per_sec = max(12.0, movement_speed_px_per_sec)
-
-	if _current_hp <= 0:
-		_current_hp = max_hp
-	else:
-		_current_hp = max(_current_hp, max_hp)
-
-	if _bite_timer != null:
-		_bite_timer.wait_time = bite_delay_sec
+	# По запросу пользователя все варианты врагов сохраняют одинаковый базовый показ
+	# (масштаб, направление и движение), отличается только спрайт.
+	pass
 
 
 func _update_role_name() -> void:
@@ -503,12 +415,21 @@ func _update_role_name() -> void:
 			role_name = "tank"
 		RaiderRole.SPRINTER:
 			role_name = "sprinter"
-		RaiderRole.SAPPER:
-			role_name = "sapper"
-		RaiderRole.HACKER:
-			role_name = "hacker"
 		_:
 			role_name = "normal"
+
+
+func _apply_role_sprite() -> void:
+	if _body_sprite == null or not is_instance_valid(_body_sprite):
+		return
+
+	match role_name:
+		"sprinter":
+			_body_sprite.texture = TextureSprinter
+		"tank":
+			_body_sprite.texture = TextureTank
+		_:
+			_body_sprite.texture = TextureNormal
 
 
 func _release_reserved_target() -> void:

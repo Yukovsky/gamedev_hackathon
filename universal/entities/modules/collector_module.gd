@@ -116,6 +116,7 @@ func _try_collect_marked_target() -> void:
 		collected = true
 
 	if collected:
+		AudioManager.play_collector_gather()
 		_marked_target = null
 		_start_cooldown()
 

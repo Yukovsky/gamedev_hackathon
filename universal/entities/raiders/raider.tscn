@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://entities/raiders/raider.gd" id="1_raider"]
-[ext_resource type="Texture2D" path="res://assets/sprites/shark.png" id="2_shark"]
+[ext_resource type="Texture2D" path="res://assets/sprites/normal.png" id="2_normal"]
 
 [node name="Raider" type="Node2D"]
 script = ExtResource("1_raider")
@@ -10,4 +10,4 @@ script = ExtResource("1_raider")
 position = Vector2(0, 36)
 rotation = -1.5708
 scale = Vector2(2.25, 2.25)
-texture = ExtResource("2_shark")
+texture = ExtResource("2_normal")

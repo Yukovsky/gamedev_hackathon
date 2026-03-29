@@ -146,7 +146,6 @@ func _on_core_plaque_input(event: InputEvent) -> void:
 		if upgrade_id.is_empty():
 			return
 		if UpgradeManager.purchase(upgrade_id):
-			AudioManager.play_ui_click()
 			_refresh_ui()
 
 func _on_btn_shop_pressed() -> void:
@@ -166,7 +165,6 @@ func _set_shop_open(value: bool, sync_pause: bool) -> void:
 		GameEvents.shop_closed.emit()
 
 func _on_btn_shop_exit_pressed() -> void:
-	AudioManager.play_ui_click()
 	_set_shop_open(false, true)
 
 func _on_module_built(_type: String, _pos: Vector2) -> void:
@@ -229,7 +227,6 @@ func _on_btn_turret_pressed() -> void: _request_build(Constants.MODULE_TURRET)
 
 func _request_build(type: String) -> void:
 	if _is_game_finished: return
-	AudioManager.play_ui_click()
 	GameEvents.build_requested.emit(type, Vector2.ZERO)
 	_set_shop_open(false, false) # Закрываем для выбора места
 
