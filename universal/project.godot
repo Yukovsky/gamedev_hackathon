@@ -11,6 +11,7 @@ config_version=5
 "ï»¿config_version"=5
 
 [application]
+config/icon="res://assets/Gemini_Generated_Image_qtma9aqtma9aqtma.png"
 
 config/name="universal"
 run/main_scene="res://ui/start_menu.tscn"

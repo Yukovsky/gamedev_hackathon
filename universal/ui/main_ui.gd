@@ -1,7 +1,7 @@
 extends CanvasLayer
 
 @onready var metal_label: Label = %MetalLabel
-@onready var metal_bar: ProgressBar = %MetalBar
+@onready var metal_bar: TextureProgressBar = %MetalBar
 @onready var btn_reactor: Button = %BtnReactor
 @onready var btn_collector: Button = %BtnCollector
 @onready var btn_hull: Button = %BtnHull
@@ -58,7 +58,7 @@ func _ready() -> void:
 
 func _apply_static_font_overrides() -> void:
 	# В некоторых сборках безопаснее задавать размеры через API, а не через serialized theme_override_font_sizes.
-	btn_shop.add_theme_font_size_override("font_size", 64)
+	btn_shop.add_theme_font_size_override("font_size", 16)
 	btn_shop_exit.add_theme_font_size_override("font_size", 42)
 	btn_hull.add_theme_font_size_override("font_size", 48)
 	btn_reactor.add_theme_font_size_override("font_size", 48)
@@ -85,8 +85,8 @@ func _sync_resource_ui(current_total: int, max_total: int, animate: bool) -> voi
 
 func _flash_label(label: Label) -> void:
 	var tween = create_tween()
-	label.modulate = Color(0.5, 1.5, 0.5)
-	tween.tween_property(label, "modulate", Color.WHITE, 0.3)
+	label.modulate = Color(0.941, 0.816, 0.125, 1.0)
+	tween.tween_property(label, "modulate", Color(0.941, 0.875, 1.0), 0.3)
 
 func _update_buttons(current_metal: int) -> void:
 	if _is_game_finished:
@@ -151,11 +151,11 @@ func _on_upgrade_purchased(_upgrade_id: String, _new_level: int) -> void:
 
 func _update_bgm_button() -> void:
 	if AudioManager.is_bgm_enabled():
-		btn_bgm_toggle.text = "BGM: ON"
-		btn_bgm_toggle.add_theme_color_override("font_color", Color(0.8, 1, 0.3))
+		btn_bgm_toggle.text = "♪ ON"
+		btn_bgm_toggle.add_theme_color_override("font_color", Color(0.941, 0.816, 0.125, 1.0))
 	else:
-		btn_bgm_toggle.text = "BGM: OFF"
-		btn_bgm_toggle.add_theme_color_override("font_color", Color(1, 0.5, 0.5))
+		btn_bgm_toggle.text = "♪ OFF"
+		btn_bgm_toggle.add_theme_color_override("font_color", Color(0.816, 0.627, 0.941, 1.0))
 
 func _on_btn_bgm_toggle_pressed() -> void:
 	AudioManager.play_ui_click()

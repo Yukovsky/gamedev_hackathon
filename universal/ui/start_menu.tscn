@@ -2,49 +2,85 @@
 
 [ext_resource type="Script" uid="uid://btdd4teupx4ke" path="res://ui/start_menu.gd" id="1_sm"]
 [ext_resource type="Texture2D" uid="uid://dwg8p8qd8fr5m" path="res://assets/background.png" id="2_bg"]
-[ext_resource type="FontFile" uid="uid://cp6yuv3vppswt" path="res://assets/fonts/RussoOne-Regular.ttf" id="3_loyqk"]
+[ext_resource type="FontFile" uid="uid://c62uvuv7pptp5" path="res://assets/fonts/PixelifySans-VariableFont_wght.ttf" id="3_loyqk"]
+
+[sub_resource type="StyleBoxFlat" id="PixelBorder_Outer"]
+bg_color = Color(0.0, 0.0, 0.0, 0.0)
+border_width_left = 24
+border_width_top = 24
+border_width_right = 24
+border_width_bottom = 24
+border_color = Color(0.816, 0.627, 0.941, 1)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+
+[sub_resource type="StyleBoxFlat" id="PixelBorder_Inner"]
+bg_color = Color(0.0, 0.0, 0.0, 0.0)
+border_width_left = 12
+border_width_top = 12
+border_width_right = 12
+border_width_bottom = 12
+border_color = Color(0.756, 0.565, 0.875, 1)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_StartBtn"]
-bg_color = Color(0.1, 0.3, 0.6, 0.8)
-border_width_left = 6
-border_width_top = 6
-border_width_right = 6
-border_width_bottom = 6
-border_color = Color(0.4, 0.8, 1, 1)
-corner_radius_top_left = 30
-corner_radius_top_right = 30
-corner_radius_bottom_right = 30
-corner_radius_bottom_left = 30
-shadow_color = Color(0, 0, 0, 0.5)
-shadow_size = 10
-
-[sub_resource type="StyleBoxFlat" id="StyleBox_StartBtnHover"]
-bg_color = Color(0.2, 0.5, 0.8, 0.9)
-border_width_left = 8
-border_width_top = 8
-border_width_right = 8
-border_width_bottom = 8
-border_color = Color(0.6, 1, 1, 1)
-corner_radius_top_left = 30
-corner_radius_top_right = 30
-corner_radius_bottom_right = 30
-corner_radius_bottom_left = 30
-shadow_color = Color(0, 0, 0, 0.7)
-shadow_size = 15
-
-[sub_resource type="StyleBoxFlat" id="StyleBox_StartBtnPressed"]
-bg_color = Color(0.05, 0.2, 0.4, 0.9)
+bg_color = Color(0.227, 0.118, 0.431, 1)
 border_width_left = 4
 border_width_top = 4
 border_width_right = 4
 border_width_bottom = 4
-border_color = Color(0.3, 0.6, 0.9, 1)
-corner_radius_top_left = 30
-corner_radius_top_right = 30
-corner_radius_bottom_right = 30
-corner_radius_bottom_left = 30
-shadow_color = Color(0, 0, 0, 0.3)
-shadow_size = 5
+border_color = Color(0.756, 0.565, 0.875, 1)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+expand_margin_left = 8
+expand_margin_top = 8
+expand_margin_right = 8
+expand_margin_bottom = 8
+shadow_color = Color(0.102, 0.051, 0.208, 1)
+shadow_size = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_StartBtnHover"]
+bg_color = Color(0.306, 0.169, 0.565, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.816, 0.627, 0.941, 1)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+expand_margin_left = 8
+expand_margin_top = 8
+expand_margin_right = 8
+expand_margin_bottom = 8
+shadow_color = Color(0.102, 0.051, 0.208, 1)
+shadow_size = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_StartBtnPressed"]
+bg_color = Color(0.184, 0.086, 0.325, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.756, 0.565, 0.875, 1)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+expand_margin_left = 4
+expand_margin_top = 4
+expand_margin_right = 4
+expand_margin_bottom = 4
+shadow_color = Color(0.102, 0.051, 0.208, 1)
+shadow_size = 6
 
 [node name="StartMenu" type="CanvasLayer" unique_id=209197812]
 script = ExtResource("1_sm")
@@ -60,6 +96,15 @@ texture = ExtResource("2_bg")
 expand_mode = 1
 stretch_mode = 6
 
+[node name="BackgroundDarken" type="ColorRect" parent="." unique_id=1460620318]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.039, 0.02, 0.125, 0.28)
+
 [node name="Control" type="Control" parent="." unique_id=1643790425]
 layout_mode = 3
 anchors_preset = 15
@@ -69,30 +114,90 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="BtnStart" type="Button" parent="Control" unique_id=1919690249]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(600, 300)
-layout_mode = 1
+[node name="LogoBox" type="ColorRect" parent="Control" unique_id=3039123456]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.0
+anchor_right = 0.5
+anchor_bottom = 0.0
+offset_left = -60.0
+offset_top = 40.0
+offset_right = 60.0
+offset_bottom = 160.0
+mouse_filter = 2
+color = Color(0.439, 0.251, 0.690, 1)
+
+[node name="LogoInner" type="ColorRect" parent="Control/LogoBox" unique_id=3039123457]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -300.0
-offset_top = -200.0
-offset_right = 300.0
-offset_bottom = 100.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_fonts/font = ExtResource("3_loyqk")
-theme_override_styles/normal = SubResource("StyleBox_StartBtn")
-theme_override_styles/hover = SubResource("StyleBox_StartBtnHover")
-theme_override_styles/pressed = SubResource("StyleBox_StartBtnPressed")
-text = "ИГРАТЬ"
+offset_left = -45.0
+offset_top = -45.0
+offset_right = 45.0
+offset_bottom = 45.0
+mouse_filter = 2
+color = Color(0.227, 0.118, 0.431, 1)
 
-[node name="BtnExit" type="Button" parent="Control" unique_id=1919690250]
+[node name="UniversalLabel" type="Label" parent="Control" unique_id=3039123458]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.0
+anchor_right = 0.5
+anchor_bottom = 0.0
+offset_left = -120.0
+offset_top = 165.0
+offset_right = 120.0
+offset_bottom = 185.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_loyqk")
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.756, 0.565, 0.875, 1)
+text = "★ UNIVERSAL ★"
+horizontal_alignment = 1
+
+[node name="TitleLabel" type="Label" parent="Control" unique_id=3039123459]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.0
+anchor_right = 0.5
+anchor_bottom = 0.0
+offset_left = -150.0
+offset_top = 185.0
+offset_right = 150.0
+offset_bottom = 265.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_loyqk")
+theme_override_font_sizes/font_size = 40
+theme_override_colors/font_color = Color(0.756, 0.565, 0.875, 1)
+text = "HYPER
+JUMP"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="Control" unique_id=3039123460]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.0
+anchor_right = 0.5
+anchor_bottom = 0.0
+offset_left = -120.0
+offset_top = 265.0
+offset_right = 120.0
+offset_bottom = 285.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_loyqk")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.756, 0.565, 0.875, 1)
+text = "SCAVENGING THE VOID"
+horizontal_alignment = 1
+
+[node name="BtnStart" type="Button" parent="Control" unique_id=1919690249]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(400, 150)
+custom_minimum_size = Vector2(400, 100)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -100,13 +205,76 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -200.0
-offset_top = 150.0
+offset_top = -50.0
 offset_right = 200.0
-offset_bottom = 300.0
+offset_bottom = 50.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_font_sizes/font_size = 24
 theme_override_fonts/font = ExtResource("3_loyqk")
+theme_override_colors/font_color = Color(0.941, 0.875, 1.0, 1)
 theme_override_styles/normal = SubResource("StyleBox_StartBtn")
 theme_override_styles/hover = SubResource("StyleBox_StartBtnHover")
 theme_override_styles/pressed = SubResource("StyleBox_StartBtnPressed")
-text = "ВЫХОД"
+text = "▶ ИГРАТЬ"
+
+[node name="BtnExit" type="Button" parent="Control" unique_id=1919690250]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -250.0
+offset_right = 200.0
+offset_bottom = -150.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 24
+theme_override_fonts/font = ExtResource("3_loyqk")
+theme_override_colors/font_color = Color(0.941, 0.875, 1.0, 1)
+theme_override_styles/normal = SubResource("StyleBox_StartBtn")
+theme_override_styles/hover = SubResource("StyleBox_StartBtnHover")
+theme_override_styles/pressed = SubResource("StyleBox_StartBtnPressed")
+text = "◄ ВЫХОД"
+
+[node name="BuildLabel" type="Label" parent="Control" unique_id=3039123461]
+anchors_preset = 6
+anchor_left = 0.0
+anchor_top = 1.0
+anchor_right = 0.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = -40.0
+offset_right = 130.0
+offset_bottom = -20.0
+grow_vertical = 0
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_loyqk")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.439, 0.251, 0.690, 1)
+text = "BUILD 0.4.2"
+horizontal_alignment = 0
+
+[node name="ScreenBorder" type="PanelContainer" parent="." unique_id=2119551550]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+layer = -1
+theme_override_styles/panel = SubResource("PixelBorder_Outer")
+
+[node name="ScreenBorderInner" type="PanelContainer" parent="." unique_id=2119551551]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+layer = -1
+theme_override_styles/panel = SubResource("PixelBorder_Inner")

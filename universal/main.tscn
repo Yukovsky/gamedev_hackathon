@@ -22,7 +22,6 @@ mouse_filter = 2
 texture = ExtResource("3_bg")
 expand_mode = 1
 stretch_mode = 6
-
 [node name="GameBoard" parent="." unique_id=601188752 instance=ExtResource("1_gb")]
 
 [node name="MainUI" parent="." unique_id=922472675 instance=ExtResource("2_ui")]

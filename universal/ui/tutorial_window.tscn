@@ -2,7 +2,21 @@
 
 [ext_resource type="Texture2D" path="res://assets/sprites/nadya.png" id="2_nadya"]
 [ext_resource type="Script" uid="uid://bk340xvps1kf" path="res://ui/tutorial_window.gd" id="2_uupdj"]
-[ext_resource type="FontFile" path="res://assets/fonts/Exo2-VariableFont_wght.ttf" id="3_8w6qn"]
+[ext_resource type="FontFile" path="res://assets/fonts/PixelifySans-VariableFont_wght.ttf" id="3_8w6qn"]
+
+[sub_resource type="StyleBoxFlat" id="TutorialPanel"]
+bg_color = Color(0.039, 0.02, 0.125, 0.95)
+border_width_left = 10
+border_width_top = 10
+border_width_right = 10
+border_width_bottom = 10
+border_color = Color(0.816, 0.627, 0.941, 1)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+shadow_color = Color(0.102, 0.051, 0.208, 0.5)
+shadow_size = 14
 
 [node name="TutorialWindow" type="CanvasLayer" unique_id=2102290992]
 layer = 2
@@ -14,7 +28,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.784314)
+color = Color(0.102, 0.051, 0.208, 0.8)
 
 [node name="MarginContainer" type="MarginContainer" parent="Overlay" unique_id=853572299]
 layout_mode = 1
@@ -31,6 +45,7 @@ theme_override_constants/margin_bottom = 60
 
 [node name="PanelContainer" type="PanelContainer" parent="Overlay/MarginContainer" unique_id=263092452]
 layout_mode = 2
+theme_override_styles/panel = SubResource("TutorialPanel")
 
 [node name="MarginContainer" type="MarginContainer" parent="Overlay/MarginContainer/PanelContainer" unique_id=956122415]
 layout_mode = 2
@@ -57,14 +72,17 @@ theme_override_constants/separation = 10
 
 [node name="NameLabel" type="Label" parent="Overlay/MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer" unique_id=1367529767]
 layout_mode = 2
-theme_override_font_sizes/font_size = 42
+theme_override_font_sizes/font_size = 28
+theme_override_fonts/font = ExtResource("3_8w6qn")
+theme_override_colors/font_color = Color(0.756, 0.565, 0.875, 1)
 text = "НАДЯ"
 
 [node name="DialogText" type="RichTextLabel" parent="Overlay/MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer" unique_id=1694491440]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_fonts/normal_font = ExtResource("3_8w6qn")
-theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/normal_font_size = 20
+theme_override_colors/default_color = Color(0.816, 0.627, 0.941, 1)
 text = "Текст диалога будет здесь..."
 fit_content = true
 scroll_active = false
