@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ce15kvsmkxxv"
-path="res://.godot/imported/icon-iOS-Default-1024x1024@1x.png-87285c509d95bd30dc84530af88a159f.ctex"
+uid="uid://bau3koey21dai"
+path="res://.godot/imported/main_screen_picture.png-8453d7439c97b7304826369eb18174ee.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/icon-iOS-Default-1024x1024@1x.png"
-dest_files=["res://.godot/imported/icon-iOS-Default-1024x1024@1x.png-87285c509d95bd30dc84530af88a159f.ctex"]
+source_file="res://assets/main_screen_picture.png"
+dest_files=["res://.godot/imported/main_screen_picture.png-8453d7439c97b7304826369eb18174ee.ctex"]
 
 [params]
 
