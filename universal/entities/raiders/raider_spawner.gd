@@ -3,6 +3,7 @@ extends Node2D
 @export_group("Raider Scene")
 @export var raider_scene: PackedScene = preload("res://entities/raiders/raider.tscn")
 @export var balance: RaiderBalance = RaiderBalance.new()
+@export var wave_config: RaiderWaveConfig = preload("res://data/raider_waves.tres")
 @export var spawn_interval_sec: float = 1.2
 @export var min_buildings_for_spawn: int = 2
 
@@ -18,99 +19,6 @@ var _spawn_cycle: Array[int] = []
 var _spawn_cycle_index: int = 0
 var _spawn_cycle_key: String = ""
 var _spawn_enabled_by_buildings: bool = false
-
-const BALANCE_ROWS: Array[Dictionary] = [
-	{
-		"buildings_min": 0,
-		"buildings_max": 1,
-		"enemy_set": [],
-		"normal_hp": 0,
-		"sprinter_hp": 0,
-		"tank_hp": 0,
-		"max_active": 0,
-	},
-	{
-		"buildings_min": 2,
-		"buildings_max": 2,
-		"enemy_set": [{"type": "normal", "count": 1}],
-		"normal_hp": 153,
-		"sprinter_hp": 0,
-		"tank_hp": 0,
-		"max_active": 1,
-	},
-	{
-		"buildings_min": 3,
-		"buildings_max": 3,
-		"enemy_set": [{"type": "normal", "count": 1}],
-		"normal_hp": 162,
-		"sprinter_hp": 0,
-		"tank_hp": 0,
-		"max_active": 1,
-	},
-	{
-		"buildings_min": 4,
-		"buildings_max": 4,
-		"enemy_set": [{"type": "normal", "count": 2}],
-		"normal_hp": 171,
-		"sprinter_hp": 0,
-		"tank_hp": 0,
-		"max_active": 1,
-	},
-	{
-		"buildings_min": 5,
-		"buildings_max": 5,
-		"enemy_set": [{"type": "normal", "count": 1}, {"type": "sprinter", "count": 1}],
-		"normal_hp": 180,
-		"sprinter_hp": 130,
-		"tank_hp": 0,
-		"max_active": 2,
-	},
-	{
-		"buildings_min": 6,
-		"buildings_max": 6,
-		"enemy_set": [{"type": "normal", "count": 2}, {"type": "sprinter", "count": 1}],
-		"normal_hp": 189,
-		"sprinter_hp": 137,
-		"tank_hp": 0,
-		"max_active": 2,
-	},
-	{
-		"buildings_min": 7,
-		"buildings_max": 7,
-		"enemy_set": [{"type": "normal", "count": 1}, {"type": "sprinter", "count": 1}, {"type": "tank", "count": 1}],
-		"normal_hp": 198,
-		"sprinter_hp": 143,
-		"tank_hp": 446,
-		"max_active": 2,
-	},
-	{
-		"buildings_min": 8,
-		"buildings_max": 8,
-		"enemy_set": [{"type": "normal", "count": 2}, {"type": "sprinter", "count": 1}, {"type": "tank", "count": 1}],
-		"normal_hp": 207,
-		"sprinter_hp": 150,
-		"tank_hp": 466,
-		"max_active": 3,
-	},
-	{
-		"buildings_min": 9,
-		"buildings_max": 9,
-		"enemy_set": [{"type": "normal", "count": 2}, {"type": "sprinter", "count": 2}, {"type": "tank", "count": 1}],
-		"normal_hp": 216,
-		"sprinter_hp": 156,
-		"tank_hp": 486,
-		"max_active": 3,
-	},
-	{
-		"buildings_min": 10,
-		"buildings_max": 999,
-		"enemy_set": [{"type": "normal", "count": 2}, {"type": "sprinter", "count": 2}, {"type": "tank", "count": 2}],
-		"normal_hp": 225,
-		"sprinter_hp": 163,
-		"tank_hp": 506,
-		"max_active": 3,
-	},
-]
 
 
 func _ready() -> void:
@@ -151,13 +59,13 @@ func _on_spawn_timer_timeout() -> void:
 		return
 	_cleanup_invalid_raiders()
 
-	var row: Dictionary = _get_balance_row(buildings_count)
-	if int(row.get("max_active", 0)) <= 0:
+	var wave: RaiderWaveRow = _get_wave_row(buildings_count)
+	if wave == null or wave.max_active <= 0:
 		return
-	if _active_raiders.size() >= int(row.get("max_active", 0)):
+	if _active_raiders.size() >= wave.max_active:
 		return
 
-	_spawn_raider(row)
+	_spawn_raider_from_wave(wave)
 
 
 func _on_buildings_changed(_module_type: String, _position: Vector2) -> void:
@@ -180,7 +88,7 @@ func _sync_spawn_timer_state() -> int:
 	return buildings_count
 
 
-func _spawn_raider(row: Dictionary) -> void:
+func _spawn_raider_from_wave(wave: RaiderWaveRow) -> void:
 	if raider_scene == null:
 		return
 
@@ -188,8 +96,9 @@ func _spawn_raider(row: Dictionary) -> void:
 	if raider == null:
 		return
 
-	var role: int = _next_role_for_row(row)
-	var hp: int = _hp_for_role(row, role)
+	var role: int = _next_role_for_wave(wave)
+	var role_name: String = _role_to_name(role)
+	var hp: int = wave.get_hp_for_role(role_name)
 	var spawn_pos: Vector2 = _compute_spawn_position(role)
 
 	raider.global_position = spawn_pos
@@ -232,18 +141,19 @@ func _get_current_buildings_count() -> int:
 	return 0
 
 
-func _get_balance_row(buildings_count: int) -> Dictionary:
-	for row in BALANCE_ROWS:
-		var min_b: int = int(row.get("buildings_min", 0))
-		var max_b: int = int(row.get("buildings_max", 0))
-		if buildings_count >= min_b and buildings_count <= max_b:
-			return row
-	return BALANCE_ROWS[BALANCE_ROWS.size() - 1]
+func _get_wave_row(buildings_count: int) -> RaiderWaveRow:
+	if wave_config == null:
+		return null
+	return wave_config.get_wave_for_buildings(buildings_count)
 
 
-func _next_role_for_row(row: Dictionary) -> int:
-	var enemy_set: Array = row.get("enemy_set", []) as Array
-	var cycle_key: String = str(row.get("buildings_min", 0)) + ":" + str(row.get("buildings_max", 0)) + ":" + str(enemy_set)
+func _next_role_for_wave(wave: RaiderWaveRow) -> int:
+	if wave == null:
+		return Raider.RaiderRole.NORMAL
+	
+	var enemy_set: Array[Dictionary] = wave.get_enemy_set()
+	var cycle_key: String = "%d:%d:%s" % [wave.buildings_min, wave.buildings_max, str(enemy_set)]
+	
 	if _spawn_cycle.is_empty() or _spawn_cycle_key != cycle_key or _spawn_cycle_index >= _spawn_cycle.size():
 		_spawn_cycle_key = cycle_key
 		_spawn_cycle = _build_spawn_cycle(enemy_set)
@@ -290,14 +200,14 @@ func _role_from_type_name(type_name: String) -> int:
 			return Raider.RaiderRole.NORMAL
 
 
-func _hp_for_role(row: Dictionary, role: int) -> int:
+func _role_to_name(role: int) -> String:
 	match role:
 		Raider.RaiderRole.SPRINTER:
-			return max(1, int(row.get("sprinter_hp", 1)))
+			return "sprinter"
 		Raider.RaiderRole.TANK:
-			return max(1, int(row.get("tank_hp", 1)))
+			return "tank"
 		_:
-			return max(1, int(row.get("normal_hp", 1)))
+			return "normal"
 
 
 func _compute_spawn_position(role: int) -> Vector2:
@@ -357,13 +267,37 @@ func _on_tutorial_raider_spawn_requested() -> void:
 	if not _active_raiders.is_empty():
 		return
 
-	var row: Dictionary = _get_balance_row(_get_current_buildings_count())
-	var tutorial_row: Dictionary = row.duplicate(true)
-	if int(tutorial_row.get("max_active", 0)) <= 0:
-		tutorial_row["max_active"] = 1
-	if not tutorial_row.has("enemy_set") or (tutorial_row.get("enemy_set") as Array).is_empty():
-		tutorial_row["enemy_set"] = [{"type": "normal", "count": 1}]
-	if int(tutorial_row.get("normal_hp", 0)) <= 0:
-		tutorial_row["normal_hp"] = max(1, balance.raider_max_hp)
+	var wave: RaiderWaveRow = _get_wave_row(_get_current_buildings_count())
+	if wave == null or wave.max_active <= 0:
+		# Создаём временную волну для туториала
+		_spawn_tutorial_fallback_raider()
+		return
+	
+	_spawn_raider_from_wave(wave)
 
-	_spawn_raider(tutorial_row)
+
+func _spawn_tutorial_fallback_raider() -> void:
+	if raider_scene == null:
+		return
+
+	var raider: Node2D = raider_scene.instantiate() as Node2D
+	if raider == null:
+		return
+
+	var spawn_pos: Vector2 = _compute_spawn_position(Raider.RaiderRole.NORMAL)
+	raider.global_position = spawn_pos
+
+	if raider.has_method("configure_from_balance"):
+		raider.call("configure_from_balance", balance)
+	if raider.has_method("configure_role"):
+		raider.call("configure_role", Raider.RaiderRole.NORMAL)
+	if raider.has_method("configure_role_hp"):
+		raider.call("configure_role_hp", max(1, balance.raider_max_hp))
+
+	var board: Node = get_parent()
+	if board != null and raider.has_method("set_game_board"):
+		raider.call("set_game_board", board)
+
+	add_child(raider)
+	_active_raiders.append(raider)
+	raider.tree_exited.connect(_on_raider_tree_exited.bind(raider))

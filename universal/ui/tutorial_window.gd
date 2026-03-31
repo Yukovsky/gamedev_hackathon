@@ -131,7 +131,6 @@ var _focused_target_rect: Rect2 = Rect2()
 var _step_allows_target_interaction: bool = false
 var _step_action_id: String = ""
 var _focus_cutout_panels: Array[ColorRect] = []
-var _cutout_layer: CanvasLayer = null  # Слой для затемнения (layer = -1)
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS # Работаем даже при паузе
@@ -219,7 +218,10 @@ func _show_current_step() -> void:
 
 	# Включаем защиту от случайных кликов на 0.5 секунд
 	_is_input_blocked = true
-	get_tree().create_timer(0.5, true, false, true).timeout.connect(func(): _is_input_blocked = false)
+	if is_inside_tree():
+		get_tree().create_timer(0.5, true, false, true).timeout.connect(func(): _is_input_blocked = false)
+	else:
+		_is_input_blocked = false
 
 	# Сбрасываем цвет перед новой репликой
 	dialog_text.modulate = Color.WHITE
@@ -458,6 +460,8 @@ func _return_to_main_menu() -> void:
 			tree.change_scene_to_file(START_MENU_SCENE)
 
 func _set_tree_paused_safe(value: bool) -> void:
+	if not is_inside_tree():
+		return
 	var tree := get_tree()
 	if tree == null:
 		return

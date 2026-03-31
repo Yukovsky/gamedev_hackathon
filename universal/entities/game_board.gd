@@ -19,10 +19,7 @@ var _ship_bounds_rect: Rect2 = Rect2()
 var _target_pressure_by_module: Dictionary = {}
 var _is_game_finished: bool = false
 var _is_collapsing_unattached: bool = false
-
-# Состояние постройки
-var _active_build_type: String = ""
-var _active_build_size: Vector2i = Vector2i.ONE
+var _build_controller: BuildModeController
 
 func _ready() -> void:
 	# Позволяет ставить модули из магазина во время паузы.
@@ -55,7 +52,13 @@ func _ready() -> void:
 	_highlights_root.position = _modules_root.position
 	add_child(_modules_root)
 
-	GameEvents.build_requested.connect(_on_build_requested)
+	# Инициализация BuildModeController
+	_build_controller = BuildModeController.new()
+	_build_controller.name = "BuildModeController"
+	add_child(_build_controller)
+	_build_controller.configure(CELL_SIZE, _module_script_by_id, gridTileManager, _highlights_root)
+	_build_controller.build_executed.connect(_on_build_executed)
+
 	_spawn_core()
 
 	print("GameBoard Initialized at origin: ", _modules_root.position)
@@ -63,7 +66,8 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if _is_game_finished:
 		return
-	if _active_build_type == "": return
+	if not _build_controller.is_build_mode_active():
+		return
 
 	var pointer_pos: Vector2
 	var has_pointer_press: bool = false
@@ -82,68 +86,19 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not has_pointer_press:
 		return
 
-	var grid_pos: Vector2i = _world_to_grid(pointer_pos)
+	_build_controller.handle_pointer_input(pointer_pos, _modules_root.global_position)
 
-	# Пытаемся построить. Если успешно — режим сбросится сам внутри _try_place_module_at
-	if _try_place_module_at(_active_build_type, grid_pos):
-		print("Build Successful at ", grid_pos)
-	else:
-		# Если кликнули ВНУТРИ сетки, но мимо подсветки — отменяем режим
-		if grid_pos.x >= 0 and grid_pos.x < GridManager.GRID_WIDTH and \
-		   grid_pos.y >= 0 and grid_pos.y < GridManager.GRID_HEIGHT:
-			var cancelled_type: String = _active_build_type
-			_clear_highlights()
-			GameEvents.build_mode_cancelled.emit(cancelled_type)
-			print("Build cancelled by clicking empty grid")
 
-func _on_build_requested(module_type: String, requested_position: Vector2) -> void:
-	if _is_game_finished:
-		return
-	if not _module_script_by_id.has(module_type): return
-	if requested_position == Vector2.ZERO:
-		_enter_build_mode(module_type)
-	else:
-		var grid_pos = _world_to_grid(requested_position)
-		_try_place_module_at(module_type, grid_pos)
+func _on_build_executed(module_type: String, grid_pos: Vector2i, _success: bool) -> void:
+	_try_place_module_at(module_type, grid_pos)
 
 
 func is_build_mode_active() -> bool:
-	return _active_build_type != ""
-
-func _enter_build_mode(module_type: String) -> void:
-	_clear_highlights()
-	_active_build_type = module_type
-	var script_ref: Script = _module_script_by_id[module_type]
-	var temp_module: ModuleBase = script_ref.new() as ModuleBase
-	_active_build_size = temp_module.grid_size
-	temp_module.queue_free()
-	_show_valid_placements(module_type, _active_build_size)
-
-func _clear_highlights() -> void:
-	for child in _highlights_root.get_children():
-		child.queue_free()
-	_active_build_type = ""
-
-func _show_valid_placements(type: String, size: Vector2i) -> void:
-	var count = 0
-	for y in range(GridManager.GRID_HEIGHT):
-		for x in range(GridManager.GRID_WIDTH):
-			var pos = Vector2i(x, y)
-			if gridTileManager.canBuildAt(pos, type, size):
-				_create_highlight(pos, size)
-				count += 1
-	print("Found ", count, " valid placements for ", type)
-
-func _create_highlight(pos: Vector2i, size: Vector2i) -> void:
-	var rect = ColorRect.new()
-	rect.color = Color(0.5, 0.5, 0.5, 0.4)
-	rect.size = Vector2(size.x * CELL_SIZE - 4, size.y * CELL_SIZE - 4)
-	rect.position = Vector2(pos.x * CELL_SIZE + 2, pos.y * CELL_SIZE + 2)
-	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_highlights_root.add_child(rect)
+	return _build_controller != null and _build_controller.is_build_mode_active()
 
 func _try_place_module_at(module_type: String, build_cell: Vector2i) -> bool:
-	if module_type == "": return false
+	if module_type == "":
+		return false
 	
 	var script_ref: Script = _module_script_by_id[module_type]
 	var module: ModuleBase = script_ref.new() as ModuleBase
@@ -163,7 +118,7 @@ func _try_place_module_at(module_type: String, build_cell: Vector2i) -> bool:
 	if discount_used and _core_module != null:
 		_core_module.consume_build_discount()
 	GameEvents.module_built.emit(module_type, Vector2(build_cell))
-	_clear_highlights()
+	print("Build Successful at ", build_cell)
 	return true
 
 func _spawn_core() -> void:
@@ -296,16 +251,10 @@ func _check_win_condition() -> void:
 	if _is_game_finished:
 		return
 
-	var reactor_count: int = 0
-	for module in _placed_modules:
-		if not is_instance_valid(module):
-			continue
-		if module.module_id == Constants.MODULE_REACTOR:
-			reactor_count += 1
-
-	if reactor_count >= 4:
+	var result: Dictionary = GameConditionChecker.check_win(_placed_modules, _is_game_finished)
+	if result.get("won", false):
 		_is_game_finished = true
-		GameEvents.game_finished.emit("win", "reactors_4")
+		GameEvents.game_finished.emit("win", result.get("reason", ""))
 		GameEvents.game_ended.emit()
 
 
@@ -424,43 +373,11 @@ func _collapse_unattached_modules() -> void:
 	_is_collapsing_unattached = true
 
 	var occupied: Dictionary = gridTileManager.get_occupied_cells()
-	if occupied.is_empty():
-		_is_collapsing_unattached = false
-		return
-
-	var visited_cells: Dictionary = {}
-	var queue: Array[Vector2i] = []
-	for core_cell in _core_module.get_occupied_cells():
-		if occupied.has(core_cell):
-			visited_cells[core_cell] = true
-			queue.append(core_cell)
-
-	var dirs: Array[Vector2i] = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
-	while not queue.is_empty():
-		var cell: Vector2i = queue.pop_front()
-		for dir in dirs:
-			var n: Vector2i = cell + dir
-			if visited_cells.has(n):
-				continue
-			if occupied.has(n):
-				visited_cells[n] = true
-				queue.append(n)
-
-	var to_collapse: Array[ModuleBase] = []
-	for module in _placed_modules:
-		if not is_instance_valid(module):
-			continue
-		if module == _core_module:
-			continue
-
-		var connected: bool = false
-		for c in module.get_occupied_cells():
-			if visited_cells.has(c):
-				connected = true
-				break
-
-		if not connected:
-			to_collapse.append(module)
+	var to_collapse: Array[ModuleBase] = ModuleCollapseHandler.find_unattached_modules(
+		_placed_modules,
+		_core_module,
+		occupied
+	)
 
 	for module in to_collapse:
 		_destroy_module(module, "collapse")

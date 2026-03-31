@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ModulePricingConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/module_pricing_config.gd" id="1_config"]
+
+[resource]
+script = ExtResource("1_config")
+reactor_costs = Array[int]([350, 525, 788, 1182, 1772, 2658, 3987, 5981, 8971, 13456])
+hull_costs = Array[int]([75, 98, 127, 165, 215, 279, 363, 471, 612, 796])
+collector_costs = Array[int]([100, 130, 169, 220, 286, 372, 483, 628, 816, 1061])
+turret_costs = Array[int]([240, 312, 406, 528, 686, 892, 1159, 1506, 1958, 2546])

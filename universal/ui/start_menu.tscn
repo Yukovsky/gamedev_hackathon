@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://btdd4teupx4ke" path="res://ui/start_menu.gd" id="1_sm"]
 [ext_resource type="Texture2D" uid="uid://dwg8p8qd8fr5m" path="res://assets/background.png" id="2_bg"]
-[ext_resource type="FontFile" uid="uid://c62uvuv7pptp5" path="res://assets/fonts/PressStart2P-Regular.ttf" id="3_font"]
-[ext_resource type="Texture2D" uid="uid://bau3koey21dai" path="res://assets/Gemini_Generated_Image_z2m6wvz2m6wvz2m6.png" id="4_appicon"]
+[ext_resource type="FontFile" uid="uid://hc2tye8vkoey" path="res://assets/fonts/PressStart2P-Regular.ttf" id="3_font"]
+[ext_resource type="Texture2D" uid="uid://bau3koey21dai" path="res://assets/main_screen_picture.png" id="4_appicon"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_StartBtn"]
 bg_color = Color(0.227, 0.118, 0.431, 1)
@@ -12,34 +12,12 @@ border_width_top = 4
 border_width_right = 4
 border_width_bottom = 4
 border_color = Color(0.756, 0.565, 0.875, 1)
-corner_radius_top_left = 0
-corner_radius_top_right = 0
-corner_radius_bottom_right = 0
-corner_radius_bottom_left = 0
-expand_margin_left = 8
-expand_margin_top = 8
-expand_margin_right = 8
-expand_margin_bottom = 8
+expand_margin_left = 8.0
+expand_margin_top = 8.0
+expand_margin_right = 8.0
+expand_margin_bottom = 8.0
 shadow_color = Color(0.102, 0.051, 0.208, 1)
 shadow_size = 10
-
-[sub_resource type="StyleBoxFlat" id="StyleBox_StartBtnHover"]
-bg_color = Color(0.306, 0.169, 0.565, 1)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0.816, 0.627, 0.941, 1)
-corner_radius_top_left = 0
-corner_radius_top_right = 0
-corner_radius_bottom_right = 0
-corner_radius_bottom_left = 0
-expand_margin_left = 8
-expand_margin_top = 8
-expand_margin_right = 8
-expand_margin_bottom = 8
-shadow_color = Color(0.102, 0.051, 0.208, 1)
-shadow_size = 14
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_StartBtnPressed"]
 bg_color = Color(0.184, 0.086, 0.325, 1)
@@ -48,16 +26,26 @@ border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
 border_color = Color(0.756, 0.565, 0.875, 1)
-corner_radius_top_left = 0
-corner_radius_top_right = 0
-corner_radius_bottom_right = 0
-corner_radius_bottom_left = 0
-expand_margin_left = 4
-expand_margin_top = 4
-expand_margin_right = 4
-expand_margin_bottom = 4
+expand_margin_left = 4.0
+expand_margin_top = 4.0
+expand_margin_right = 4.0
+expand_margin_bottom = 4.0
 shadow_color = Color(0.102, 0.051, 0.208, 1)
 shadow_size = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_StartBtnHover"]
+bg_color = Color(0.306, 0.169, 0.565, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.816, 0.627, 0.941, 1)
+expand_margin_left = 8.0
+expand_margin_top = 8.0
+expand_margin_right = 8.0
+expand_margin_bottom = 8.0
+shadow_color = Color(0.102, 0.051, 0.208, 1)
+shadow_size = 14
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_ExitBtn"]
 bg_color = Color(0.164, 0.082, 0.302, 0.98)
@@ -66,26 +54,12 @@ border_width_top = 5
 border_width_right = 5
 border_width_bottom = 8
 border_color = Color(0.816, 0.627, 0.941, 1)
-expand_margin_left = 6
-expand_margin_top = 6
-expand_margin_right = 6
-expand_margin_bottom = 10
+expand_margin_left = 6.0
+expand_margin_top = 6.0
+expand_margin_right = 6.0
+expand_margin_bottom = 10.0
 shadow_color = Color(0.102, 0.051, 0.208, 1)
 shadow_size = 10
-
-[sub_resource type="StyleBoxFlat" id="StyleBox_ExitBtnHover"]
-bg_color = Color(0.258, 0.129, 0.451, 1)
-border_width_left = 5
-border_width_top = 5
-border_width_right = 5
-border_width_bottom = 9
-border_color = Color(0.941, 0.816, 0.125, 1)
-expand_margin_left = 6
-expand_margin_top = 6
-expand_margin_right = 6
-expand_margin_bottom = 10
-shadow_color = Color(0.102, 0.051, 0.208, 1)
-shadow_size = 14
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_ExitBtnPressed"]
 bg_color = Color(0.12, 0.062, 0.235, 1)
@@ -94,12 +68,26 @@ border_width_top = 4
 border_width_right = 4
 border_width_bottom = 6
 border_color = Color(0.815686, 0.627451, 0.941176, 1)
-expand_margin_left = 4
-expand_margin_top = 4
-expand_margin_right = 4
-expand_margin_bottom = 6
+expand_margin_left = 4.0
+expand_margin_top = 4.0
+expand_margin_right = 4.0
+expand_margin_bottom = 6.0
 shadow_color = Color(0.102, 0.051, 0.208, 1)
 shadow_size = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_ExitBtnHover"]
+bg_color = Color(0.258, 0.129, 0.451, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 9
+border_color = Color(0.941, 0.816, 0.125, 1)
+expand_margin_left = 6.0
+expand_margin_top = 6.0
+expand_margin_right = 6.0
+expand_margin_bottom = 10.0
+shadow_color = Color(0.102, 0.051, 0.208, 1)
+shadow_size = 14
 
 [node name="StartMenu" type="CanvasLayer" unique_id=209197812]
 script = ExtResource("1_sm")
@@ -133,8 +121,9 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="LogoIcon" type="TextureRect" parent="Control" unique_id=3039123456]
-anchors_preset = 8
+[node name="LogoIcon" type="TextureRect" parent="Control" unique_id=-1255843840]
+texture_filter = 1
+layout_mode = 0
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -200.0
@@ -146,10 +135,9 @@ mouse_filter = 2
 texture = ExtResource("4_appicon")
 expand_mode = 1
 stretch_mode = 5
-texture_filter = 1
 
-[node name="UniversalLabel" type="Label" parent="Control" unique_id=3039123458]
-anchors_preset = 8
+[node name="UniversalLabel" type="Label" parent="Control" unique_id=-1255843838]
+layout_mode = 0
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -480.0
@@ -157,15 +145,14 @@ offset_top = 540.0
 offset_right = 480.0
 offset_bottom = 760.0
 grow_horizontal = 2
-mouse_filter = 2
+theme_override_colors/font_color = Color(0.941, 0.875, 1, 1)
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 104
-theme_override_colors/font_color = Color(0.941, 0.875, 1.0, 1)
 text = "UNIVERSAL"
 horizontal_alignment = 1
 
-[node name="TitleLabel" type="Label" parent="Control" unique_id=3039123459]
-anchors_preset = 8
+[node name="TitleLabel" type="Label" parent="Control" unique_id=-1255843837]
+layout_mode = 0
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -380.0
@@ -173,10 +160,9 @@ offset_top = 740.0
 offset_right = 380.0
 offset_bottom = 830.0
 grow_horizontal = 2
-mouse_filter = 2
+theme_override_colors/font_color = Color(0.756, 0.565, 0.875, 1)
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 38
-theme_override_colors/font_color = Color(0.756, 0.565, 0.875, 1)
 text = "HYPER JUMP"
 horizontal_alignment = 1
 
@@ -195,15 +181,15 @@ offset_right = 300.0
 offset_bottom = 340.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 42
+theme_override_colors/font_color = Color(0.941, 0.875, 1, 1)
 theme_override_fonts/font = ExtResource("3_font")
-theme_override_colors/font_color = Color(0.941, 0.875, 1.0, 1)
+theme_override_font_sizes/font_size = 42
 theme_override_styles/normal = SubResource("StyleBox_StartBtn")
-theme_override_styles/hover = SubResource("StyleBox_StartBtnHover")
 theme_override_styles/pressed = SubResource("StyleBox_StartBtnPressed")
+theme_override_styles/hover = SubResource("StyleBox_StartBtnHover")
 text = "▶ ИГРАТЬ"
 
-[node name="BtnTraining" type="Button" parent="Control"]
+[node name="BtnTraining" type="Button" parent="Control" unique_id=1516868992]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(600, 140)
 layout_mode = 1
@@ -218,19 +204,19 @@ offset_right = 300.0
 offset_bottom = 510.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 28
-theme_override_fonts/font = ExtResource("3_font")
 theme_override_colors/font_color = Color(0.941, 0.875, 1, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 28
 theme_override_styles/normal = SubResource("StyleBox_StartBtn")
-theme_override_styles/hover = SubResource("StyleBox_StartBtnHover")
 theme_override_styles/pressed = SubResource("StyleBox_StartBtnPressed")
+theme_override_styles/hover = SubResource("StyleBox_StartBtnHover")
 text = "ОБУЧЕНИЕ С НАДЕЙ"
 
 [node name="BtnExit" type="Button" parent="Control" unique_id=1919690250]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(540, 130)
 layout_mode = 1
-anchors_preset = 8
+anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
@@ -241,28 +227,24 @@ offset_right = 270.0
 offset_bottom = -190.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(1, 0.929, 0.369, 1)
 theme_override_fonts/font = ExtResource("3_font")
-theme_override_colors/font_color = Color(1.0, 0.929, 0.369, 1)
+theme_override_font_sizes/font_size = 30
 theme_override_styles/normal = SubResource("StyleBox_ExitBtn")
-theme_override_styles/hover = SubResource("StyleBox_ExitBtnHover")
 theme_override_styles/pressed = SubResource("StyleBox_ExitBtnPressed")
+theme_override_styles/hover = SubResource("StyleBox_ExitBtnHover")
 text = "ВЫЙТИ"
 
-[node name="BuildLabel" type="Label" parent="Control" unique_id=3039123461]
-anchors_preset = 6
-anchor_left = 0.0
+[node name="BuildLabel" type="Label" parent="Control" unique_id=-1255843835]
+layout_mode = 0
 anchor_top = 1.0
-anchor_right = 0.0
 anchor_bottom = 1.0
 offset_left = 30.0
 offset_top = -60.0
 offset_right = 200.0
 offset_bottom = -20.0
 grow_vertical = 0
-mouse_filter = 2
+theme_override_colors/font_color = Color(0.439, 0.251, 0.69, 1)
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 24
-theme_override_colors/font_color = Color(0.439, 0.251, 0.690, 1)
 text = "BUILD 0.4.2"
-horizontal_alignment = 0

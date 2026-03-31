@@ -30,8 +30,10 @@ const MODULE_IDS = {
 	"turret": MODULE_TURRET,
 }
 
-# ========== Путь к единому конфигу баланса ==========
+# ========== Пути к конфигам баланса ==========
 const RESOURCE_BALANCE_PATH: String = "res://data/room_stats/resource_balance.tres"
+const MODULE_PRICING_PATH: String = "res://data/module_pricing.tres"
+const CORE_UPGRADE_PATH: String = "res://data/core_upgrade.tres"
 
 # ========== Кэш загруженных конфигов ==========
 var MODULE_COST_METAL: Dictionary = {}
@@ -39,14 +41,8 @@ var _resource_initial_metal: int = 0
 var _resource_max_metal: int = 0
 var _resource_hull_bonus: int = 0
 var _is_balance_loaded: bool = false
-
-# Стоимости из БАЛАНС.csv по номеру итерации (0..9), дальше используется последний индекс.
-const ITERATION_MODULE_COSTS: Dictionary = {
-	MODULE_REACTOR: [350, 525, 788, 1182, 1772, 2658, 3987, 5981, 8971, 13456],
-	MODULE_HULL: [75, 98, 127, 165, 215, 279, 363, 471, 612, 796],
-	MODULE_COLLECTOR: [100, 130, 169, 220, 286, 372, 483, 628, 816, 1061],
-	MODULE_TURRET: [240, 312, 406, 528, 686, 892, 1159, 1506, 1958, 2546],
-}
+var _pricing_config: ModulePricingConfig = null
+var _core_upgrade_config: CoreUpgradeConfig = null
 
 # ========== Параметры ядра ==========
 const BASE_METAL_PER_CLICK: int = 10
@@ -57,20 +53,6 @@ const CORE_RADIUS_CELLS: int = 1
 # ========== Улучшения ==========
 const UPGRADE_CORE_ID: String = "core_upgrade"
 const UPGRADE_CORE_NAME: String = "Улучшение ядра"
-
-# Таблица из БАЛАНС (2).csv по уровням улучшения ядра.
-const CORE_UPGRADE_REWARD_TABLE: Array[Dictionary] = [
-	{DEBRIS_TRASH_1: 17, DEBRIS_TRASH_2: 13, DEBRIS_TRASH_3: 20},
-	{DEBRIS_TRASH_1: 21, DEBRIS_TRASH_2: 16, DEBRIS_TRASH_3: 25},
-	{DEBRIS_TRASH_1: 27, DEBRIS_TRASH_2: 20, DEBRIS_TRASH_3: 31},
-	{DEBRIS_TRASH_1: 33, DEBRIS_TRASH_2: 25, DEBRIS_TRASH_3: 39},
-	{DEBRIS_TRASH_1: 42, DEBRIS_TRASH_2: 32, DEBRIS_TRASH_3: 49},
-	{DEBRIS_TRASH_1: 52, DEBRIS_TRASH_2: 61, DEBRIS_TRASH_3: 40},
-]
-
-# Стоимость перехода на следующий уровень (0->1, 1->2, ...).
-const CORE_UPGRADE_COSTS: Array[int] = [375, 469, 586, 733, 916]
-
 const UPGRADE_IDS: Array[String] = [UPGRADE_CORE_ID]
 
 # ========== UI Слои ==========
@@ -89,6 +71,22 @@ func _ensure_balance_loaded() -> void:
 	_load_balance_config()
 
 
+func _ensure_pricing_loaded() -> void:
+	if _pricing_config != null:
+		return
+	var loaded: Resource = load(MODULE_PRICING_PATH)
+	if loaded is ModulePricingConfig:
+		_pricing_config = loaded as ModulePricingConfig
+
+
+func _ensure_core_upgrade_loaded() -> void:
+	if _core_upgrade_config != null:
+		return
+	var loaded: Resource = load(CORE_UPGRADE_PATH)
+	if loaded is CoreUpgradeConfig:
+		_core_upgrade_config = loaded as CoreUpgradeConfig
+
+
 func get_module_cost(module_id: String) -> int:
 	_ensure_balance_loaded()
 	if module_id == MODULE_TURRET:
@@ -98,17 +96,19 @@ func get_module_cost(module_id: String) -> int:
 
 func get_module_cost_for_iteration(module_id: String, iteration: int) -> int:
 	_ensure_balance_loaded()
-	if ITERATION_MODULE_COSTS.has(module_id):
-		var iteration_costs: Array = ITERATION_MODULE_COSTS[module_id]
-		if iteration_costs.is_empty():
-			return get_module_cost(module_id)
-		var index: int = clamp(iteration, 0, iteration_costs.size() - 1)
-		return int(iteration_costs[index])
+	_ensure_pricing_loaded()
+	
+	if _pricing_config != null and _pricing_config.has_incremental_pricing(module_id):
+		return _pricing_config.get_cost_for_module(module_id, iteration)
+	
 	return get_module_cost(module_id)
 
 
 func is_incremental_price_module(module_id: String) -> bool:
-	return ITERATION_MODULE_COSTS.has(module_id)
+	_ensure_pricing_loaded()
+	if _pricing_config != null:
+		return _pricing_config.has_incremental_pricing(module_id)
+	return false
 
 
 func get_resource_initial_metal() -> int:
@@ -127,26 +127,24 @@ func get_hull_metal_bonus() -> int:
 
 
 func get_core_upgrade_max_level() -> int:
-	if CORE_UPGRADE_REWARD_TABLE.is_empty():
-		return 0
-	return CORE_UPGRADE_REWARD_TABLE.size() - 1
+	_ensure_core_upgrade_loaded()
+	if _core_upgrade_config != null:
+		return _core_upgrade_config.get_max_level()
+	return 0
 
 
 func get_core_upgrade_next_cost(current_level: int) -> int:
-	if current_level < 0:
-		return CORE_UPGRADE_COSTS[0]
-	if current_level >= CORE_UPGRADE_COSTS.size():
-		return -1
-	return CORE_UPGRADE_COSTS[current_level]
+	_ensure_core_upgrade_loaded()
+	if _core_upgrade_config != null:
+		return _core_upgrade_config.get_upgrade_cost(current_level)
+	return -1
 
 
 func get_core_upgrade_reward(debris_type: int, level: int) -> int:
-	if CORE_UPGRADE_REWARD_TABLE.is_empty():
-		return 0
-
-	var clamped_level: int = clamp(level, 0, CORE_UPGRADE_REWARD_TABLE.size() - 1)
-	var reward_row: Dictionary = CORE_UPGRADE_REWARD_TABLE[clamped_level]
-	return int(reward_row.get(debris_type, 0))
+	_ensure_core_upgrade_loaded()
+	if _core_upgrade_config != null:
+		return _core_upgrade_config.get_reward_for_debris(debris_type, level)
+	return 0
 
 
 func _load_balance_config() -> void:

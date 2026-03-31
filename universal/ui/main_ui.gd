@@ -230,7 +230,7 @@ func _request_build(type: String) -> void:
 	GameEvents.build_requested.emit(type, Vector2.ZERO)
 	_set_shop_open(false, false) # Закрываем для выбора места
 
-func _on_game_finished(outcome: String, reason: String) -> void:
+func _on_game_finished(outcome: String, _reason: String) -> void:
 	_is_game_finished = true
 	_set_shop_open(false, false)
 	get_tree().paused = true

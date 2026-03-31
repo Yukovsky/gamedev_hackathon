@@ -1,0 +1,112 @@
+[gd_resource type="Resource" script_class="RaiderWaveConfig" format=3 uid="uid://c3tg2qu57h6d7"]
+
+[ext_resource type="Script" uid="uid://d0pdqn2ie74n" path="res://data/raider_wave_config.gd" id="1_config"]
+[ext_resource type="Script" uid="uid://clrthi4olb0yn" path="res://data/raider_wave_row.gd" id="2_row"]
+
+[sub_resource type="Resource" id="wave_00"]
+script = ExtResource("2_row")
+buildings_max = 1
+normal_hp = 0
+sprinter_hp = 0
+tank_hp = 0
+max_active = 0
+
+[sub_resource type="Resource" id="wave_01"]
+script = ExtResource("2_row")
+buildings_min = 2
+buildings_max = 2
+normal_count = 1
+normal_hp = 153
+sprinter_hp = 0
+tank_hp = 0
+
+[sub_resource type="Resource" id="wave_02"]
+script = ExtResource("2_row")
+buildings_min = 3
+buildings_max = 3
+normal_count = 1
+normal_hp = 162
+sprinter_hp = 0
+tank_hp = 0
+
+[sub_resource type="Resource" id="wave_03"]
+script = ExtResource("2_row")
+buildings_min = 4
+buildings_max = 4
+normal_count = 2
+normal_hp = 171
+sprinter_hp = 0
+tank_hp = 0
+
+[sub_resource type="Resource" id="wave_04"]
+script = ExtResource("2_row")
+buildings_min = 5
+buildings_max = 5
+normal_count = 1
+sprinter_count = 1
+normal_hp = 180
+sprinter_hp = 130
+tank_hp = 0
+max_active = 2
+
+[sub_resource type="Resource" id="wave_05"]
+script = ExtResource("2_row")
+buildings_min = 6
+buildings_max = 6
+normal_count = 2
+sprinter_count = 1
+normal_hp = 189
+sprinter_hp = 137
+tank_hp = 0
+max_active = 2
+
+[sub_resource type="Resource" id="wave_06"]
+script = ExtResource("2_row")
+buildings_min = 7
+buildings_max = 7
+normal_count = 1
+sprinter_count = 1
+tank_count = 1
+normal_hp = 198
+sprinter_hp = 143
+tank_hp = 446
+max_active = 2
+
+[sub_resource type="Resource" id="wave_07"]
+script = ExtResource("2_row")
+buildings_min = 8
+buildings_max = 8
+normal_count = 2
+sprinter_count = 1
+tank_count = 1
+normal_hp = 207
+sprinter_hp = 150
+tank_hp = 466
+max_active = 3
+
+[sub_resource type="Resource" id="wave_08"]
+script = ExtResource("2_row")
+buildings_min = 9
+buildings_max = 9
+normal_count = 2
+sprinter_count = 2
+tank_count = 1
+normal_hp = 216
+sprinter_hp = 156
+tank_hp = 486
+max_active = 3
+
+[sub_resource type="Resource" id="wave_09"]
+script = ExtResource("2_row")
+buildings_min = 10
+normal_count = 2
+sprinter_count = 2
+tank_count = 2
+normal_hp = 225
+sprinter_hp = 163
+tank_hp = 506
+max_active = 3
+
+[resource]
+script = ExtResource("1_config")
+waves = Array[ExtResource("2_row")]([SubResource("wave_00"), SubResource("wave_01"), SubResource("wave_02"), SubResource("wave_03"), SubResource("wave_04"), SubResource("wave_05"), SubResource("wave_06"), SubResource("wave_07"), SubResource("wave_08"), SubResource("wave_09")])
