@@ -1,4 +1,4 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cu8piwflo1vop"]
 
 [ext_resource type="PackedScene" uid="uid://cal40ma30npno" path="res://entities/game_board.tscn" id="1_gb"]
 [ext_resource type="PackedScene" uid="uid://b1c2d3e4f5g6" path="res://ui/main_ui.tscn" id="2_ui"]
@@ -6,13 +6,13 @@
 [ext_resource type="PackedScene" uid="uid://c6qmbc0uftdvu" path="res://ui/tutorial_window.tscn" id="4_tw"]
 [ext_resource type="Script" uid="uid://bmiws2mxv45rm" path="res://ui/main.gd" id="5_main"]
 
-[node name="TutorialFirstCallMain" type="Node2D"]
+[node name="TutorialFirstCallMain" type="Node2D" unique_id=1570604552]
 script = ExtResource("5_main")
 
-[node name="BackgroundLayer" type="CanvasLayer" parent="."]
+[node name="BackgroundLayer" type="CanvasLayer" parent="." unique_id=1954858930]
 layer = -1
 
-[node name="Background" type="TextureRect" parent="BackgroundLayer"]
+[node name="Background" type="TextureRect" parent="BackgroundLayer" unique_id=1208043271]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -23,10 +23,10 @@ texture = ExtResource("3_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="GameBoard" parent="." instance=ExtResource("1_gb")]
+[node name="GameBoard" parent="." unique_id=521275020 instance=ExtResource("1_gb")]
 
-[node name="MainUI" parent="." instance=ExtResource("2_ui")]
+[node name="MainUI" parent="." unique_id=410971281 instance=ExtResource("2_ui")]
 
-[node name="TutorialWindow" parent="." instance=ExtResource("4_tw")]
+[node name="TutorialWindow" parent="." unique_id=451762452 instance=ExtResource("4_tw")]
 tutorial_mode = 2
 ignore_save_flags = true
