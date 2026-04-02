@@ -38,9 +38,11 @@ func is_target_valid(target_id: String) -> bool:
 	if target_id.is_empty() or not _tutorial_target_controls.has(target_id):
 		return false
 	var target: Variant = _tutorial_target_controls[target_id]
+	if not is_instance_valid(target):
+		return false
 	if not (target is CanvasItem):
 		return false
-	return is_instance_valid(target)
+	return true
 
 
 func clear_focus() -> void:
