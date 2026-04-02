@@ -264,6 +264,9 @@ func _on_dialog_finished(finished_steps: Array[String]) -> void:
 	if finished_steps == gathering_steps and (tutorial_mode == TutorialMode.FULL or tutorial_mode == TutorialMode.FULL_CYCLE_TRAINING):
 		_request_first_raider_for_tutorial()
 
+	if finished_steps == raider_warning_steps:
+		_clear_focus_target()
+
 	if tutorial_mode == TutorialMode.FULL:
 		if finished_steps == shop_guide_steps:
 			_mark_tutorial_completed_once()
@@ -502,6 +505,10 @@ func _input(event: InputEvent) -> void:
 
 func _apply_focus_for_current_step() -> void:
 	_clear_focus_target()
+
+	if tutorial_steps == raider_warning_steps:
+		_set_focus_target("first_raider", Color(1.0, 0.18, 0.18, 1.0), false)
+		return
 
 	if tutorial_steps == shop_invite_steps and current_step == 0:
 		_set_focus_target("shop_button", Color(0.756863, 0.564706, 0.87451, 1.0), true, "open_shop")

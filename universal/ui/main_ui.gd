@@ -50,6 +50,7 @@ var _is_game_finished: bool = false
 var _shop_state: ShopStateController
 var _tutorial_focus: TutorialFocusController
 var _core_upgrade: CoreUpgradeController
+var _first_raider_focus_target_registered: bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -70,6 +71,8 @@ func _ready() -> void:
 	GameEvents.tutorial_focus_changed.connect(_on_tutorial_focus_changed)
 	GameEvents.tutorial_focus_cleared.connect(_on_tutorial_focus_cleared)
 	GameEvents.tutorial_action_requested.connect(_on_tutorial_action_requested)
+	GameEvents.raider_spawned.connect(_on_raider_spawned)
+	GameEvents.raider_destroyed.connect(_on_raider_destroyed)
 
 	btn_reactor.pressed.connect(_on_btn_reactor_pressed)
 	btn_collector.pressed.connect(_on_btn_collector_pressed)
@@ -260,6 +263,60 @@ func _register_tutorial_targets() -> void:
 		"turret": btn_turret,
 		"core": core_plaque,
 	})
+
+
+func _on_raider_spawned(_position: Vector2) -> void:
+	if _tutorial_focus == null:
+		return
+	if _first_raider_focus_target_registered:
+		if _tutorial_focus.is_target_valid("first_raider"):
+			return
+		_tutorial_focus.unregister_target("first_raider")
+		_first_raider_focus_target_registered = false
+	call_deferred("_register_first_raider_focus_target")
+
+
+func _on_raider_destroyed(_position: Vector2, _evolution_level: int, _source: String) -> void:
+	if _tutorial_focus == null:
+		return
+	if not _first_raider_focus_target_registered:
+		return
+	if not _tutorial_focus.has_target("first_raider"):
+		_first_raider_focus_target_registered = false
+		return
+	if not _tutorial_focus.is_target_valid("first_raider"):
+		_tutorial_focus.unregister_target("first_raider")
+		_first_raider_focus_target_registered = false
+
+
+func _register_first_raider_focus_target() -> void:
+	if _tutorial_focus == null:
+		return
+	if _first_raider_focus_target_registered:
+		return
+
+	var tree: SceneTree = get_tree()
+	if tree == null:
+		return
+
+	var raiders: Array[Node] = tree.get_nodes_in_group("raiders")
+	if raiders.is_empty():
+		return
+
+	for raider_any in raiders:
+		if not (raider_any is Node2D):
+			continue
+		var raider: Node2D = raider_any as Node2D
+		if not is_instance_valid(raider):
+			continue
+		var sprite: Sprite2D = raider.get_node_or_null("BodySprite") as Sprite2D
+		if sprite != null and is_instance_valid(sprite):
+			_tutorial_focus.register_target("first_raider", sprite)
+			_first_raider_focus_target_registered = true
+			return
+		_tutorial_focus.register_target("first_raider", raider)
+		_first_raider_focus_target_registered = true
+		return
 
 func _on_tutorial_focus_changed(target_id: String, accent_color: Color, _allow_interaction: bool) -> void:
 	if _tutorial_focus != null:
