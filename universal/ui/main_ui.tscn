@@ -133,6 +133,14 @@ border_width_right = 4
 border_width_bottom = 9
 border_color = Color(0.95, 0.32, 0.18, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_EndPanel"]
+bg_color = Color(0.027451, 0.0117647, 0.0901961, 0.98)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.756863, 0.564706, 0.87451, 1)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Btn"]
 bg_color = Color(0.227451, 0.117647, 0.431373, 1)
 border_width_left = 3
@@ -148,14 +156,6 @@ border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
 border_color = Color(0.815686, 0.627451, 0.941176, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_EndPanel"]
-bg_color = Color(0.027451, 0.0117647, 0.0901961, 0.98)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0.756863, 0.564706, 0.87451, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ScreenOuter"]
 bg_color = Color(0, 0, 0, 0)

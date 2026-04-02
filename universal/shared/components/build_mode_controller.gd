@@ -7,6 +7,10 @@ signal build_executed(module_type: String, grid_pos: Vector2i, success: bool)
 
 @export var highlights_root: Node2D
 @export var grid_manager: GridManager
+@export var border_thickness: int = 3
+@export var corner_radius: int = 6
+@export var border_color: Color = Color.YELLOW
+@export var fill_color: Color = Color(0.5, 0.5, 0.5, 0.4)
 
 var _active_build_type: String = ""
 var _active_build_size: Vector2i = Vector2i.ONE
@@ -117,21 +121,54 @@ func _clear_highlights() -> void:
 func _show_valid_placements(type: String, size: Vector2i) -> void:
 	if grid_manager == null or highlights_root == null:
 		return
+
+	var occupied_cells: Dictionary = {}
 	
 	for y in range(GridManager.GRID_HEIGHT):
 		for x in range(GridManager.GRID_WIDTH):
 			var pos: Vector2i = Vector2i(x, y)
 			if grid_manager.canBuildAt(pos, type, size):
-				_create_highlight(pos, size)
+				_add_highlight_area(occupied_cells, pos, size)
+
+	for cell_pos: Vector2i in occupied_cells.keys():
+		_create_highlight_cell(cell_pos, occupied_cells)
 
 
-func _create_highlight(pos: Vector2i, size: Vector2i) -> void:
-	var rect: ColorRect = ColorRect.new()
-	rect.color = Color(0.5, 0.5, 0.5, 0.4)
-	rect.size = Vector2(size.x * _cell_size - 4, size.y * _cell_size - 4)
-	rect.position = Vector2(pos.x * _cell_size + 2, pos.y * _cell_size + 2)
-	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	highlights_root.add_child(rect)
+func _add_highlight_area(occupied_cells: Dictionary, pos: Vector2i, size: Vector2i) -> void:
+	for offset_y in range(size.y):
+		for offset_x in range(size.x):
+			occupied_cells[Vector2i(pos.x + offset_x, pos.y + offset_y)] = true
+
+
+func _create_highlight_cell(pos: Vector2i, occupied_cells: Dictionary) -> void:
+	var panel: Panel = Panel.new()
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.position = Vector2(pos.x * _cell_size, pos.y * _cell_size)
+	panel.size = Vector2(_cell_size, _cell_size)
+	panel.add_theme_stylebox_override("panel", _build_highlight_style(pos, occupied_cells))
+	highlights_root.add_child(panel)
+
+
+func _build_highlight_style(pos: Vector2i, occupied_cells: Dictionary) -> StyleBoxFlat:
+	var has_left: bool = occupied_cells.has(pos + Vector2i(-1, 0))
+	var has_right: bool = occupied_cells.has(pos + Vector2i(1, 0))
+	var has_up: bool = occupied_cells.has(pos + Vector2i(0, -1))
+	var has_down: bool = occupied_cells.has(pos + Vector2i(0, 1))
+	
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = fill_color
+	style.border_color = border_color
+	style.border_width_left = 0 if has_left else border_thickness
+	style.border_width_top = 0 if has_up else border_thickness
+	style.border_width_right = border_thickness
+	style.border_width_bottom = border_thickness
+	style.corner_radius_top_left = corner_radius if not has_up and not has_left else 0
+	style.corner_radius_top_right = corner_radius if not has_up and not has_right else 0
+	style.corner_radius_bottom_left = corner_radius if not has_down and not has_left else 0
+	style.corner_radius_bottom_right = corner_radius if not has_down and not has_right else 0
+	style.anti_aliasing = true
+	style.anti_aliasing_size = 1.0
+	return style
 
 
 func _world_to_grid(world_position: Vector2, grid_origin: Vector2) -> Vector2i:
