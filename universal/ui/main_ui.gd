@@ -7,6 +7,20 @@ const ShopStateControllerScript: Script = preload("res://ui/shop_state_controlle
 const TutorialFocusControllerScript: Script = preload("res://ui/tutorial_focus_controller.gd")
 const CoreUpgradeControllerScript: Script = preload("res://ui/core_upgrade_controller.gd")
 
+@export var ui_base_margin_left: int = 24
+@export var ui_base_margin_top: int = 24
+@export var ui_base_margin_right: int = 24
+@export var ui_base_margin_bottom: int = 60
+
+@export var shop_base_margin_left: int = 30
+@export var shop_base_margin_top: int = 64
+@export var shop_base_margin_right: int = 30
+@export var shop_base_margin_bottom: int = 80
+
+@onready var root_margin_container: MarginContainer = $MarginContainer
+@onready var shop_center_container: MarginContainer = $ShopOverlay/Center
+@onready var end_center_container: Control = $EndOverlay/Center
+
 @onready var metal_label: Label = %MetalLabel
 @onready var metal_counter: Label = %MetalCounter
 @onready var metal_bar: TextureProgressBar = %MetalBar
@@ -43,6 +57,9 @@ func _ready() -> void:
 	_tutorial_focus = TutorialFocusControllerScript.new() as TutorialFocusController
 	_core_upgrade = CoreUpgradeControllerScript.new() as CoreUpgradeController
 	_core_upgrade.setup(core_cost_label, core_level_label, level_bars_container, core_plaque)
+	_apply_safe_area()
+	if not get_viewport().size_changed.is_connected(_apply_safe_area):
+		get_viewport().size_changed.connect(_apply_safe_area)
 
 	GameEvents.resource_changed.connect(_on_resource_changed)
 	GameEvents.module_built.connect(_on_module_built)
@@ -72,6 +89,37 @@ func _ready() -> void:
 	_refresh_ui()
 	_set_shop_open(false, false)
 	end_overlay.visible = false
+
+func _exit_tree() -> void:
+	if get_viewport() != null and get_viewport().size_changed.is_connected(_apply_safe_area):
+		get_viewport().size_changed.disconnect(_apply_safe_area)
+
+func _apply_safe_area() -> void:
+	var window_size: Vector2i = DisplayServer.window_get_size()
+	var safe_area: Rect2i = DisplayServer.get_display_safe_area()
+	if safe_area.size.x <= 0 or safe_area.size.y <= 0:
+		safe_area = Rect2i(Vector2i.ZERO, window_size)
+
+	var safe_left: int = max(0, int(safe_area.position.x))
+	var safe_top: int = max(0, int(safe_area.position.y))
+	var safe_right: int = max(0, int(window_size.x - safe_area.end.x))
+	var safe_bottom: int = max(0, int(window_size.y - safe_area.end.y))
+
+	# Фон остается full-screen, а интерактивный UI получает safe-area отступы.
+	root_margin_container.add_theme_constant_override("margin_left", ui_base_margin_left + safe_left)
+	root_margin_container.add_theme_constant_override("margin_top", ui_base_margin_top + safe_top)
+	root_margin_container.add_theme_constant_override("margin_right", ui_base_margin_right + safe_right)
+	root_margin_container.add_theme_constant_override("margin_bottom", ui_base_margin_bottom + safe_bottom)
+
+	shop_center_container.add_theme_constant_override("margin_left", shop_base_margin_left + safe_left)
+	shop_center_container.add_theme_constant_override("margin_top", shop_base_margin_top + safe_top)
+	shop_center_container.add_theme_constant_override("margin_right", shop_base_margin_right + safe_right)
+	shop_center_container.add_theme_constant_override("margin_bottom", shop_base_margin_bottom + safe_bottom)
+
+	end_center_container.offset_left = float(safe_left)
+	end_center_container.offset_top = float(safe_top)
+	end_center_container.offset_right = -float(safe_right)
+	end_center_container.offset_bottom = -float(safe_bottom)
 
 func _process(_delta: float) -> void:
 	if _tutorial_focus != null:

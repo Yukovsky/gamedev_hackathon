@@ -76,6 +76,7 @@ func _ready() -> void:
 
 	_spawn_core()
 
+	print("GameBoard Initialized at origin: ", _modules_root.position)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _game_state != null and _game_state.is_game_finished():
@@ -124,6 +125,7 @@ func _try_place_module_at(module_type: String, build_cell: Vector2i) -> bool:
 	var discount_used: bool = _core_module != null and _core_module.get_build_discount_multiplier() < 1.0
 	var final_cost: int = _get_final_build_cost(module)
 	if final_cost > 0 and not ResourceManager.spend_metal(final_cost):
+		print("Not enough metal! Need: ", final_cost)
 		module.queue_free()
 		return false
 
@@ -131,6 +133,7 @@ func _try_place_module_at(module_type: String, build_cell: Vector2i) -> bool:
 	if discount_used and _core_module != null:
 		_core_module.consume_build_discount()
 	GameEvents.module_built.emit(module_type, Vector2(build_cell))
+	print("Build Successful at ", build_cell)
 	return true
 
 func _spawn_core() -> void:
@@ -216,18 +219,11 @@ func _get_ship_bounds_rect() -> Rect2:
 func _on_module_tree_exited(module: ModuleBase) -> void:
 	if _pressure_tracker != null:
 		_pressure_tracker.clear_target(module)
-	
-	# Модуль уже удалён из _placed_modules в _destroy_module,
-	# но на всякий случай проверяем (для случаев прямого удаления)
-	if _placed_modules.has(module):
-		_placed_modules.erase(module)
-		gridTileManager.unregister_module(module)
-	
+	_placed_modules.erase(module)
+	gridTileManager.unregister_module(module)
 	if module == _core_module:
 		_core_module = null
-	
 	_refresh_ship_bounds()
-	
 	var is_finished: bool = _game_state != null and _game_state.is_game_finished()
 	if not is_finished and not _is_collapsing_unattached:
 		call_deferred("_collapse_unattached_modules")
@@ -249,19 +245,10 @@ func _destroy_module(module: ModuleBase, source: String) -> bool:
 
 	var destroyed_module_id: String = module.module_id
 	var destroyed_pos: Vector2 = Vector2(module.grid_position)
-	
-	# Удаляем модуль из списка ДО испускания события,
-	# чтобы системы (например, spawner) получили актуальное количество модулей
-	_placed_modules.erase(module)
-	gridTileManager.unregister_module(module)
-	
-	# Теперь испускаем событие с актуальным состоянием
-	GameEvents.module_destroyed.emit(destroyed_module_id, destroyed_pos)
-	
 	module.queue_free()
+	GameEvents.module_destroyed.emit(destroyed_module_id, destroyed_pos)
 
 	if module == _core_module:
-		_core_module = null
 		if _game_state != null:
 			_game_state.handle_core_destroyed(source)
 	else:
