@@ -16,6 +16,7 @@ const MODULE_COLLECTOR: String = "collector"
 const MODULE_REACTOR: String = "reactor"
 const MODULE_HULL: String = "hull"
 const MODULE_TURRET: String = "turret"
+const MODULE_REPAIR: String = "repair"
 const MODULE_TURRET_DEFAULT_COST: int = 240
 
 # ========== Типы мусора ==========
@@ -29,6 +30,7 @@ const MODULE_IDS = {
 	"reactor": MODULE_REACTOR,
 	"hull": MODULE_HULL,
 	"turret": MODULE_TURRET,
+	"repair": MODULE_REPAIR,
 }
 
 # ========== Параметры ядра ==========

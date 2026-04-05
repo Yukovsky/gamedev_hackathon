@@ -69,6 +69,9 @@ signal module_destroyed(module_type: String, position: Vector2)
 ## @param source: Источник урона ("raider", "tap", "collapse").
 signal module_damaged(module_type: String, current_hp: int, max_hp: int, position: Vector2, source: String)
 
+## Запрос на ремонт поврежденных модулей.
+signal repair_requested()
+
 # ========== Сигналы улучшений ==========
 
 ## Улучшение куплено.

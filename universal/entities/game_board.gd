@@ -21,6 +21,7 @@ var _ship_bounds_rect: Rect2 = Rect2()
 var _pressure_tracker: TargetPressureTracker
 var _game_state: GameStateController
 var _is_collapsing_unattached: bool = false
+var _is_repair_mode: bool = false
 var _build_controller: BuildModeController
 
 func _ready() -> void:
@@ -78,10 +79,10 @@ func _ready() -> void:
 
 	print("GameBoard Initialized at origin: ", _modules_root.position)
 
+	GameEvents.repair_requested.connect(_on_repair_requested)
+
 func _unhandled_input(event: InputEvent) -> void:
 	if _game_state != null and _game_state.is_game_finished():
-		return
-	if not _build_controller.is_build_mode_active():
 		return
 
 	var pointer_pos: Vector2
@@ -98,6 +99,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			has_pointer_press = true
 			pointer_pos = touch_event.position
 
+	if not _build_controller.is_build_mode_active():
+		if _is_repair_mode and has_pointer_press:
+			_handle_repair_click(pointer_pos)
+			return
+		return
+
 	if not has_pointer_press:
 		return
 
@@ -110,6 +117,31 @@ func _on_build_executed(module_type: String, grid_pos: Vector2i, _success: bool)
 
 func is_build_mode_active() -> bool:
 	return _build_controller != null and _build_controller.is_build_mode_active()
+
+func _handle_repair_click(pointer_pos: Vector2) -> void:
+	var grid_pos: Vector2i = _world_to_grid(pointer_pos)
+	var module: ModuleBase = null
+	var occupied: Dictionary = gridTileManager.get_occupied_cells()
+	if occupied.has(grid_pos):
+		module = occupied[grid_pos] as ModuleBase
+
+	if module == null or not is_instance_valid(module):
+		_is_repair_mode = false
+		GameEvents.build_mode_cancelled.emit("repair")
+		return
+
+	var current_hp_value: int = int(module.get("current_hp"))
+	var max_hp_value: int = int(module.get("max_hp"))
+	var can_repair: bool = max_hp_value > 0 and current_hp_value < max_hp_value
+
+	if not can_repair:
+		return
+
+	if ResourceManager.spend_metal(5):
+		module.call("repair")
+		AudioManager._on_module_repaired()
+		_is_repair_mode = false
+		GameEvents.build_mode_cancelled.emit("repair")
 
 func _try_place_module_at(module_type: String, build_cell: Vector2i) -> bool:
 	if module_type == "":
@@ -366,3 +398,9 @@ func _collapse_unattached_modules() -> void:
 		_destroy_module(module, "collapse")
 
 	_is_collapsing_unattached = false
+
+
+func _on_repair_requested() -> void:
+	if _game_state != null and _game_state.is_game_finished():
+		return
+	_is_repair_mode = true

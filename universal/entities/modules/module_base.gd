@@ -105,6 +105,16 @@ func take_damage(amount: int, source: String = "unknown") -> bool:
 	return _health.take_damage(damage, source)
 
 
+## Чинит модуль до полного здоровья.
+func repair() -> void:
+	_ensure_health_component()
+	if _health == null:
+		return
+	var heal_amount: int = _health.max_hp - _health.current_hp
+	if heal_amount > 0:
+		_health.heal(heal_amount)
+
+
 ## Возвращает отношение текущего HP к максимальному (0.0 - 1.0).
 func get_hp_ratio() -> float:
 	if _health != null:

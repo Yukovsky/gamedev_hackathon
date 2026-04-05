@@ -168,6 +168,8 @@ func _on_garbage_clicked(_amount: int) -> void:
 func _on_module_built(_module_type: String, _position: Vector2) -> void:
 	_play_sfx(AudioCatalogScript.TAG_GAMEPLAY_BUILD_PLACE)
 
+func _on_module_repaired() -> void:
+	_play_sfx(AudioCatalogScript.TAG_GAMEPLAY_BUILD_PLACE)
 
 func _on_module_damaged(_module_type: String, _current_hp: int, _max_hp: int, _position: Vector2, _source: String) -> void:
 	var now_ms: int = Time.get_ticks_msec()

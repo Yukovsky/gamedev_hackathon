@@ -134,6 +134,14 @@ border_width_right = 4
 border_width_bottom = 9
 border_color = Color(0.95, 0.32, 0.18, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ModuleRepair"]
+bg_color = Color(0.0392157, 0.0196078, 0.12549, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 9
+border_color = Color(0.2, 0.5, 1, 1)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_EndPanel"]
 bg_color = Color(0.027451, 0.0117647, 0.0901961, 0.98)
 border_width_left = 4
@@ -689,6 +697,41 @@ theme_override_colors/font_color = Color(0.941, 0.816, 0.125, 1)
 theme_override_fonts/font = ExtResource("2_hlo7n")
 theme_override_font_sizes/font_size = 32
 text = "240 +"
+horizontal_alignment = 1
+
+[node name="BtnRepair" type="Button" parent="ShopOverlay/Center/ShopPanel/ShopMargin/ShopVBox/BottomPanel" unique_id=123456789]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_ModuleRepair")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ModuleRepair")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ModuleRepair")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_BtnDisabled")
+
+[node name="V" type="VBoxContainer" parent="ShopOverlay/Center/ShopPanel/ShopMargin/ShopVBox/BottomPanel/BtnRepair" unique_id=987654321]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="ShopOverlay/Center/ShopPanel/ShopMargin/ShopVBox/BottomPanel/BtnRepair/V" unique_id=112233445]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.5, 1, 1)
+theme_override_fonts/font = ExtResource("2_hlo7n")
+theme_override_font_sizes/font_size = 38
+text = "РЕМОНТ"
+horizontal_alignment = 1
+
+[node name="Price" type="Label" parent="ShopOverlay/Center/ShopPanel/ShopMargin/ShopVBox/BottomPanel/BtnRepair/V" unique_id=556677889]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.941, 0.816, 0.125, 1)
+theme_override_fonts/font = ExtResource("2_hlo7n")
+theme_override_font_sizes/font_size = 32
+text = "5 +"
 horizontal_alignment = 1
 
 [node name="ModulesBottomSpacer" type="Control" parent="ShopOverlay/Center/ShopPanel/ShopMargin/ShopVBox" unique_id=1955100018]

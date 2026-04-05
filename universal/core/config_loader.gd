@@ -32,6 +32,8 @@ func get_module_cost(module_id: String) -> int:
 	_ensure_balance_loaded()
 	if module_id == Constants.MODULE_TURRET:
 		return int(_module_cost_metal.get(Constants.MODULE_TURRET, Constants.MODULE_TURRET_DEFAULT_COST))
+	if module_id == Constants.MODULE_REPAIR:
+		return 5
 	return int(_module_cost_metal.get(module_id, 0))
 
 

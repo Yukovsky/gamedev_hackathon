@@ -32,6 +32,7 @@ const CoreUpgradeControllerScript: Script = preload("res://ui/core_upgrade_contr
 @onready var btn_collector: Button = %BtnCollector
 @onready var btn_hull: Button = %BtnHull
 @onready var btn_turret: Button = %BtnTurret
+@onready var btn_repair: Button = %BtnRepair
 @onready var btn_shop: Button = %BtnShop
 @onready var btn_shop_exit: Button = %BtnShopExit
 @onready var btn_main_menu: Button = %BtnMainMenu
@@ -86,6 +87,7 @@ func _ready() -> void:
 	btn_collector.pressed.connect(_on_btn_collector_pressed)
 	btn_hull.pressed.connect(_on_btn_hull_pressed)
 	btn_turret.pressed.connect(_on_btn_turret_pressed)
+	btn_repair.pressed.connect(_on_btn_repair_pressed)
 	btn_shop.pressed.connect(_on_btn_shop_pressed)
 	btn_restart.pressed.connect(_on_btn_restart_pressed)
 	btn_shop_exit.pressed.connect(_on_btn_shop_exit_pressed)
@@ -171,6 +173,7 @@ func _refresh_ui() -> void:
 	_update_module_button(btn_reactor, Constants.MODULE_REACTOR, metal)
 	_update_module_button(btn_collector, Constants.MODULE_COLLECTOR, metal)
 	_update_module_button(btn_turret, Constants.MODULE_TURRET, metal)
+	_update_module_button(btn_repair, Constants.MODULE_REPAIR, metal)
 
 	# Обновление ядра через контроллер
 	if _core_upgrade != null:
@@ -296,6 +299,11 @@ func _on_btn_hull_pressed() -> void: _request_build(Constants.MODULE_HULL)
 func _on_btn_reactor_pressed() -> void: _request_build(Constants.MODULE_REACTOR)
 func _on_btn_collector_pressed() -> void: _request_build(Constants.MODULE_COLLECTOR)
 func _on_btn_turret_pressed() -> void: _request_build(Constants.MODULE_TURRET)
+func _on_btn_repair_pressed() -> void:
+	if _is_game_finished: return
+	if ResourceManager.metal >= 5:
+		GameEvents.repair_requested.emit()
+		_set_shop_open(false, false)
 
 func _request_build(type: String) -> void:
 	if _is_game_finished: return
