@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://ds0shjt5ptmgg" path="res://assets/ui_icons/metal_bar_fill_pixel.svg" id="9_bar_fill"]
 [ext_resource type="Texture2D" uid="uid://drcm1po4v7167" path="res://assets/ui_icons/metal_coin_pixel.svg" id="10_coin"]
 [ext_resource type="Texture2D" uid="uid://dtiqtu2hqaipc" path="res://assets/ui_icons/shop_basket_pixel.svg" id="11_basket"]
-[ext_resource type="Script" path="res://ui/metal_max_notice_stack.gd" id="12_metal_notice_stack"]
+[ext_resource type="Script" uid="uid://sx4xvjnc5gti" path="res://ui/metal_max_notice_stack.gd" id="12_metal_notice_stack"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_TopHeader"]
 bg_color = Color(0.0117647, 0.0117647, 0.0313726, 0.901961)
@@ -266,14 +266,6 @@ theme_override_fonts/font = ExtResource("2_hlo7n")
 theme_override_font_sizes/font_size = 32
 text = "0 / 200"
 
-[node name="MetalMaxNoticeStack" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1700104471]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_filter = 2
-theme_override_constants/separation = 6
-script = ExtResource("12_metal_notice_stack")
-
 [node name="MetalBar" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/TopHeader/HeaderPadding/TopPanel/MetalGroup/ResourceVBox" unique_id=1824190027]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0.845, 40)
@@ -301,6 +293,14 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_BtnShopHover")
 text = "ЦЕХ"
 icon = ExtResource("11_basket")
 
+[node name="MetalMaxNoticeStack" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1700104471]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 6
+script = ExtResource("12_metal_notice_stack")
+
 [node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer" unique_id=327372049]
 layout_mode = 2
 size_flags_vertical = 3
@@ -308,7 +308,6 @@ mouse_filter = 2
 
 [node name="ShopOverlay" type="ColorRect" parent="." unique_id=1955100001]
 unique_name_in_owner = true
-visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -835,7 +834,8 @@ size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.815686, 0.627451, 0.941176, 1)
 theme_override_fonts/font = ExtResource("2_hlo7n")
 theme_override_font_sizes/font_size = 24
-text = "Прогресс текущего захода не сохранится.\nПерейти в главное меню?"
+text = "Прогресс текущего захода не сохранится.
+Перейти в главное меню?"
 horizontal_alignment = 1
 autowrap_mode = 2
 

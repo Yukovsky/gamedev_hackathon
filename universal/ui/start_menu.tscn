@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://btdd4teupx4ke" path="res://ui/start_menu.gd" id="1_sm"]
 [ext_resource type="Texture2D" uid="uid://dwg8p8qd8fr5m" path="res://assets/background.png" id="2_bg"]
 [ext_resource type="FontFile" uid="uid://hc2tye8vkoey" path="res://assets/fonts/PressStart2P-Regular.ttf" id="3_font"]
-[ext_resource type="Texture2D" uid="uid://bau3koey21dai" path="res://assets/main_screen_picture.png" id="4_appicon"]
+[ext_resource type="Texture2D" uid="uid://bau3koey21dai" path="res://assets/reactor-1.png" id="4_appicon"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_StartBtn"]
 bg_color = Color(0.227, 0.118, 0.431, 1)
@@ -236,15 +236,15 @@ theme_override_styles/hover = SubResource("StyleBox_ExitBtnHover")
 text = "ВЫЙТИ"
 
 [node name="BuildLabel" type="Label" parent="Control" unique_id=-1255843835]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 30.0
 offset_top = -60.0
 offset_right = 200.0
 offset_bottom = -20.0
-grow_vertical = 0
-theme_override_colors/font_color = Color(0.439, 0.251, 0.69, 1)
+theme_override_colors/font_color = Color(0.8308827, 0.7185861, 0.96072835, 1)
 theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 28
 text = "BUILD 1.3"

@@ -183,10 +183,31 @@ func _update_module_button(btn: Button, type: String, metal: int) -> void:
 	price_label.text = "%d +" % cost
 	btn.disabled = metal < cost
 
-	if btn.disabled:
-		price_label.add_theme_color_override("font_color", Color(0.8, 0.2, 0.2))
+	var red_color: Color = Color(0.8, 0.2, 0.2)
+	var gold_color: Color = Color(0.941, 0.816, 0.125)
+	
+	if metal >= cost:
+		price_label.add_theme_color_override("font_color", gold_color)
+	elif metal <= 0:
+		price_label.add_theme_color_override("font_color", red_color)
 	else:
 		price_label.add_theme_color_override("font_color", Color(0.941, 0.816, 0.125))
+
+	# Добавление или обновление заполняющегося цвета под кнопкой слева направо
+	var fill_rect: ColorRect = btn.get_node_or_null("FillRect") as ColorRect
+	if fill_rect == null:
+		fill_rect = ColorRect.new()
+		fill_rect.name = "FillRect"
+		btn.add_child(fill_rect)
+		var color = btn.get_node("V").get_node("Label").get_theme_color("font_color")
+		color.a = 0.15
+		fill_rect.color =  color  # Полупрозрачный золотой
+		fill_rect.z_index = 0  # Под кнопкой
+		fill_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE  # Чтобы не блокировать клики на кнопке
+	
+	var ratio: float = clamp(float(metal) / float(cost), 0.0, 1.0)
+	fill_rect.size = Vector2(btn.size.x * ratio, btn.size.y)
+	fill_rect.position = Vector2(0, 0)
 
 
 func _on_core_plaque_input(event: InputEvent) -> void:
@@ -205,6 +226,8 @@ func _on_btn_shop_pressed() -> void:
 func _set_shop_open(value: bool, sync_pause: bool) -> void:
 	if _shop_state != null:
 		_shop_state.set_shop_open(value, sync_pause, shop_overlay)
+	if value:
+		_refresh_ui()
 	if not value:
 		_set_confirm_exit_visible(false)
 
