@@ -15,6 +15,7 @@ signal collected(amount: int, debris_type: DebrisType, source: String)
 @export var metal_reward_trash_3: int = 20
 @export var movement_speed_px_per_sec: float = 500.0
 @export var unit_size_px: Vector2 = Vector2(140.0, 140.0)
+@export var hitbox_scale: float = 1.5
 @export var movement_direction: Vector2 = Vector2.DOWN
 
 @export_group("Debris Pixel Burst")
@@ -185,7 +186,8 @@ func _apply_unit_size() -> void:
 
 	var shape: Shape2D = _collision_shape.shape
 	if shape is RectangleShape2D:
-		(shape as RectangleShape2D).size = unit_size_px
+		var clamped_scale: float = maxf(1.0, hitbox_scale)
+		(shape as RectangleShape2D).size = unit_size_px * clamped_scale
 
 	_fit_sprite_to_unit_size()
 
