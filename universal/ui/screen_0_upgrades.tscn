@@ -15,27 +15,19 @@ border_color = Color(0.439, 0.251, 0.690, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_SettingsBtn"]
 bg_color = Color(0.227, 0.118, 0.431, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
 border_color = Color(0.439, 0.251, 0.690, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_left = 8
-corner_radius_bottom_right = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_SettingsBtnHover"]
 bg_color = Color(0.306, 0.169, 0.565, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
 border_color = Color(0.439, 0.251, 0.690, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_left = 8
-corner_radius_bottom_right = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Item"]
 bg_color = Color(0.039, 0.020, 0.125, 1.0)
@@ -44,10 +36,6 @@ border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
 border_color = Color(0.439, 0.251, 0.690, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_left = 6
-corner_radius_bottom_right = 6
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_Btn"]
 

@@ -79,6 +79,11 @@ var _pre_build_screen: int = DEFAULT_SCREEN
 var _is_in_build_mode: bool = false
 var _pending_build_type: String = ""
 
+# Pixel-sharp nav button styles
+var _nav_style_active: StyleBoxFlat
+var _nav_style_inactive: StyleBoxFlat
+var _nav_style_disabled: StyleBoxFlat
+
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -115,6 +120,7 @@ func _ready() -> void:
 	btn_confirm_exit_yes.pressed.connect(_on_btn_confirm_exit_yes_pressed)
 	btn_confirm_exit_no.pressed.connect(_on_btn_confirm_exit_no_pressed)
 
+	_create_nav_styles()
 	_setup_nav_buttons()
 	_register_tutorial_targets()
 
@@ -308,17 +314,44 @@ func _refresh_screen_metal(_index: int, screen: Control) -> void:
 		metal_bar_node.value = metal
 
 
+func _create_nav_styles() -> void:
+	_nav_style_active = StyleBoxFlat.new()
+	_nav_style_active.bg_color = Color(0.168, 0.090, 0.337, 0.9)
+	_nav_style_active.border_color = Color(0.4, 0.8, 1.0, 1.0)
+	_nav_style_active.set_border_width_all(3)
+	_nav_style_active.border_width_bottom = 6
+
+	_nav_style_inactive = StyleBoxFlat.new()
+	_nav_style_inactive.bg_color = Color(0.101, 0.050, 0.207, 0.7)
+	_nav_style_inactive.border_color = Color(0.313, 0.250, 0.470, 0.6)
+	_nav_style_inactive.set_border_width_all(3)
+
+	_nav_style_disabled = StyleBoxFlat.new()
+	_nav_style_disabled.bg_color = Color(0.060, 0.030, 0.120, 0.4)
+	_nav_style_disabled.border_color = Color(0.200, 0.180, 0.250, 0.3)
+	_nav_style_disabled.set_border_width_all(2)
+
+
 func _update_nav_highlights() -> void:
 	for i in range(_nav_buttons.size()):
 		var btn: Button = _nav_buttons[i]
 		if i == 4:
 			btn.add_theme_color_override("font_color", NAV_DISABLED_COLOR)
+			btn.add_theme_stylebox_override("normal", _nav_style_disabled)
+			btn.add_theme_stylebox_override("hover", _nav_style_disabled)
+			btn.add_theme_stylebox_override("pressed", _nav_style_disabled)
 			btn.disabled = true
 		elif i == _current_screen:
 			btn.add_theme_color_override("font_color", NAV_ACTIVE_COLOR)
+			btn.add_theme_stylebox_override("normal", _nav_style_active)
+			btn.add_theme_stylebox_override("hover", _nav_style_active)
+			btn.add_theme_stylebox_override("pressed", _nav_style_active)
 			btn.disabled = false
 		else:
 			btn.add_theme_color_override("font_color", NAV_INACTIVE_COLOR)
+			btn.add_theme_stylebox_override("normal", _nav_style_inactive)
+			btn.add_theme_stylebox_override("hover", _nav_style_inactive)
+			btn.add_theme_stylebox_override("pressed", _nav_style_inactive)
 			btn.disabled = false
 
 

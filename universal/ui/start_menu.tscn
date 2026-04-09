@@ -11,27 +11,15 @@ border_width_left = 4
 border_width_top = 4
 border_width_right = 4
 border_width_bottom = 4
-border_color = Color(0.756, 0.565, 0.875, 1)
-expand_margin_left = 8.0
-expand_margin_top = 8.0
-expand_margin_right = 8.0
-expand_margin_bottom = 8.0
-shadow_color = Color(0.102, 0.051, 0.208, 1)
-shadow_size = 10
+border_color = Color(0.4, 0.8, 1.0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_StartBtnPressed"]
 bg_color = Color(0.184, 0.086, 0.325, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.756, 0.565, 0.875, 1)
-expand_margin_left = 4.0
-expand_margin_top = 4.0
-expand_margin_right = 4.0
-expand_margin_bottom = 4.0
-shadow_color = Color(0.102, 0.051, 0.208, 1)
-shadow_size = 6
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.3, 0.6, 0.8, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_StartBtnHover"]
 bg_color = Color(0.306, 0.169, 0.565, 1)
@@ -39,55 +27,31 @@ border_width_left = 4
 border_width_top = 4
 border_width_right = 4
 border_width_bottom = 4
-border_color = Color(0.816, 0.627, 0.941, 1)
-expand_margin_left = 8.0
-expand_margin_top = 8.0
-expand_margin_right = 8.0
-expand_margin_bottom = 8.0
-shadow_color = Color(0.102, 0.051, 0.208, 1)
-shadow_size = 14
+border_color = Color(0.5, 0.9, 1.0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_ExitBtn"]
 bg_color = Color(0.164, 0.082, 0.302, 0.98)
-border_width_left = 5
-border_width_top = 5
-border_width_right = 5
-border_width_bottom = 8
-border_color = Color(0.816, 0.627, 0.941, 1)
-expand_margin_left = 6.0
-expand_margin_top = 6.0
-expand_margin_right = 6.0
-expand_margin_bottom = 10.0
-shadow_color = Color(0.102, 0.051, 0.208, 1)
-shadow_size = 10
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.757, 0.565, 0.875, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_ExitBtnPressed"]
 bg_color = Color(0.12, 0.062, 0.235, 1)
 border_width_left = 4
 border_width_top = 4
 border_width_right = 4
-border_width_bottom = 6
-border_color = Color(0.815686, 0.627451, 0.941176, 1)
-expand_margin_left = 4.0
-expand_margin_top = 4.0
-expand_margin_right = 4.0
-expand_margin_bottom = 6.0
-shadow_color = Color(0.102, 0.051, 0.208, 1)
-shadow_size = 6
+border_width_bottom = 4
+border_color = Color(0.757, 0.565, 0.875, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_ExitBtnHover"]
 bg_color = Color(0.258, 0.129, 0.451, 1)
-border_width_left = 5
-border_width_top = 5
-border_width_right = 5
-border_width_bottom = 9
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
 border_color = Color(0.941, 0.816, 0.125, 1)
-expand_margin_left = 6.0
-expand_margin_top = 6.0
-expand_margin_right = 6.0
-expand_margin_bottom = 10.0
-shadow_color = Color(0.102, 0.051, 0.208, 1)
-shadow_size = 14
 
 [node name="StartMenu" type="CanvasLayer" unique_id=209197812]
 script = ExtResource("1_sm")
