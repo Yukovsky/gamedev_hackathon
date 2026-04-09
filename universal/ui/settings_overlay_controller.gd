@@ -11,7 +11,7 @@ extends ColorRect
 var _was_paused: bool = false
 
 func _ready() -> void:
-	hide()
+	super.hide()
 	
 	# Подключаем обработчики слайдеров
 	if sound_slider:
@@ -31,9 +31,9 @@ func _ready() -> void:
 	
 	# Подключаемся к сигналам открытия/закрытия
 	if GameEvents.has_signal("settings_overlay_open"):
-		GameEvents.settings_overlay_open.connect(show)
+		GameEvents.settings_overlay_open.connect(open_settings)
 	if GameEvents.has_signal("settings_overlay_close"):
-		GameEvents.settings_overlay_close.connect(hide)
+		GameEvents.settings_overlay_close.connect(close_settings)
 
 func _on_sound_slider_changed(value: float) -> void:
 	"""Изменяет громкость звуков."""
@@ -48,7 +48,7 @@ func _on_btn_back_pressed() -> void:
 	AudioManager.play_ui_close()
 	if _was_paused:
 		get_tree().paused = false
-	hide()
+	close_settings()
 
 func _on_btn_main_menu_pressed() -> void:
 	"""Переходит в главное меню."""
@@ -60,11 +60,11 @@ func _on_btn_main_menu_pressed() -> void:
 func toggle_visibility() -> void:
 	"""Переключает видимость оверлея."""
 	if visible:
-		hide()
+		close_settings()
 	else:
-		show()
+		open_settings()
 
-func show() -> void:
+func open_settings() -> void:
 	"""Показывает оверлей и ставит игру на паузу."""
 	_was_paused = get_tree().paused
 	get_tree().paused = true
@@ -75,6 +75,6 @@ func show() -> void:
 		music_slider.value = AudioManager.get_music_volume()
 	super.show()
 
-func hide() -> void:
+func close_settings() -> void:
 	"""Скрывает оверлей."""
 	super.hide()
