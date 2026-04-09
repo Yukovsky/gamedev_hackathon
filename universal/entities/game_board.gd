@@ -3,6 +3,8 @@ extends Node2D
 const CELL_SIZE: float = float(GridManager.CELL_SIZE)
 const CORE_START_CELL: Vector2i = Vector2i(5, 17)
 
+@export var board_bottom_padding_px: float = 180.0
+
 const CORE_MODULE_SCRIPT: Script = preload("res://entities/modules/core_module.gd")
 const COLLECTOR_MODULE_SCRIPT: Script = preload("res://entities/modules/collector_module.gd")
 const REACTOR_MODULE_SCRIPT: Script = preload("res://entities/modules/reactor_module.gd")
@@ -186,7 +188,7 @@ func _get_grid_origin() -> Vector2:
 	var grid_pixel_size: Vector2 = Vector2(GridManager.GRID_WIDTH, GridManager.GRID_HEIGHT) * CELL_SIZE
 	return Vector2(
 		(viewport_size.x - grid_pixel_size.x) * 0.5,
-		viewport_size.y - grid_pixel_size.y
+		viewport_size.y - grid_pixel_size.y - board_bottom_padding_px
 	)
 
 func _update_module_facing(module: ModuleBase) -> void:
