@@ -41,10 +41,12 @@ func open() -> void:
 	sfx_slider.value = sfx_vol
 	_update_value_labels()
 	visible = true
+	get_tree().paused = true
 
 
 func close() -> void:
 	visible = false
+	get_tree().paused = false
 
 
 func _configure_slider(slider: HSlider) -> void:

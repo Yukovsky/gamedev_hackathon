@@ -1,4 +1,4 @@
-﻿[gd_scene format=3 uid="uid://8y3t4bnglrrd"]
+[gd_scene format=3 uid="uid://8y3t4bnglrrd"]
 
 [ext_resource type="FontFile" uid="uid://hc2tye8vkoey" path="res://assets/fonts/PressStart2P-Regular.ttf" id="1_font"]
 [ext_resource type="Texture2D" uid="uid://cx7u584k2a3q4" path="res://assets/ui_icons/metal_bar_under_pixel.svg" id="2_bar_under"]
