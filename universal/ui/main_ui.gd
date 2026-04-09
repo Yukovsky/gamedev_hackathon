@@ -140,16 +140,17 @@ func _apply_safe_area() -> void:
 	var safe_right: int = max(0, int(window_size.x - safe_area.end.x))
 	var safe_bottom: int = max(0, int(window_size.y - safe_area.end.y))
 
-	# Main content margins — bottom accounts for external nav bar
-	var content_bottom: int = NAV_BAR_HEIGHT + NAV_CONTENT_GAP + safe_bottom
+	# Main content margins — bottom accounts for external nav bar + side/bottom gaps
+	var content_bottom: int = NAV_BAR_HEIGHT + NAV_CONTENT_GAP + ui_base_margin_bottom + safe_bottom
 	root_margin_container.add_theme_constant_override("margin_left", ui_base_margin_left + safe_left)
 	root_margin_container.add_theme_constant_override("margin_top", ui_base_margin_top + safe_top)
 	root_margin_container.add_theme_constant_override("margin_right", ui_base_margin_right + safe_right)
 	root_margin_container.add_theme_constant_override("margin_bottom", content_bottom)
 
-	# Bottom nav panel — side insets match MarginContainer (decorative stripes), bottom covers safe area
-	bottom_nav_panel.offset_top = float(-(NAV_BAR_HEIGHT + safe_bottom))
-	bottom_nav_panel.offset_bottom = 0.0
+	# Bottom nav panel — inset on all 4 sides like TopHeader
+	var nav_bottom_offset: int = ui_base_margin_bottom + safe_bottom
+	bottom_nav_panel.offset_top = float(-(NAV_BAR_HEIGHT + nav_bottom_offset))
+	bottom_nav_panel.offset_bottom = -float(nav_bottom_offset)
 	bottom_nav_panel.offset_left = float(ui_base_margin_left + safe_left)
 	bottom_nav_panel.offset_right = -float(ui_base_margin_right + safe_right)
 
