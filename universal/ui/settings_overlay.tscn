@@ -1,0 +1,137 @@
+[gd_scene load_steps=4 format=3 uid="uid://bqq0ebrjvlfoa"]
+
+[ext_resource type="FontFile" uid="uid://hc2tye8vkoey" path="res://assets/fonts/PressStart2P-Regular.ttf" id="1_font"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Background"]
+bg_color = Color(0, 0, 0, 0.7)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Panel"]
+bg_color = Color(0.0117647, 0.0117647, 0.0313726, 0.95)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.4, 0.8, 1.0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Button"]
+bg_color = Color(0.227451, 0.117647, 0.431373, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.3137255, 0.2509804, 0.4705882, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ButtonHover"]
+bg_color = Color(0.305882, 0.168627, 0.564706, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.3137255, 0.2509804, 0.4705882, 1)
+
+[node name="SettingsOverlay" type="ColorRect"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0)
+theme_override_styles/panel = SubResource("StyleBoxFlat_Background")
+
+[node name="Center" type="CenterContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(600, 400)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_Panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="Center/Panel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="Center/Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1.0, 1)
+theme_override_fonts/font = ExtResource("1_font")
+theme_override_font_sizes/font_size = 28
+text = "НАСТРОЙКИ"
+horizontal_alignment = 1
+
+[node name="SoundSection" type="VBoxContainer" parent="Center/Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SoundLabel" type="Label" parent="Center/Panel/MarginContainer/VBox/SoundSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.756863, 0.564706, 0.87451, 1)
+theme_override_fonts/font = ExtResource("1_font")
+theme_override_font_sizes/font_size = 16
+text = "Громкость звуков:"
+
+[node name="SoundSlider" type="HSlider" parent="Center/Panel/MarginContainer/VBox/SoundSection"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+min_value = 0.0
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="MusicSection" type="VBoxContainer" parent="Center/Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MusicLabel" type="Label" parent="Center/Panel/MarginContainer/VBox/MusicSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.756863, 0.564706, 0.87451, 1)
+theme_override_fonts/font = ExtResource("1_font")
+theme_override_font_sizes/font_size = 16
+text = "Громкость музыки:"
+
+[node name="MusicSlider" type="HSlider" parent="Center/Panel/MarginContainer/VBox/MusicSection"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+min_value = 0.0
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="Spacer" type="Control" parent="Center/Panel/MarginContainer/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ButtonsBox" type="HBoxContainer" parent="Center/Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="BtnBack" type="Button" parent="Center/Panel/MarginContainer/VBox/ButtonsBox"]
+custom_minimum_size = Vector2(150, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("1_font")
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_Button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ButtonHover")
+text = "НАЗАД"
+
+[node name="BtnMainMenu" type="Button" parent="Center/Panel/MarginContainer/VBox/ButtonsBox"]
+custom_minimum_size = Vector2(150, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("1_font")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_Button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ButtonHover")
+text = "ГЛАВНОЕ МЕНЮ"

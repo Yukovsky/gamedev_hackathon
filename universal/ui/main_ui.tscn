@@ -7,6 +7,11 @@
 [ext_resource type="Texture2D" uid="uid://drcm1po4v7167" path="res://assets/ui_icons/metal_coin_pixel.svg" id="10_coin"]
 [ext_resource type="Texture2D" uid="uid://dtiqtu2hqaipc" path="res://assets/ui_icons/shop_basket_pixel.svg" id="11_basket"]
 [ext_resource type="Script" path="res://ui/metal_max_notice_stack.gd" id="12_metal_notice_stack"]
+[ext_resource type="Script" path="res://ui/build_mode_controller.gd" id="13_build_mode_controller"]
+[ext_resource type="Script" path="res://ui/settings_overlay_controller.gd" id="14_settings_overlay_controller"]
+
+[sub_resource type="PackedScene" id="SettingsOverlay"]
+path = "res://ui/settings_overlay.tscn"
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_TopHeader"]
 bg_color = Color(0.0117647, 0.0117647, 0.0313726, 0.901961)
@@ -287,19 +292,18 @@ stretch_margin_bottom = 2
 texture_under = ExtResource("8_bar_under")
 texture_progress = ExtResource("9_bar_fill")
 
-[node name="BtnShop" type="Button" parent="MarginContainer/VBoxContainer/TopHeader/HeaderPadding/TopPanel" unique_id=788802664]
+[node name="BtnSettings" type="Button" parent="MarginContainer/VBoxContainer/TopHeader/HeaderPadding/TopPanel" unique_id=788802664]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(180, 100)
+custom_minimum_size = Vector2(100, 100)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_hlo7n")
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 28
 theme_override_styles/normal = SubResource("StyleBoxFlat_BtnShop")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnShopHover")
 theme_override_styles/hover = SubResource("StyleBoxFlat_BtnShopHover")
-text = "ЦЕХ"
-icon = ExtResource("11_basket")
+text = "⚙"
 
 [node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer" unique_id=327372049]
 layout_mode = 2
@@ -886,3 +890,307 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_ScreenInner")
+
+[node name="BottomNavigationPanel" type="PanelContainer" parent="." unique_id=1804509103]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -120.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_BottomPanel")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BottomPanel"]
+bg_color = Color(0.0117647, 0.0117647, 0.0313726, 0.95)
+border_width_bottom = 0
+border_width_left = 4
+border_width_right = 4
+border_width_top = 10
+border_color = Color(0.3137255, 0.2509804, 0.4705882, 1)
+
+[node name="Margin" type="MarginContainer" parent="BottomNavigationPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 12
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BottomNavigationPanel/Margin"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 16
+
+[node name="NavBtn0" type="Button" parent="BottomNavigationPanel/Margin/HBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_hlo7n")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_NavBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_NavBtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_NavBtnPressed")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_NavBtnDisabled")
+text = "⬆"
+
+[node name="NavBtn1" type="Button" parent="BottomNavigationPanel/Margin/HBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_hlo7n")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_NavBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_NavBtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_NavBtnPressed")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_NavBtnDisabled")
+text = "🛡"
+
+[node name="NavBtn2" type="Button" parent="BottomNavigationPanel/Margin/HBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_hlo7n")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_NavBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_NavBtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_NavBtnPressed")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_NavBtnDisabled")
+text = "🚀"
+
+[node name="NavBtn3" type="Button" parent="BottomNavigationPanel/Margin/HBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_hlo7n")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_NavBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_NavBtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_NavBtnPressed")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_NavBtnDisabled")
+text = "⚙"
+
+[node name="NavBtn4" type="Button" parent="BottomNavigationPanel/Margin/HBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_hlo7n")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_NavBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_NavBtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_NavBtnPressed")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_NavBtnDisabled")
+text = "🌳"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_NavBtn"]
+bg_color = Color(0.1, 0.1, 0.2, 0.8)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.439216, 0.25098, 0.690196, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_NavBtnHover"]
+bg_color = Color(0.2, 0.2, 0.3, 1.0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.756863, 0.564706, 0.87451, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_NavBtnPressed"]
+bg_color = Color(0.3, 0.3, 0.4, 1.0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.815686, 0.627451, 0.941176, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_NavBtnDisabled"]
+bg_color = Color(0.05, 0.05, 0.1, 0.5)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.3, 0.3, 0.3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BuildPanel"]
+bg_color = Color(0.0117647, 0.0117647, 0.0313726, 0.95)
+border_width_left = 0
+border_width_top = 0
+border_width_right = 0
+border_width_bottom = 4
+border_color = Color(0.4, 0.8, 1.0, 0.8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Panel"]
+bg_color = Color(0.0117647, 0.0117647, 0.0313726, 0.95)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.4, 0.8, 1.0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Button"]
+bg_color = Color(0.227451, 0.117647, 0.431373, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.3137255, 0.2509804, 0.4705882, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ButtonHover"]
+bg_color = Color(0.305882, 0.168627, 0.564706, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.3137255, 0.2509804, 0.4705882, 1)
+
+[node name="BuildModeTopPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 80.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_BuildPanel")
+visible = false
+
+[node name="MarginContainer" type="MarginContainer" parent="BuildModeTopPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 12
+
+[node name="Content" type="HBoxContainer" parent="BuildModeTopPanel/MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="StatLabel" type="Label" parent="BuildModeTopPanel/MarginContainer/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1.0, 1)
+theme_override_fonts/font = ExtResource("2_hlo7n")
+theme_override_font_sizes/font_size = 24
+text = "Металл/сек +"
+text_overrun_behavior = 2
+
+[node name="StatValue" type="Label" parent="BuildModeTopPanel/MarginContainer/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 1.0, 0.4, 1)
+theme_override_fonts/font = ExtResource("2_hlo7n")
+theme_override_font_sizes/font_size = 24
+text = "5"
+custom_minimum_size = Vector2(100, 0)
+text_overrun_behavior = 2
+
+[node name="BuildModeController" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("13_build_mode_controller")
+
+[node name="SettingsOverlay" type="ColorRect" parent="."]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7)
+script = ExtResource("14_settings_overlay_controller")
+
+[node name="Center" type="CenterContainer" parent="SettingsOverlay"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="SettingsOverlay/Center"]
+custom_minimum_size = Vector2(600, 400)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_Panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="SettingsOverlay/Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="SettingsOverlay/Center/Panel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="SettingsOverlay/Center/Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1.0, 1)
+theme_override_fonts/font = ExtResource("2_hlo7n")
+theme_override_font_sizes/font_size = 28
+text = "НАСТРОЙКИ"
+horizontal_alignment = 1
+
+[node name="SoundSection" type="VBoxContainer" parent="SettingsOverlay/Center/Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SoundLabel" type="Label" parent="SettingsOverlay/Center/Panel/MarginContainer/VBox/SoundSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.756863, 0.564706, 0.87451, 1)
+theme_override_fonts/font = ExtResource("2_hlo7n")
+theme_override_font_sizes/font_size = 16
+text = "Громкость звуков:"
+
+[node name="SoundSlider" type="HSlider" parent="SettingsOverlay/Center/Panel/MarginContainer/VBox/SoundSection"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+min_value = 0.0
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="MusicSection" type="VBoxContainer" parent="SettingsOverlay/Center/Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MusicLabel" type="Label" parent="SettingsOverlay/Center/Panel/MarginContainer/VBox/MusicSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.756863, 0.564706, 0.87451, 1)
+theme_override_fonts/font = ExtResource("2_hlo7n")
+theme_override_font_sizes/font_size = 16
+text = "Громкость музыки:"
+
+[node name="MusicSlider" type="HSlider" parent="SettingsOverlay/Center/Panel/MarginContainer/VBox/MusicSection"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+min_value = 0.0
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="Spacer" type="Control" parent="SettingsOverlay/Center/Panel/MarginContainer/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ButtonsBox" type="HBoxContainer" parent="SettingsOverlay/Center/Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="BtnBack" type="Button" parent="SettingsOverlay/Center/Panel/MarginContainer/VBox/ButtonsBox"]
+custom_minimum_size = Vector2(150, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_hlo7n")
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_Button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ButtonHover")
+text = "НАЗАД"
+
+[node name="BtnMainMenu" type="Button" parent="SettingsOverlay/Center/Panel/MarginContainer/VBox/ButtonsBox"]
+custom_minimum_size = Vector2(150, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_hlo7n")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_Button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ButtonHover")
+text = "ГЛАВНОЕ МЕНЮ"

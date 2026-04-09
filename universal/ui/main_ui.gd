@@ -32,7 +32,7 @@ const CoreUpgradeControllerScript: Script = preload("res://ui/core_upgrade_contr
 @onready var btn_collector: Button = %BtnCollector
 @onready var btn_hull: Button = %BtnHull
 @onready var btn_turret: Button = %BtnTurret
-@onready var btn_shop: Button = %BtnShop
+@onready var btn_settings: Button = %BtnSettings
 @onready var btn_shop_exit: Button = %BtnShopExit
 @onready var btn_main_menu: Button = %BtnMainMenu
 @onready var shop_overlay: ColorRect = %ShopOverlay
@@ -56,6 +56,21 @@ var _shop_state: ShopStateController
 var _tutorial_focus: TutorialFocusController
 var _core_upgrade: CoreUpgradeController
 var _first_raider_focus_target_registered: bool = false
+
+# Навигация между экранами
+var _current_screen: int = 2  # Центральный экран (главный)
+var _swipe_start_pos: Vector2 = Vector2.ZERO
+var _is_swiping: bool = false
+const SWIPE_MIN_DISTANCE = 50.0
+
+# Сцены экранов
+var _screen_scenes: Dictionary = {
+	0: "res://ui/screen_0_upgrades.tscn",
+	1: "res://ui/screen_1_defense.tscn",
+	3: "res://ui/screen_3_automation.tscn",
+	4: "res://ui/screen_4_tech_tree.tscn"
+}
+var _loaded_screens: Dictionary = {}  # Кэш загруженных сцен
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -86,7 +101,7 @@ func _ready() -> void:
 	btn_collector.pressed.connect(_on_btn_collector_pressed)
 	btn_hull.pressed.connect(_on_btn_hull_pressed)
 	btn_turret.pressed.connect(_on_btn_turret_pressed)
-	btn_shop.pressed.connect(_on_btn_shop_pressed)
+	btn_settings.pressed.connect(_on_btn_settings_pressed)
 	btn_restart.pressed.connect(_on_btn_restart_pressed)
 	btn_shop_exit.pressed.connect(_on_btn_shop_exit_pressed)
 	btn_main_menu.pressed.connect(_on_btn_main_menu_pressed)
@@ -104,6 +119,9 @@ func _ready() -> void:
 	_set_shop_open(false, false)
 	end_overlay.visible = false
 	_set_confirm_exit_visible(false)
+	
+	# Инициализируем нижнюю панель навигации
+	_init_bottom_navigation()
 
 func _exit_tree() -> void:
 	if get_viewport() != null and get_viewport().size_changed.is_connected(_apply_safe_area):
@@ -201,6 +219,13 @@ func _on_btn_shop_pressed() -> void:
 	if _is_game_finished: return
 	AudioManager.play_ui_open()
 	_set_shop_open(not _is_shop_open(), true)
+
+func _on_btn_settings_pressed() -> void:
+	if _is_game_finished: return
+	AudioManager.play_ui_open()
+	var settings_overlay = find_child("SettingsOverlay", true, false)
+	if settings_overlay:
+		settings_overlay.toggle_visibility()
 
 func _set_shop_open(value: bool, sync_pause: bool) -> void:
 	if _shop_state != null:
@@ -301,7 +326,7 @@ func _register_tutorial_targets() -> void:
 	if _tutorial_focus == null:
 		return
 	_tutorial_focus.register_targets({
-		"shop_button": btn_shop,
+		"settings_button": btn_settings,
 		"hull": btn_hull,
 		"reactor": btn_reactor,
 		"collector": btn_collector,
@@ -384,3 +409,164 @@ func _get_focused_target_id() -> String:
 	if _tutorial_focus == null:
 		return ""
 	return _tutorial_focus.get_focused_target_id()
+
+# ============== НАВИГАЦИЯ И УПРАВЛЕНИЕ ЭКРАНАМИ ==============
+
+func _init_bottom_navigation() -> void:
+	"""Инициализирует нижнюю панель навигации и подключает обработчики свайпов."""
+	var nav_buttons = [
+		$BottomNavigationPanel/Margin/HBoxContainer/NavBtn0,
+		$BottomNavigationPanel/Margin/HBoxContainer/NavBtn1,
+		$BottomNavigationPanel/Margin/HBoxContainer/NavBtn2,
+		$BottomNavigationPanel/Margin/HBoxContainer/NavBtn3,
+		$BottomNavigationPanel/Margin/HBoxContainer/NavBtn4,
+	]
+	
+	for i in range(nav_buttons.size()):
+		var btn = nav_buttons[i]
+		if btn == null:
+			push_error("Navigation button %d not found" % i)
+			continue
+		
+		btn.pressed.connect(_on_nav_button_pressed.bind(i))
+	
+	_update_nav_button_states()
+
+func _on_nav_button_pressed(index: int) -> void:
+	"""Обработчик нажатия на кнопку нижней панели."""
+	if index < 0 or index > 4:
+		return
+	if index == 4:  # Экран дерева технологий недоступен
+		AudioManager.play_ui_error() if AudioManager else null
+		return
+	
+	_set_current_screen(index)
+
+func _input(event: InputEvent) -> void:
+	"""Обработка свайпов для навигации между экранами."""
+	if _is_game_finished:
+		return
+	
+	# Обработка начала свайпа
+	if event is InputEventScreenTouch or (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT):
+		if event.pressed:
+			_swipe_start_pos = event.position
+			_is_swiping = true
+		else:
+			if _is_swiping:
+				_handle_swipe_end(event.position)
+			_is_swiping = false
+
+func _handle_swipe_end(end_pos: Vector2) -> void:
+	"""Обрабатывает завершение свайпа и переключает экраны."""
+	var swipe_vector = end_pos - _swipe_start_pos
+	var horizontal_distance = swipe_vector.x
+	var vertical_distance = abs(swipe_vector.y)
+	
+	# Проверяем, что это горизонтальный свайп
+	if vertical_distance > abs(horizontal_distance):
+		return
+	
+	# Проверяем минимальное расстояние
+	if abs(horizontal_distance) < SWIPE_MIN_DISTANCE:
+		return
+	
+	# Определяем направление
+	if horizontal_distance > 0:  # Свайп вправо - предыдущий экран
+		_set_current_screen(_current_screen - 1)
+	else:  # Свайп влево - следующий экран
+		_set_current_screen(_current_screen + 1)
+
+func _set_current_screen(index: int) -> void:
+	"""Устанавливает текущий экран и обновляет UI."""
+	# Ограничиваем диапазон
+	index = clampi(index, 0, 4)
+	
+	# Проверяем доступность экрана 4
+	if index == 4:
+		return
+	
+	if index == _current_screen:
+		return
+	
+	_current_screen = index
+	# Сохраняем в метаданные для use в build_mode_controller
+	set_meta("_current_screen", _current_screen)
+	_update_nav_button_states()
+	_update_screen_visibility()
+
+func _update_nav_button_states() -> void:
+	"""Обновляет визуальное состояние кнопок нижней панели."""
+	var nav_buttons = [
+		$BottomNavigationPanel/Margin/HBoxContainer/NavBtn0,
+		$BottomNavigationPanel/Margin/HBoxContainer/NavBtn1,
+		$BottomNavigationPanel/Margin/HBoxContainer/NavBtn2,
+		$BottomNavigationPanel/Margin/HBoxContainer/NavBtn3,
+		$BottomNavigationPanel/Margin/HBoxContainer/NavBtn4,
+	]
+	
+	var active_color = Color(0.4, 0.8, 1.0, 1.0)  # Голубой
+	var inactive_color = Color(0.5, 0.5, 0.5, 0.7)  # Серый
+	var disabled_color = Color(0.3, 0.3, 0.3, 0.3)  # Темный серый
+	
+	for i in range(nav_buttons.size()):
+		var btn = nav_buttons[i]
+		if btn == null:
+			continue
+		
+		if i == 4:  # Экран дерева - всегда недоступен
+			btn.disabled = true
+			btn.self_modulate = disabled_color
+		elif i == _current_screen:
+			btn.disabled = false
+			btn.self_modulate = active_color
+		else:
+			btn.disabled = false
+			btn.self_modulate = inactive_color
+
+func _update_screen_visibility() -> void:
+	"""Обновляет видимость элементов в зависимости от текущего экрана."""
+	# Сначала скрываем все загруженные экраны
+	for screen_key in _loaded_screens.keys():
+		if _loaded_screens[screen_key] != null:
+			_loaded_screens[screen_key].visible = false
+	
+	# Скрываем основной контент
+	root_margin_container.visible = (_current_screen == 2)
+	shop_overlay.visible = (_current_screen == 2 and _is_shop_open())
+	
+	match _current_screen:
+		0:  # Экран Улучшения
+			_show_screen(0)
+		1:  # Экран Оборона
+			_show_screen(1)
+		2:  # Главный экран
+			pass  # Уже обработано выше
+		3:  # Экран Автоматизация
+			_show_screen(3)
+		4:  # Экран Дерево (недоступен)
+			_show_screen(4)
+
+func _show_screen(index: int) -> void:
+	"""Загружает и показывает экран с индексом index."""
+	if index not in _screen_scenes:
+		return
+	
+	# Если экран уже загружен, просто показываем его
+	if index in _loaded_screens and _loaded_screens[index] != null:
+		_loaded_screens[index].visible = true
+		return
+	
+	# Иначе загружаем сцену
+	var scene_path = _screen_scenes[index]
+	var scene = load(scene_path)
+	if scene == null:
+		push_error("Failed to load scene: " + scene_path)
+		return
+	
+	var instance = scene.instantiate()
+	# Добавляем в корень, чтобы он рисовался поверх всего
+	add_child(instance)
+	instance.z_index = 0  # Убеждаемся, что это не перекрывает UI
+	_loaded_screens[index] = instance
+	instance.visible = true

@@ -1,0 +1,140 @@
+[gd_scene load_steps=6 format=3 uid="uid://d0aj3s5xvpqj9"]
+
+[ext_resource type="Script" path="res://ui/purchase_card.gd" id="1_purchase_card"]
+[ext_resource type="FontFile" uid="uid://hc2tye8vkoey" path="res://assets/fonts/PressStart2P-Regular.ttf" id="2_font"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Header"]
+bg_color = Color(0.0117647, 0.0117647, 0.0313726, 0.901961)
+border_width_bottom = 10
+border_color = Color(0.3137255, 0.2509804, 0.4705882, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Item_Automation"]
+bg_color = Color(0.2, 0.15, 0.05, 0.8)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.9, 0.2, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ItemDisabled"]
+bg_color = Color(0.1, 0.075, 0.025, 0.5)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.5, 0.45, 0.1, 0.5)
+
+[node name="Screen3Automation" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 140
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Header" type="PanelContainer" parent="MarginContainer/VBox"]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_Header")
+
+[node name="HeaderMargin" type="MarginContainer" parent="MarginContainer/VBox/Header"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="HeaderHBox" type="HBoxContainer" parent="MarginContainer/VBox/Header/HeaderMargin"]
+layout_mode = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="MarginContainer/VBox/Header/HeaderMargin/HeaderHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.9, 0.2, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 32
+text = "АВТОМАТИЗАЦИЯ"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ItemsList" type="VBoxContainer" parent="MarginContainer/VBox/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Item0" type="PanelContainer" parent="MarginContainer/VBox/ScrollContainer/ItemsList"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_Item_Automation")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_ItemDisabled")
+script = ExtResource("1_purchase_card")
+module_type = "collector"
+item_name = "СБОРЩИК"
+item_description = "Собирает мусор автоматически"
+item_icon = "🔧"
+
+[node name="Margin" type="MarginContainer" parent="MarginContainer/VBox/ScrollContainer/ItemsList/Item0"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="HBox" type="HBoxContainer" parent="MarginContainer/VBox/ScrollContainer/ItemsList/Item0/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Icon" type="Label" parent="MarginContainer/VBox/ScrollContainer/ItemsList/Item0/Margin/HBox"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 32
+text = "🔧"
+horizontal_alignment = 1
+
+[node name="Content" type="VBoxContainer" parent="MarginContainer/VBox/ScrollContainer/ItemsList/Item0/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Name" type="Label" parent="MarginContainer/VBox/ScrollContainer/ItemsList/Item0/Margin/HBox/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.2, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 20
+text = "СБОРЩИК"
+
+[node name="Desc" type="Label" parent="MarginContainer/VBox/ScrollContainer/ItemsList/Item0/Margin/HBox/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.5, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "Собирает мусор автоматически"
+custom_minimum_size = Vector2(300, 0)
+autowrap_mode = 2
+
+[node name="Price" type="Label" parent="MarginContainer/VBox/ScrollContainer/ItemsList/Item0/Margin/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.941, 0.816, 0.125, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+text = "100 +"
