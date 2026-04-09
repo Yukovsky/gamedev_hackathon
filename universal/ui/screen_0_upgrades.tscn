@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://cx7u584k2a3q4" path="res://assets/ui_icons/metal_bar_under_pixel.svg" id="2_bar_under"]
 [ext_resource type="Texture2D" uid="uid://ds0shjt5ptmgg" path="res://assets/ui_icons/metal_bar_fill_pixel.svg" id="3_bar_fill"]
 [ext_resource type="Texture2D" uid="uid://drcm1po4v7167" path="res://assets/ui_icons/metal_coin_pixel.svg" id="4_coin"]
+[ext_resource type="Script" path="res://ui/purchase_card.gd" id="5_card"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_TopBar"]
 bg_color = Color(0.011, 0.011, 0.031, 0.9)
@@ -257,6 +258,11 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 160)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_Item")
+script = ExtResource("5_card")
+module_type = "hull"
+display_name = "КОРПУС"
+description = "+50 макс. металла"
+accent_color = Color(0.439, 0.251, 0.690, 1)
 
 [node name="CardButton" type="Button" parent="ScrollContainer/ItemList/MarginLeft/CoreSection/Item0"]
 layout_mode = 2
@@ -329,6 +335,11 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 160)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_Item")
+script = ExtResource("5_card")
+module_type = "reactor"
+display_name = "РЕАКТОР"
+description = "Питание модулей"
+accent_color = Color(0.439, 0.251, 0.690, 1)
 
 [node name="CardButton" type="Button" parent="ScrollContainer/ItemList/MarginLeft/CoreSection/Item1"]
 layout_mode = 2

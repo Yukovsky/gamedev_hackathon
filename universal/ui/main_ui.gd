@@ -43,6 +43,7 @@ const NAV_DISABLED_COLOR: Color = Color(0.3, 0.3, 0.3, 0.3)
 # --- Экранный контейнер ---
 @onready var screen_container: Control = %ScreenContainer
 @onready var screen_dark_bg: ColorRect = %ScreenDarkBg
+@onready var spacer: Control = %Spacer
 
 # --- Нижняя панель навигации ---
 @onready var bottom_nav_panel: PanelContainer = %BottomNavPanel
@@ -197,11 +198,13 @@ func _switch_to_screen(index: int, should_emit: bool = true) -> void:
 		# Экран игры — нет загружаемого контента, только HUD
 		top_header.visible = true and not _is_in_build_mode
 		screen_dark_bg.visible = false
+		spacer.visible = true
 	else:
 		# Загружаем/показываем экран магазина
 		_show_screen(index)
 		top_header.visible = false
 		screen_dark_bg.visible = true
+		spacer.visible = false
 
 	_update_nav_highlights()
 	if should_emit:
