@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://ds0shjt5ptmgg" path="res://assets/ui_icons/metal_bar_fill_pixel.svg" id="3_bar_fill"]
 [ext_resource type="Texture2D" uid="uid://drcm1po4v7167" path="res://assets/ui_icons/metal_coin_pixel.svg" id="4_coin"]
 [ext_resource type="Script" path="res://ui/purchase_card.gd" id="5_card"]
+[ext_resource type="Texture2D" path="res://assets/sprites/turret.png" id="6_turret"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_TopBar"]
 bg_color = Color(0.011, 0.011, 0.031, 0.9)
@@ -173,6 +174,7 @@ script = ExtResource("5_card")
 module_type = "turret"
 display_name = "ТУРЕЛЬ"
 description = "Стреляет по рейдерам"
+icon_texture = ExtResource("6_turret")
 accent_color = Color(0.95, 0.32, 0.18, 1)
 
 [node name="CardButton" type="Button" parent="ScrollContainer/ItemList/MarginLeft/Items/Item0"]

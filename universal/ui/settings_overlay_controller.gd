@@ -14,6 +14,8 @@ class_name SettingsOverlayController
 const TRAINING_SCENE: String = "res://ui/tutorial_first_call_mode.tscn"
 const START_MENU_SCENE: String = "res://ui/start_menu.tscn"
 
+var _was_paused_before: bool = false
+
 
 func _ready() -> void:
 	visible = false
@@ -41,12 +43,13 @@ func open() -> void:
 	sfx_slider.value = sfx_vol
 	_update_value_labels()
 	visible = true
+	_was_paused_before = get_tree().paused
 	get_tree().paused = true
 
 
 func close() -> void:
 	visible = false
-	get_tree().paused = false
+	get_tree().paused = _was_paused_before
 
 
 func _configure_slider(slider: HSlider) -> void:

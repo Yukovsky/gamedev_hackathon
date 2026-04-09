@@ -1,6 +1,7 @@
 extends CanvasLayer
-## Главный UI-контроллер игры — архитектура 5 экранов со свайп-навигацией.
+## Главный UI-контроллер игры — архитектура 5 экранов с навигацией по нижним кнопкам.
 ## Screen 0: Улучшения | Screen 1: Оборона | Screen 2: Игра | Screen 3: Автоматизация | Screen 4: Дерево (заблокирован).
+## Магазинные экраны ставят игру на паузу; возврат на экран 2 снимает паузу.
 ## Взаимодействует с игрой через Event Bus (GameEvents).
 
 const TutorialFocusControllerScript: Script = preload("res://ui/tutorial_focus_controller.gd")
@@ -15,7 +16,6 @@ const SCREEN_SCENES: Dictionary = {
 
 const SCREEN_COUNT: int = 5
 const DEFAULT_SCREEN: int = 2
-const SWIPE_THRESHOLD: float = 80.0
 
 const NAV_ICONS: Array[String] = ["⬆", "🛡", "🚀", "⚡", "🔬"]
 const NAV_ACTIVE_COLOR: Color = Color(0.4, 0.8, 1.0)
@@ -71,10 +71,6 @@ var _core_upgrade: RefCounted
 var _build_mode_panel: RefCounted
 var _first_raider_focus_target_registered: bool = false
 var _nav_buttons: Array[Button] = []
-
-# Свайп
-var _swipe_start_pos: Vector2 = Vector2.ZERO
-var _is_swiping: bool = false
 
 # Build mode — запоминаем откуда зашли
 var _pre_build_screen: int = DEFAULT_SCREEN
@@ -191,25 +187,32 @@ func _switch_to_screen(index: int, should_emit: bool = true) -> void:
 	_previous_screen = _current_screen
 	_current_screen = index
 
-	# Скрываем предыдущий загруженный экран
 	_hide_all_loaded_screens()
 
 	if index == 2:
 		# Экран игры — нет загружаемого контента, только HUD
-		top_header.visible = true and not _is_in_build_mode
+		top_header.visible = not _is_in_build_mode
 		screen_dark_bg.visible = false
 		spacer.visible = true
+		if metal_max_notice_stack != null:
+			metal_max_notice_stack.visible = true
+		# Снимаем паузу только если НЕ в режиме строительства
+		if not _is_in_build_mode:
+			get_tree().paused = false
 	else:
-		# Загружаем/показываем экран магазина
+		# Загружаем/показываем экран магазина — ставим игру на паузу
 		_show_screen(index)
 		top_header.visible = false
 		screen_dark_bg.visible = true
 		spacer.visible = false
+		if metal_max_notice_stack != null:
+			metal_max_notice_stack.visible = false
+		get_tree().paused = true
+		SaveManager.save_game()
 
 	_update_nav_highlights()
 	if should_emit:
 		GameEvents.screen_changed.emit(index)
-		# Совместимость с туториалом: переход на экраны 0-3 считается как "открытие магазина"
 		if index != 2:
 			GameEvents.shop_opened.emit()
 
@@ -225,6 +228,8 @@ func _show_screen(index: int) -> void:
 			return
 		var instance: Control = scene.instantiate() as Control
 		instance.name = "Screen_%d" % index
+		# Работают даже при паузе (магазинные экраны = паузa)
+		instance.process_mode = Node.PROCESS_MODE_ALWAYS
 		# Заполняем весь контейнер
 		instance.anchors_preset = Control.PRESET_FULL_RECT
 		instance.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -300,58 +305,6 @@ func _update_nav_highlights() -> void:
 		else:
 			btn.add_theme_color_override("font_color", NAV_INACTIVE_COLOR)
 			btn.disabled = false
-
-
-# ========== Свайп-навигация ==========
-
-func _input(event: InputEvent) -> void:
-	if _is_game_finished:
-		return
-	if settings_overlay and settings_overlay.visible:
-		return
-
-	if event is InputEventScreenTouch:
-		var touch: InputEventScreenTouch = event as InputEventScreenTouch
-		if touch.pressed:
-			_swipe_start_pos = touch.position
-			_is_swiping = true
-		elif _is_swiping:
-			_is_swiping = false
-			_handle_swipe(touch.position)
-
-	elif event is InputEventMouseButton:
-		var mb: InputEventMouseButton = event as InputEventMouseButton
-		if mb.button_index == MOUSE_BUTTON_LEFT:
-			if mb.pressed:
-				_swipe_start_pos = mb.position
-				_is_swiping = true
-			elif _is_swiping:
-				_is_swiping = false
-				_handle_swipe(mb.position)
-
-
-func _handle_swipe(end_pos: Vector2) -> void:
-	if _is_in_build_mode:
-		return
-
-	var delta: Vector2 = end_pos - _swipe_start_pos
-	if abs(delta.x) < SWIPE_THRESHOLD:
-		return
-	if abs(delta.y) > abs(delta.x) * 1.2:
-		return # Вертикальный жест — не свайп
-
-	if delta.x < 0:
-		# Свайп влево — следующий экран
-		var next: int = _current_screen + 1
-		if next == 4:
-			next = 3 # Пропускаем заблокированный
-		if next < 4:
-			_switch_to_screen(next)
-	else:
-		# Свайп вправо — предыдущий экран
-		var prev: int = _current_screen - 1
-		if prev >= 0:
-			_switch_to_screen(prev)
 
 
 # ========== HUD верхняя панель ==========
