@@ -264,7 +264,7 @@ mouse_filter = 2
 theme_override_constants/margin_left = 24
 theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 60
+theme_override_constants/margin_bottom = 160
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=270872879]
 layout_mode = 2
@@ -968,7 +968,7 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -120.0
+offset_top = -140.0
 grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 1
@@ -987,11 +987,11 @@ alignment = 1
 theme_override_constants/separation = 16
 
 [node name="NavBtn0" type="Button" parent="BottomNavigationPanel/Margin/HBoxContainer"]
-custom_minimum_size = Vector2(64, 64)
+custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_hlo7n")
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 48
 theme_override_styles/normal = SubResource("StyleBoxFlat_NavBtn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_NavBtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_NavBtnPressed")
@@ -999,11 +999,11 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_NavBtnDisabled")
 text = "⬆"
 
 [node name="NavBtn1" type="Button" parent="BottomNavigationPanel/Margin/HBoxContainer"]
-custom_minimum_size = Vector2(64, 64)
+custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_hlo7n")
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 48
 theme_override_styles/normal = SubResource("StyleBoxFlat_NavBtn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_NavBtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_NavBtnPressed")
@@ -1011,11 +1011,11 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_NavBtnDisabled")
 text = "🛡"
 
 [node name="NavBtn2" type="Button" parent="BottomNavigationPanel/Margin/HBoxContainer"]
-custom_minimum_size = Vector2(64, 64)
+custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_hlo7n")
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 48
 theme_override_styles/normal = SubResource("StyleBoxFlat_NavBtn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_NavBtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_NavBtnPressed")
@@ -1023,11 +1023,11 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_NavBtnDisabled")
 text = "🚀"
 
 [node name="NavBtn3" type="Button" parent="BottomNavigationPanel/Margin/HBoxContainer"]
-custom_minimum_size = Vector2(64, 64)
+custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_hlo7n")
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 48
 theme_override_styles/normal = SubResource("StyleBoxFlat_NavBtn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_NavBtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_NavBtnPressed")
@@ -1035,11 +1035,11 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_NavBtnDisabled")
 text = "⚙"
 
 [node name="NavBtn4" type="Button" parent="BottomNavigationPanel/Margin/HBoxContainer"]
-custom_minimum_size = Vector2(64, 64)
+custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_hlo7n")
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 48
 theme_override_styles/normal = SubResource("StyleBoxFlat_NavBtn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_NavBtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_NavBtnPressed")

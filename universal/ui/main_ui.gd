@@ -440,7 +440,8 @@ func _on_nav_button_pressed(index: int) -> void:
 	if index < 0 or index > 4:
 		return
 	if index == 4:  # Экран дерева технологий недоступен
-		AudioManager.play_ui_error() if AudioManager else null
+		if AudioManager:
+			AudioManager.play_ui_error()
 		return
 	
 	_set_current_screen(index)
@@ -448,6 +449,11 @@ func _on_nav_button_pressed(index: int) -> void:
 func _input(event: InputEvent) -> void:
 	"""Обработка свайпов для навигации между экранами."""
 	if _is_game_finished:
+		return
+	
+	# Блокируем свайпы если открыты настройки
+	var settings_overlay = find_child("SettingsOverlay", true, false)
+	if settings_overlay and settings_overlay.visible:
 		return
 	
 	# Обработка начала свайпа
