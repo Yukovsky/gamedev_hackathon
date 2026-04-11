@@ -21,6 +21,16 @@ const NAV_ICONS: Array[String] = ["⬆", "🛡", "🚀", "⚡", "🔬"]
 const NAV_ACTIVE_COLOR: Color = Color(0.4, 0.8, 1.0)
 const NAV_INACTIVE_COLOR: Color = Color(0.5, 0.4, 0.6, 0.6)
 const NAV_DISABLED_COLOR: Color = Color(0.3, 0.3, 0.3, 0.3)
+const NAV_ICON_COLORS: Array[Color] = [
+	Color(0.520, 0.430, 0.620), # Upgrades (dim purple)
+	Color(0.620, 0.340, 0.310), # Defense (dim red)
+	Color(0.340, 0.500, 0.620), # Main (dim cyan)
+	Color(0.620, 0.580, 0.320), # Automation (dim yellow)
+	Color(0.340, 0.310, 0.420), # Tech (disabled)
+]
+const NAV_ACTIVE_ALPHA: float = 0.92
+const NAV_INACTIVE_COLOR_NEUTRAL: Color = Color(0.53, 0.46, 0.64, 0.58)
+const NAV_DISABLED_COLOR_NEAR_BLACK: Color = Color(0.17, 0.14, 0.22, 0.24)
 
 @export var ui_base_margin_left: int = 24
 @export var ui_base_margin_top: int = 24
@@ -28,6 +38,15 @@ const NAV_DISABLED_COLOR: Color = Color(0.3, 0.3, 0.3, 0.3)
 @export var ui_base_margin_bottom: int = 24
 const NAV_BAR_HEIGHT: int = 180
 const NAV_CONTENT_GAP: int = 20
+
+# Маппинг tutorial target_id → индекс экрана для авто-переключения
+const TUTORIAL_TARGET_SCREENS: Dictionary = {
+	"hull": 0,
+	"reactor": 0,
+	"core": 0,
+	"turret": 1,
+	"collector": 3,
+}
 
 # --- Верхняя панель (Screen 2 HUD) ---
 @onready var top_header: PanelContainer = %TopHeader
@@ -111,6 +130,7 @@ func _ready() -> void:
 	GameEvents.tutorial_focus_changed.connect(_on_tutorial_focus_changed)
 	GameEvents.tutorial_focus_cleared.connect(_on_tutorial_focus_cleared)
 	GameEvents.tutorial_action_requested.connect(_on_tutorial_action_requested)
+	GameEvents.tutorial_session_ended.connect(_on_tutorial_session_ended)
 	GameEvents.raider_spawned.connect(_on_raider_spawned)
 	GameEvents.raider_destroyed.connect(_on_raider_destroyed)
 
@@ -281,6 +301,9 @@ func _wire_screen(index: int, screen: Control) -> void:
 	if index == 0:
 		_wire_screen_0(screen)
 
+	# Регистрируем элементы экрана как tutorial targets
+	_register_screen_tutorial_targets(index, screen)
+
 
 func _wire_screen_0(screen: Control) -> void:
 	var core_plaque: PanelContainer = screen.get_node_or_null("%CorePlaque") as PanelContainer
@@ -327,32 +350,45 @@ func _create_nav_styles() -> void:
 	_nav_style_inactive.set_border_width_all(3)
 
 	_nav_style_disabled = StyleBoxFlat.new()
-	_nav_style_disabled.bg_color = Color(0.060, 0.030, 0.120, 0.4)
-	_nav_style_disabled.border_color = Color(0.200, 0.180, 0.250, 0.3)
-	_nav_style_disabled.set_border_width_all(2)
+	_nav_style_disabled.bg_color = Color(0.120, 0.080, 0.200, 0.65)
+	_nav_style_disabled.border_color = Color(0.313, 0.250, 0.470, 0.6)
+	_nav_style_disabled.set_border_width_all(3)
 
 
 func _update_nav_highlights() -> void:
 	for i in range(_nav_buttons.size()):
 		var btn: Button = _nav_buttons[i]
+		var base_color: Color = NAV_ICON_COLORS[i]
 		if i == 4:
-			btn.add_theme_color_override("font_color", NAV_DISABLED_COLOR)
+			_apply_icon_tint(btn, Color(0.53, 0.46, 0.64, 0.62))
 			btn.add_theme_stylebox_override("normal", _nav_style_disabled)
 			btn.add_theme_stylebox_override("hover", _nav_style_disabled)
 			btn.add_theme_stylebox_override("pressed", _nav_style_disabled)
 			btn.disabled = true
 		elif i == _current_screen:
-			btn.add_theme_color_override("font_color", NAV_ACTIVE_COLOR)
+			var active_color: Color = base_color.lerp(Color(0.86, 0.82, 0.92), 0.22)
+			active_color.a = NAV_ACTIVE_ALPHA
+			_apply_icon_tint(btn, active_color)
 			btn.add_theme_stylebox_override("normal", _nav_style_active)
 			btn.add_theme_stylebox_override("hover", _nav_style_active)
 			btn.add_theme_stylebox_override("pressed", _nav_style_active)
 			btn.disabled = false
 		else:
-			btn.add_theme_color_override("font_color", NAV_INACTIVE_COLOR)
+			var inactive_color: Color = base_color.lerp(NAV_INACTIVE_COLOR_NEUTRAL, 0.72)
+			inactive_color.a = NAV_INACTIVE_COLOR_NEUTRAL.a
+			_apply_icon_tint(btn, inactive_color)
 			btn.add_theme_stylebox_override("normal", _nav_style_inactive)
 			btn.add_theme_stylebox_override("hover", _nav_style_inactive)
 			btn.add_theme_stylebox_override("pressed", _nav_style_inactive)
 			btn.disabled = false
+
+
+func _apply_icon_tint(btn: Button, color: Color) -> void:
+	btn.add_theme_color_override("icon_normal_color", color)
+	btn.add_theme_color_override("icon_hover_color", color)
+	btn.add_theme_color_override("icon_pressed_color", color)
+	btn.add_theme_color_override("icon_focus_color", color)
+	btn.add_theme_color_override("icon_disabled_color", color)
 
 
 # ========== HUD верхняя панель ==========
@@ -514,6 +550,41 @@ func _register_tutorial_targets() -> void:
 	_tutorial_focus.register_targets({
 		"settings_button": btn_settings,
 	})
+	# Кнопка навигации «Улучшения» — это вход в ЦЕХ для tutorial
+	if _nav_buttons.size() >= 4:
+		_tutorial_focus.register_target("shop_button", _nav_buttons[0])
+
+
+func _register_screen_tutorial_targets(index: int, screen: Control) -> void:
+	if _tutorial_focus == null:
+		return
+	# Регистрируем PurchaseCard по module_type
+	_register_purchase_cards_recursive(screen)
+	# CorePlaque на Screen 0
+	if index == 0:
+		var core_plaque: PanelContainer = screen.get_node_or_null("%CorePlaque") as PanelContainer
+		if core_plaque != null:
+			_tutorial_focus.register_target("core", core_plaque)
+
+
+func _register_purchase_cards_recursive(parent: Node) -> void:
+	for child in parent.get_children():
+		if child is PurchaseCard:
+			var card: PurchaseCard = child as PurchaseCard
+			if not card.module_type.is_empty():
+				_tutorial_focus.register_target(card.module_type, card)
+		if child.get_child_count() > 0:
+			_register_purchase_cards_recursive(child)
+
+
+func _ensure_tutorial_target_screen(target_id: String) -> void:
+	if not TUTORIAL_TARGET_SCREENS.has(target_id):
+		return
+	var target_screen: int = TUTORIAL_TARGET_SCREENS[target_id] as int
+	if _current_screen == target_screen:
+		return
+	# Переключаем экран без эмита сигналов (чтобы не триггерить side-effects)
+	_switch_to_screen(target_screen, false)
 
 
 func _on_raider_spawned(_position: Vector2) -> void:
@@ -571,6 +642,8 @@ func _register_first_raider_focus_target() -> void:
 
 
 func _on_tutorial_focus_changed(target_id: String, accent_color: Color, _allow_interaction: bool) -> void:
+	# Авто-переключение на нужный экран перед фокусировкой
+	_ensure_tutorial_target_screen(target_id)
 	if _tutorial_focus != null:
 		_tutorial_focus.focus_target(target_id, accent_color)
 
@@ -586,6 +659,16 @@ func _on_tutorial_action_requested(action_id: String) -> void:
 			_switch_to_screen(0)
 		"buy_hull":
 			_switch_to_screen(0)
+
+
+func _on_tutorial_session_ended() -> void:
+	# Пересинхронизируем паузу после закрытия tutorial-окна:
+	# экран мог измениться во время обучения.
+	if _current_screen == 2:
+		if not _is_in_build_mode:
+			get_tree().paused = false
+	else:
+		get_tree().paused = true
 
 
 func _get_focused_target_id() -> String:

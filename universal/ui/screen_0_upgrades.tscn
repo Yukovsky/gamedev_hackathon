@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://ds0shjt5ptmgg" path="res://assets/ui_icons/metal_bar_fill_pixel.svg" id="3_bar_fill"]
 [ext_resource type="Texture2D" uid="uid://drcm1po4v7167" path="res://assets/ui_icons/metal_coin_pixel.svg" id="4_coin"]
 [ext_resource type="Script" path="res://ui/purchase_card.gd" id="5_card"]
+[ext_resource type="Texture2D" uid="uid://bpiovtldlxo57" path="res://assets/ui_icons/configuration.png" id="8_settings"]
 [ext_resource type="Texture2D" path="res://assets/sprites/hull.png" id="6_hull"]
 [ext_resource type="Texture2D" path="res://assets/sprites/reactor.png" id="7_reactor"]
 
@@ -19,7 +20,7 @@ border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.439, 0.251, 0.690, 1)
+border_color = Color(0.314, 0.251, 0.471, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_SettingsBtnHover"]
 bg_color = Color(0.306, 0.169, 0.565, 1)
@@ -27,7 +28,7 @@ border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.439, 0.251, 0.690, 1)
+border_color = Color(0.314, 0.251, 0.471, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Item"]
 bg_color = Color(0.039, 0.020, 0.125, 1.0)
@@ -114,23 +115,23 @@ texture_progress = ExtResource("3_bar_fill")
 
 [node name="BtnSettings" type="Button" parent="TopBar/TopBarMargin/TopBarHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(80, 80)
+custom_minimum_size = Vector2(120, 100)
 layout_mode = 2
 size_flags_vertical = 4
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_fonts/font = ExtResource("1_font")
-theme_override_font_sizes/font_size = 32
+theme_override_colors/icon_normal_color = Color(0.60, 0.56, 0.68, 0.78)
+theme_override_constants/icon_max_width = 85
 theme_override_styles/normal = SubResource("StyleBoxFlat_SettingsBtn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_SettingsBtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_SettingsBtnHover")
-text = "⚙"
+icon = ExtResource("8_settings")
+icon_alignment = 1
 
 [node name="ScreenTitle" type="Label" parent="."]
-custom_minimum_size = Vector2(0, 60)
+custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.439, 0.251, 0.690, 1)
 theme_override_fonts/font = ExtResource("1_font")
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 40
 text = "УЛУЧШЕНИЯ"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -158,12 +159,11 @@ theme_override_constants/separation = 10
 layout_mode = 2
 theme_override_colors/font_color = Color(0.616, 0.478, 0.737, 1)
 theme_override_fonts/font = ExtResource("1_font")
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 text = "ЯДРО"
 
 [node name="CorePlaque" type="PanelContainer" parent="ScrollContainer/ItemList/MarginLeft/CoreSection"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_Item")
 
@@ -205,6 +205,14 @@ theme_override_fonts/font = ExtResource("1_font")
 theme_override_font_sizes/font_size = 20
 text = "УРОВЕНЬ 0 / 5"
 
+[node name="CoreDescLabel" type="Label" parent="ScrollContainer/ItemList/MarginLeft/CoreSection/CorePlaque/CoreMargin/CoreVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.616, 0.478, 0.737, 1)
+theme_override_fonts/font = ExtResource("1_font")
+theme_override_font_sizes/font_size = 20
+text = "НАДЯ: каждый уровень ядра усиливает сканеры. Металла с обломков становится больше. Апгрейд рекомендован."
+autowrap_mode = 2
+
 [node name="CoreUpgradeBtn" type="Button" parent="ScrollContainer/ItemList/MarginLeft/CoreSection/CorePlaque/CoreMargin/CoreVBox"]
 unique_name_in_owner = true
 visible = false
@@ -240,18 +248,17 @@ size_flags_horizontal = 3
 layout_mode = 2
 theme_override_colors/font_color = Color(0.616, 0.478, 0.737, 1)
 theme_override_fonts/font = ExtResource("1_font")
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 text = "ХРАНИЛИЩЕ"
 
 [node name="Item0" type="PanelContainer" parent="ScrollContainer/ItemList/MarginLeft/CoreSection"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 160)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_Item")
 script = ExtResource("5_card")
 module_type = "hull"
 display_name = "КОРПУС"
-description = "+50 макс. металла"
+description = "НАДЯ: новые переборки расширяют грузовые трюмы. +100 к максимуму металла. Без корпуса — просто летающий хлам."
 icon_texture = ExtResource("6_hull")
 accent_color = Color(0.439, 0.251, 0.690, 1)
 
@@ -293,15 +300,15 @@ theme_override_constants/separation = 8
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.8, 0.3, 1)
 theme_override_fonts/font = ExtResource("1_font")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 28
 text = "КОРПУС"
 
 [node name="DescLabel" type="Label" parent="ScrollContainer/ItemList/MarginLeft/CoreSection/Item0/ItemMargin/ItemHBox/InfoVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.616, 0.478, 0.737, 1)
 theme_override_fonts/font = ExtResource("1_font")
-theme_override_font_sizes/font_size = 16
-text = "+50 макс. металла"
+theme_override_font_sizes/font_size = 20
+text = "НАДЯ: новые переборки расширяют грузовые трюмы. +100 к максимуму металла. Без корпуса — просто летающий хлам."
 autowrap_mode = 2
 
 [node name="PriceLabel" type="Label" parent="ScrollContainer/ItemList/MarginLeft/CoreSection/Item0/ItemMargin/ItemHBox"]
@@ -310,7 +317,7 @@ layout_mode = 2
 size_flags_vertical = 4
 theme_override_colors/font_color = Color(0.941, 0.816, 0.125, 1)
 theme_override_fonts/font = ExtResource("1_font")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 28
 text = "75 ⬡"
 horizontal_alignment = 2
 
@@ -318,18 +325,17 @@ horizontal_alignment = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.616, 0.478, 0.737, 1)
 theme_override_fonts/font = ExtResource("1_font")
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 text = "ЭНЕРГИЯ"
 
 [node name="Item1" type="PanelContainer" parent="ScrollContainer/ItemList/MarginLeft/CoreSection"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 160)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_Item")
 script = ExtResource("5_card")
 module_type = "reactor"
 display_name = "РЕАКТОР"
-description = "Питание модулей"
+description = "НАДЯ: поле питания охватывает соседние ячейки — только там возможна постройка. ЗАПРЕЩЕНО: два реактора или ядро в одной зоне питания."
 icon_texture = ExtResource("7_reactor")
 accent_color = Color(0.439, 0.251, 0.690, 1)
 
@@ -371,15 +377,15 @@ theme_override_constants/separation = 8
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.74, 0.2, 1)
 theme_override_fonts/font = ExtResource("1_font")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 28
 text = "РЕАКТОР"
 
 [node name="DescLabel" type="Label" parent="ScrollContainer/ItemList/MarginLeft/CoreSection/Item1/ItemMargin/ItemHBox/InfoVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.616, 0.478, 0.737, 1)
 theme_override_fonts/font = ExtResource("1_font")
-theme_override_font_sizes/font_size = 16
-text = "Питание модулей"
+theme_override_font_sizes/font_size = 20
+text = "НАДЯ: поле питания охватывает соседние ячейки — только там возможна постройка. ЗАПРЕЩЕНО: два реактора или ядро в одной зоне питания."
 autowrap_mode = 2
 
 [node name="PriceLabel" type="Label" parent="ScrollContainer/ItemList/MarginLeft/CoreSection/Item1/ItemMargin/ItemHBox"]
@@ -388,7 +394,7 @@ layout_mode = 2
 size_flags_vertical = 4
 theme_override_colors/font_color = Color(0.941, 0.816, 0.125, 1)
 theme_override_fonts/font = ExtResource("1_font")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 28
 text = "350 ⬡"
 horizontal_alignment = 2
 

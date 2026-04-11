@@ -155,6 +155,10 @@ signal tutorial_target_rect_changed(target_id: String, target_rect: Rect2)
 ## @param action_id: ID действия (например: "open_shop", "buy_hull").
 signal tutorial_action_requested(action_id: String)
 
+## Туториальная сессия (диалоговое окно) закрылась.
+## UI может пересинхронизировать состояние паузы.
+signal tutorial_session_ended
+
 # ========== Сигналы сохранения ==========
 
 ## Запрос на сохранение игры.

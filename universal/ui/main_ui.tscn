@@ -7,6 +7,12 @@
 [ext_resource type="Texture2D" uid="uid://drcm1po4v7167" path="res://assets/ui_icons/metal_coin_pixel.svg" id="10_coin"]
 [ext_resource type="Script" uid="uid://sx4xvjnc5gti" path="res://ui/metal_max_notice_stack.gd" id="12_metal_notice_stack"]
 [ext_resource type="PackedScene" uid="uid://bflxbhe7oogw5" path="res://ui/settings_overlay.tscn" id="14_settings"]
+[ext_resource type="Texture2D" uid="uid://c2fbaykvu6ame" path="res://assets/ui_icons/screen1_icon.png" id="15_nav0"]
+[ext_resource type="Texture2D" uid="uid://cyia1y7qhwpjw" path="res://assets/ui_icons/screen2_icon.png" id="16_nav1"]
+[ext_resource type="Texture2D" uid="uid://dyf33gne62tl3" path="res://assets/ui_icons/screen3_icon.png" id="17_nav2"]
+[ext_resource type="Texture2D" uid="uid://dvywshofu8g8s" path="res://assets/ui_icons/screen4_icon.png" id="18_nav3"]
+[ext_resource type="Texture2D" uid="uid://cjlhs637vrs0v" path="res://assets/ui_icons/screen5_icon.png" id="19_nav4"]
+[ext_resource type="Texture2D" uid="uid://bpiovtldlxo57" path="res://assets/ui_icons/configuration.png" id="20_settings"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_TopHeader"]
 bg_color = Color(0.0117647, 0.0117647, 0.0313726, 0.901961)
@@ -234,13 +240,13 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 100)
 layout_mode = 2
 size_flags_vertical = 4
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_fonts/font = ExtResource("2_hlo7n")
-theme_override_font_sizes/font_size = 42
+theme_override_colors/icon_normal_color = Color(0.60, 0.56, 0.68, 0.78)
+theme_override_constants/icon_max_width = 85
 theme_override_styles/normal = SubResource("StyleBoxFlat_BtnSettings")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_BtnSettingsHover")
 theme_override_styles/hover = SubResource("StyleBoxFlat_BtnSettingsHover")
-text = "⚙"
+icon = ExtResource("20_settings")
+icon_alignment = 1
 
 [node name="BuildModeTopPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=111562817]
 unique_name_in_owner = true
@@ -305,10 +311,10 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -204.0
-offset_bottom = -24.0
 offset_left = 24.0
+offset_top = -204.0
 offset_right = -24.0
+offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_BottomNav")
@@ -337,62 +343,46 @@ alignment = 1
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.5, 0.4, 0.6, 0.6)
-theme_override_fonts/font = ExtResource("2_hlo7n")
-theme_override_font_sizes/font_size = 34
-theme_override_styles/normal = SubResource("StyleBoxFlat_NavBtn")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_NavBtnHover")
-theme_override_styles/hover = SubResource("StyleBoxFlat_NavBtnHover")
-text = "⬆"
+theme_override_constants/icon_max_width = 85
+icon = ExtResource("15_nav0")
+theme_override_colors/icon_normal_color = Color(0.53, 0.46, 0.64, 0.58)
+icon_alignment = 1
 
 [node name="Nav1" type="Button" parent="BottomNavPanel/NavPadding/NavButtonsContainer" unique_id=1826953195]
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.5, 0.4, 0.6, 0.6)
-theme_override_fonts/font = ExtResource("2_hlo7n")
-theme_override_font_sizes/font_size = 34
-theme_override_styles/normal = SubResource("StyleBoxFlat_NavBtn")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_NavBtnHover")
-theme_override_styles/hover = SubResource("StyleBoxFlat_NavBtnHover")
-text = "🛡"
+theme_override_constants/icon_max_width = 85
+icon = ExtResource("16_nav1")
+theme_override_colors/icon_normal_color = Color(0.53, 0.46, 0.64, 0.58)
+icon_alignment = 1
 
 [node name="Nav2" type="Button" parent="BottomNavPanel/NavPadding/NavButtonsContainer" unique_id=628256596]
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
-theme_override_fonts/font = ExtResource("2_hlo7n")
-theme_override_font_sizes/font_size = 34
-theme_override_styles/normal = SubResource("StyleBoxFlat_NavBtn")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_NavBtnHover")
-theme_override_styles/hover = SubResource("StyleBoxFlat_NavBtnHover")
-text = "🚀"
+theme_override_constants/icon_max_width = 85
+icon = ExtResource("17_nav2")
+theme_override_colors/icon_normal_color = Color(0.53, 0.46, 0.64, 0.58)
+icon_alignment = 1
 
 [node name="Nav3" type="Button" parent="BottomNavPanel/NavPadding/NavButtonsContainer" unique_id=1333601726]
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.5, 0.4, 0.6, 0.6)
-theme_override_fonts/font = ExtResource("2_hlo7n")
-theme_override_font_sizes/font_size = 34
-theme_override_styles/normal = SubResource("StyleBoxFlat_NavBtn")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_NavBtnHover")
-theme_override_styles/hover = SubResource("StyleBoxFlat_NavBtnHover")
-text = "⚡"
+theme_override_constants/icon_max_width = 85
+icon = ExtResource("18_nav3")
+theme_override_colors/icon_normal_color = Color(0.53, 0.46, 0.64, 0.58)
+icon_alignment = 1
 
 [node name="Nav4" type="Button" parent="BottomNavPanel/NavPadding/NavButtonsContainer" unique_id=1253334]
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.3, 0.3, 0.3, 0.3)
-theme_override_fonts/font = ExtResource("2_hlo7n")
-theme_override_font_sizes/font_size = 34
-theme_override_styles/normal = SubResource("StyleBoxFlat_NavBtn")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_NavBtnHover")
-theme_override_styles/hover = SubResource("StyleBoxFlat_NavBtnHover")
-disabled = true
-text = "🔬"
+theme_override_constants/icon_max_width = 85
+icon = ExtResource("19_nav4")
+theme_override_colors/icon_normal_color = Color(0.53, 0.46, 0.64, 0.62)
+icon_alignment = 1
 
 [node name="SettingsOverlay" parent="." unique_id=2064851856 instance=ExtResource("14_settings")]
 unique_name_in_owner = true

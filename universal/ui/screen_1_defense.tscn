@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://ds0shjt5ptmgg" path="res://assets/ui_icons/metal_bar_fill_pixel.svg" id="3_bar_fill"]
 [ext_resource type="Texture2D" uid="uid://drcm1po4v7167" path="res://assets/ui_icons/metal_coin_pixel.svg" id="4_coin"]
 [ext_resource type="Script" path="res://ui/purchase_card.gd" id="5_card"]
+[ext_resource type="Texture2D" uid="uid://bpiovtldlxo57" path="res://assets/ui_icons/configuration.png" id="8_settings"]
 [ext_resource type="Texture2D" path="res://assets/sprites/turret.png" id="6_turret"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_TopBar"]
@@ -18,7 +19,7 @@ border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.95, 0.32, 0.18, 1)
+border_color = Color(0.314, 0.251, 0.471, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_SettingsBtnHover"]
 bg_color = Color(0.306, 0.169, 0.565, 1)
@@ -26,7 +27,7 @@ border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.95, 0.32, 0.18, 1)
+border_color = Color(0.314, 0.251, 0.471, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Item_Defense"]
 bg_color = Color(0.039, 0.020, 0.125, 1.0)
@@ -113,23 +114,23 @@ texture_progress = ExtResource("3_bar_fill")
 
 [node name="BtnSettings" type="Button" parent="TopBar/TopBarMargin/TopBarHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(80, 80)
+custom_minimum_size = Vector2(120, 100)
 layout_mode = 2
 size_flags_vertical = 4
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_fonts/font = ExtResource("1_font")
-theme_override_font_sizes/font_size = 32
+theme_override_colors/icon_normal_color = Color(0.60, 0.56, 0.68, 0.78)
+theme_override_constants/icon_max_width = 85
 theme_override_styles/normal = SubResource("StyleBoxFlat_SettingsBtn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_SettingsBtnHover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_SettingsBtnHover")
-text = "⚙"
+icon = ExtResource("8_settings")
+icon_alignment = 1
 
 [node name="ScreenTitle" type="Label" parent="."]
-custom_minimum_size = Vector2(0, 60)
+custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.32, 0.18, 1)
 theme_override_fonts/font = ExtResource("1_font")
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 40
 text = "ОБОРОНА"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -155,13 +156,12 @@ theme_override_constants/separation = 14
 
 [node name="Item0" type="PanelContainer" parent="ScrollContainer/ItemList/MarginLeft/Items"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 160)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_Item_Defense")
 script = ExtResource("5_card")
 module_type = "turret"
 display_name = "ТУРЕЛЬ"
-description = "Стреляет по рейдерам"
+description = "НАДЯ: автономная орудийная платформа. Обнаруживает и уничтожает входящие угрозы. Рейдерам не нравится. Мне нравится."
 icon_texture = ExtResource("6_turret")
 accent_color = Color(0.95, 0.32, 0.18, 1)
 
@@ -203,15 +203,15 @@ theme_override_constants/separation = 8
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.32, 0.18, 1)
 theme_override_fonts/font = ExtResource("1_font")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 28
 text = "ТУРЕЛЬ"
 
 [node name="DescLabel" type="Label" parent="ScrollContainer/ItemList/MarginLeft/Items/Item0/ItemMargin/ItemHBox/InfoVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.616, 0.478, 0.737, 1)
 theme_override_fonts/font = ExtResource("1_font")
-theme_override_font_sizes/font_size = 16
-text = "Стреляет по рейдерам"
+theme_override_font_sizes/font_size = 20
+text = "НАДЯ: автономная орудийная платформа. Обнаруживает и уничтожает входящие угрозы. Рейдерам не нравится. Мне нравится."
 autowrap_mode = 2
 
 [node name="PriceLabel" type="Label" parent="ScrollContainer/ItemList/MarginLeft/Items/Item0/ItemMargin/ItemHBox"]
@@ -220,7 +220,7 @@ layout_mode = 2
 size_flags_vertical = 4
 theme_override_colors/font_color = Color(0.941, 0.816, 0.125, 1)
 theme_override_fonts/font = ExtResource("1_font")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 28
 text = "240 ⬡"
 horizontal_alignment = 2
 
